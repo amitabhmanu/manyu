@@ -1,0 +1,32 @@
+{
+  "schema_version": "manyu.profile.v0.1",
+  "profile_id": "default",
+  "agent_id": "agent_demo",
+  "emotions": {
+    "fear": {"baseline": 0.08, "half_life_s": 900, "max_delta_per_event": 0.35},
+    "anger": {"baseline": 0.05, "half_life_s": 1200, "max_delta_per_event": 0.30},
+    "joy": {"baseline": 0.12, "half_life_s": 1800, "max_delta_per_event": 0.35},
+    "sadness": {"baseline": 0.06, "half_life_s": 1800, "max_delta_per_event": 0.25},
+    "trust": {"baseline": 0.20, "half_life_s": 3600, "max_delta_per_event": 0.25},
+    "distrust": {"baseline": 0.05, "half_life_s": 2400, "max_delta_per_event": 0.30},
+    "surprise": {"baseline": 0.04, "half_life_s": 600, "max_delta_per_event": 0.30},
+    "interest": {"baseline": 0.18, "half_life_s": 2400, "max_delta_per_event": 0.25}
+  },
+  "interoception": {
+    "acuity": 0.7,
+    "raw_state_access": false
+  },
+  "influence_limits": {
+    "attention": 0.5,
+    "memory_retrieval": 0.4,
+    "planning": 0.45,
+    "risk_preference": 0.35,
+    "response_pacing": 0.35,
+    "expression": 0.3,
+    "learning": 0.2
+  },
+  "arbitration": {
+    "decision_ttl_s": 120,
+    "consequential_classes": ["C3", "C4", "C5"]
+  }
+}

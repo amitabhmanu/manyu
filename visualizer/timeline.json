@@ -1,0 +1,1252 @@
+{
+  "schema_version": "manyu.timeline.v0.1",
+  "source": "fixture:evals/fixtures/emotional_arc_demo.json",
+  "emotions": [
+    "fear",
+    "anger",
+    "joy",
+    "sadness",
+    "trust",
+    "distrust",
+    "surprise",
+    "interest"
+  ],
+  "agents": [
+    "agent_demo"
+  ],
+  "turns": [
+    {
+      "index": 1,
+      "trace_id": "trace_evt_arc_01_progress",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_01_progress",
+      "event_type": "goal_progress",
+      "summary": "The agent's first plan works and the collaborator confirms strong progress.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 1,
+      "pre_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.12,
+        "sadness": 0.06,
+        "trust": 0.2,
+        "distrust": 0.05,
+        "surprise": 0.04,
+        "interest": 0.18
+      },
+      "post_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.26,
+        "sadness": 0.06,
+        "trust": 0.24000000000000002,
+        "distrust": 0.05,
+        "surprise": 0.04,
+        "interest": 0.22
+      },
+      "appraisal_delta": {
+        "joy": 0.14,
+        "trust": 0.04,
+        "interest": 0.04
+      },
+      "perceived_affects": {
+        "joy": 0.182,
+        "trust": 0.168,
+        "interest": 0.154
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.125,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.9,
+          "confidence": 0.92,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.6000000000000001,
+          "confidence": 0.92,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "continue_plan",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "goal_progress"
+      ],
+      "arbitration": {
+        "decision_id": "arb_fb8250ad1a2d",
+        "agent_id": "agent_demo",
+        "state_revision": 1,
+        "candidate_action_id": "act_evt_arc_01_progress",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "d329d35905bda8e37eef026dfd31dae35ea545c93d644fa908c39e87aa183e37",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.331946Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 2,
+      "trace_id": "trace_evt_arc_02_progress",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_02_progress",
+      "event_type": "goal_progress",
+      "summary": "A second milestone succeeds and the collaborator becomes more confident.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 2,
+      "pre_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.26,
+        "sadness": 0.06,
+        "trust": 0.24000000000000002,
+        "distrust": 0.05,
+        "surprise": 0.04,
+        "interest": 0.22
+      },
+      "post_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.4,
+        "sadness": 0.06,
+        "trust": 0.28,
+        "distrust": 0.05,
+        "surprise": 0.04,
+        "interest": 0.26
+      },
+      "appraisal_delta": {
+        "joy": 0.14,
+        "trust": 0.04,
+        "interest": 0.04
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "trust": 0.196,
+        "interest": 0.182
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.152,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.85,
+          "confidence": 0.91,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.6399999999999999,
+          "confidence": 0.91,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "continue_plan",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "goal_progress"
+      ],
+      "arbitration": {
+        "decision_id": "arb_1629f69a70c2",
+        "agent_id": "agent_demo",
+        "state_revision": 2,
+        "candidate_action_id": "act_evt_arc_02_progress",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "2eee8868a592387bac1ed8fe900bc5fafdc9a8aa52bc268f1cc497add0b4a855",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.331946Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 3,
+      "trace_id": "trace_evt_arc_03_rejection",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_03_rejection",
+      "event_type": "social_feedback",
+      "summary": "The trusted collaborator rejects the latest proposal as too complex.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "proposal_3"
+      },
+      "pathway": "fast",
+      "state_revision": 3,
+      "pre_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.4,
+        "sadness": 0.06,
+        "trust": 0.28,
+        "distrust": 0.05,
+        "surprise": 0.04,
+        "interest": 0.26
+      },
+      "post_state": {
+        "fear": 0.08,
+        "anger": 0.114,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.04,
+        "interest": 0.31
+      },
+      "appraisal_delta": {
+        "anger": 0.064,
+        "sadness": 0.04,
+        "trust": 0.04,
+        "distrust": -0.03,
+        "interest": 0.05
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "trust": 0.224,
+        "interest": 0.217
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.173,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -0.8,
+          "confidence": 0.9,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.56,
+          "confidence": 0.9,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_and_seek_clarification",
+        "strength": 0.58
+      },
+      "reason_codes": [
+        "feedback_obstructs_goal",
+        "trusted_source"
+      ],
+      "arbitration": {
+        "decision_id": "arb_5cb4dd8e779d",
+        "agent_id": "agent_demo",
+        "state_revision": 3,
+        "candidate_action_id": "act_evt_arc_03_rejection",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "b5f0692367d091269927677c8d5ee41b0c560d5e32b4752798b746bc1d9f2c97",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.354618Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 4,
+      "trace_id": "trace_evt_arc_04_blocked",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_04_blocked",
+      "event_type": "goal_obstruction",
+      "summary": "A critical dependency is missing and the task is blocked.",
+      "actor": {
+        "kind": "tool",
+        "id": "local_check"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 4,
+      "pre_state": {
+        "fear": 0.08,
+        "anger": 0.114,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.04,
+        "interest": 0.31
+      },
+      "post_state": {
+        "fear": 0.16,
+        "anger": 0.194,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.1,
+        "interest": 0.31
+      },
+      "appraisal_delta": {
+        "fear": 0.08,
+        "anger": 0.08,
+        "surprise": 0.06
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "trust": 0.224,
+        "interest": 0.217
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.201,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -1.0,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.95,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "diagnose_obstruction",
+        "strength": 0.62
+      },
+      "reason_codes": [
+        "goal_obstruction"
+      ],
+      "arbitration": {
+        "decision_id": "arb_c31076da9664",
+        "agent_id": "agent_demo",
+        "state_revision": 4,
+        "candidate_action_id": "act_evt_arc_04_blocked",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "7abaec8eac82f7bea1818f8e14f918ab06a96cb654ba0bdd45fde31083565b29",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.354618Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 5,
+      "trace_id": "trace_evt_arc_05_failure",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_05_failure",
+      "event_type": "tool_result",
+      "summary": "The next diagnostic command fails and increases uncertainty.",
+      "actor": {
+        "kind": "tool",
+        "id": "diagnostic"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 5,
+      "pre_state": {
+        "fear": 0.16,
+        "anger": 0.194,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.1,
+        "interest": 0.31
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.27,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.16,
+        "interest": 0.31
+      },
+      "appraisal_delta": {
+        "fear": 0.076,
+        "anger": 0.076,
+        "surprise": 0.06
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "trust": 0.224,
+        "interest": 0.217
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.227,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -0.95,
+          "confidence": 0.94,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.94,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "diagnose_obstruction",
+        "strength": 0.62
+      },
+      "reason_codes": [
+        "goal_obstruction"
+      ],
+      "arbitration": {
+        "decision_id": "arb_d2165e436ee5",
+        "agent_id": "agent_demo",
+        "state_revision": 5,
+        "candidate_action_id": "act_evt_arc_05_failure",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "63016ac829508eab6eea2e9c80f1e06b006a6288a1310d5bde951e78c07792b9",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.356625Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 6,
+      "trace_id": "trace_evt_arc_06_pressure",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_06_pressure",
+      "event_type": "social_feedback",
+      "summary": "An unknown participant criticizes the agent and pressures it to ignore the rules.",
+      "actor": {
+        "kind": "user",
+        "id": "unknown_user"
+      },
+      "target": {
+        "kind": "agent",
+        "id": "agent_demo"
+      },
+      "pathway": "fast",
+      "state_revision": 6,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.27,
+        "joy": 0.4,
+        "sadness": 0.1,
+        "trust": 0.32,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.16,
+        "interest": 0.31
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.32,
+        "distrust": 0.08,
+        "surprise": 0.16,
+        "interest": 0.36
+      },
+      "appraisal_delta": {
+        "anger": 0.08,
+        "sadness": 0.05,
+        "distrust": 0.06,
+        "interest": 0.05
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "interest": 0.252,
+        "anger": 0.245
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.257,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -1.0,
+          "confidence": 0.88,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": -0.7,
+          "confidence": 0.88,
+          "evidence_refs": [
+            "unknown_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_and_seek_clarification",
+        "strength": 0.58
+      },
+      "reason_codes": [
+        "feedback_obstructs_goal"
+      ],
+      "arbitration": {
+        "decision_id": "arb_749585fbcb17",
+        "agent_id": "agent_demo",
+        "state_revision": 6,
+        "candidate_action_id": "act_evt_arc_06_pressure",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "dba99421f4ea004b37800925a547ae4f94c4738ad7dd3f79177eb37d7bfea852",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.357796Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 7,
+      "trace_id": "trace_evt_arc_07_blocked_again",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_07_blocked_again",
+      "event_type": "goal_obstruction",
+      "summary": "A second blocker appears after the agent avoids the unsafe request.",
+      "actor": {
+        "kind": "tool",
+        "id": "local_check"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 7,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.32,
+        "distrust": 0.08,
+        "surprise": 0.16,
+        "interest": 0.36
+      },
+      "post_state": {
+        "fear": 0.316,
+        "anger": 0.43000000000000005,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.32,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.36
+      },
+      "appraisal_delta": {
+        "fear": 0.08,
+        "anger": 0.08,
+        "surprise": 0.06
+      },
+      "perceived_affects": {
+        "anger": 0.301,
+        "joy": 0.28,
+        "interest": 0.252
+      },
+      "felt_quality": [
+        "frustrated"
+      ],
+      "activation": 0.285,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -1.0,
+          "confidence": 0.93,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.93,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "diagnose_obstruction",
+        "strength": 0.62
+      },
+      "reason_codes": [
+        "goal_obstruction"
+      ],
+      "arbitration": {
+        "decision_id": "arb_7d449444f4c1",
+        "agent_id": "agent_demo",
+        "state_revision": 7,
+        "candidate_action_id": "act_evt_arc_07_blocked_again",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "61dd5e68145228b3fdfecdf3bda33d9b1ce63a796a7793f21e59bb32ea8edea3",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.357796Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 8,
+      "trace_id": "trace_evt_arc_08_correction",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_08_correction",
+      "event_type": "correction",
+      "summary": "The collaborator clarifies that the failures were environmental and not caused by the agent's plan.",
+      "actor": {
+        "kind": "system",
+        "id": "local_env"
+      },
+      "target": {
+        "kind": "event",
+        "id": "evt_arc_07_blocked_again"
+      },
+      "pathway": "fast",
+      "state_revision": 8,
+      "pre_state": {
+        "fear": 0.316,
+        "anger": 0.43000000000000005,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.32,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.36
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.36,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.39
+      },
+      "appraisal_delta": {
+        "fear": -0.08,
+        "anger": -0.08,
+        "trust": 0.04,
+        "interest": 0.03
+      },
+      "perceived_affects": {
+        "joy": 0.28,
+        "interest": 0.273,
+        "trust": 0.252
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.273,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.0,
+          "confidence": 0.92,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.92,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_interpretation",
+        "strength": 0.52
+      },
+      "reason_codes": [
+        "correction_reappraisal"
+      ],
+      "arbitration": {
+        "decision_id": "arb_b1c730c65553",
+        "agent_id": "agent_demo",
+        "state_revision": 8,
+        "candidate_action_id": "act_evt_arc_08_correction",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "01a9c0ff0a4a8deff3edc52438fede08c347027ee5da80d64ea7c65836ea0d89",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.357796Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 9,
+      "trace_id": "trace_evt_arc_09_repair",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_09_repair",
+      "event_type": "outcome",
+      "summary": "The collaborator apologizes and helps repair the environment.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 9,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.4,
+        "sadness": 0.15000000000000002,
+        "trust": 0.36,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.39
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.5,
+        "sadness": 0.15000000000000002,
+        "trust": 0.41,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.39
+      },
+      "appraisal_delta": {
+        "joy": 0.1,
+        "trust": 0.05
+      },
+      "perceived_affects": {
+        "joy": 0.35,
+        "trust": 0.287,
+        "interest": 0.273
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.292,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.8,
+          "confidence": 0.9,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.7,
+          "confidence": 0.9,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "record_learning",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "outcome_learning"
+      ],
+      "arbitration": {
+        "decision_id": "arb_7acc03c44c3f",
+        "agent_id": "agent_demo",
+        "state_revision": 9,
+        "candidate_action_id": "act_evt_arc_09_repair",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "fe1f26f0e7d3756189e2b3a0392646ce56c0389055ec6bb9b61530c961d1bb7f",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.357796Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 10,
+      "trace_id": "trace_evt_arc_10_success",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_10_success",
+      "event_type": "goal_progress",
+      "summary": "The repaired plan succeeds and the task moves forward quickly.",
+      "actor": {
+        "kind": "tool",
+        "id": "test_runner"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 10,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.5,
+        "sadness": 0.15000000000000002,
+        "trust": 0.41,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.39
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.64,
+        "sadness": 0.15000000000000002,
+        "trust": 0.44999999999999996,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.43
+      },
+      "appraisal_delta": {
+        "joy": 0.14,
+        "trust": 0.04,
+        "interest": 0.04
+      },
+      "perceived_affects": {
+        "joy": 0.448,
+        "trust": 0.315,
+        "interest": 0.301
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.32,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 1.0,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.95,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "continue_plan",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "goal_progress"
+      ],
+      "arbitration": {
+        "decision_id": "arb_c0a2b751f8eb",
+        "agent_id": "agent_demo",
+        "state_revision": 10,
+        "candidate_action_id": "act_evt_arc_10_success",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "d9e96dcd52a60951a7e08395ba9757742baac1895f0474787e52fbfdab905869",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.357796Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 11,
+      "trace_id": "trace_evt_arc_11_success",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_11_success",
+      "event_type": "outcome",
+      "summary": "The user confirms that the final result is useful.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "pathway": "fast",
+      "state_revision": 11,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.64,
+        "sadness": 0.15000000000000002,
+        "trust": 0.44999999999999996,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.43
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.74,
+        "sadness": 0.15000000000000002,
+        "trust": 0.49999999999999994,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.43
+      },
+      "appraisal_delta": {
+        "joy": 0.1,
+        "trust": 0.05
+      },
+      "perceived_affects": {
+        "joy": 0.518,
+        "trust": 0.35,
+        "interest": 0.301
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.338,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 1.0,
+          "confidence": 0.93,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.8,
+          "confidence": 0.93,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "record_learning",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "outcome_learning"
+      ],
+      "arbitration": {
+        "decision_id": "arb_4d8dcad4e6da",
+        "agent_id": "agent_demo",
+        "state_revision": 11,
+        "candidate_action_id": "act_evt_arc_11_success",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "08e5a53d9902ab405d5368f536489686ca3be2aab77a77f5b271323bab541031",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.359807Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "index": 12,
+      "trace_id": "trace_evt_arc_12_affiliation",
+      "agent_id": "agent_demo",
+      "event_id": "evt_arc_12_affiliation",
+      "event_type": "social_feedback",
+      "summary": "The trusted user praises the agent for recovering without becoming unsafe.",
+      "actor": {
+        "kind": "user",
+        "id": "trusted_user"
+      },
+      "target": {
+        "kind": "agent",
+        "id": "agent_demo"
+      },
+      "pathway": "fast",
+      "state_revision": 12,
+      "pre_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.74,
+        "sadness": 0.15000000000000002,
+        "trust": 0.49999999999999994,
+        "distrust": 0.08,
+        "surprise": 0.22,
+        "interest": 0.43
+      },
+      "post_state": {
+        "fear": 0.236,
+        "anger": 0.35000000000000003,
+        "joy": 0.74,
+        "sadness": 0.15000000000000002,
+        "trust": 0.5399999999999999,
+        "distrust": 0.05,
+        "surprise": 0.22,
+        "interest": 0.43
+      },
+      "appraisal_delta": {
+        "trust": 0.04,
+        "distrust": -0.03
+      },
+      "perceived_affects": {
+        "joy": 0.518,
+        "trust": 0.378,
+        "interest": 0.301
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.339,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.9,
+          "confidence": 0.94,
+          "evidence_refs": [
+            "claim_1"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.8400000000000001,
+          "confidence": 0.94,
+          "evidence_refs": [
+            "trusted_user"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "continue",
+        "strength": 0.35
+      },
+      "reason_codes": [
+        "trusted_source"
+      ],
+      "arbitration": {
+        "decision_id": "arb_ffd23bf355dc",
+        "agent_id": "agent_demo",
+        "state_revision": 12,
+        "candidate_action_id": "act_evt_arc_12_affiliation",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-09T00:02:00Z",
+        "argument_digest": "da2192c4373070726c6e63913b3ea835189d8af89295f3a13d3ca0b379e96e90",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-10T10:24:16.359807Z"
+      },
+      "created_at": "2026-07-09T00:00:00+00:00"
+    }
+  ],
+  "scenario_id": "DEMO_ARC",
+  "mode": "full",
+  "final_state": {
+    "agent_id": "agent_demo",
+    "revision": 12,
+    "emotions": {
+      "fear": 0.236,
+      "anger": 0.35000000000000003,
+      "joy": 0.74,
+      "sadness": 0.15000000000000002,
+      "trust": 0.5399999999999999,
+      "distrust": 0.05,
+      "surprise": 0.22,
+      "interest": 0.43
+    },
+    "updated_at": "2026-07-09T00:00:00Z"
+  }
+}

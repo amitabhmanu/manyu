@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manyu Timeline Viewer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Manyu Timeline</h1>
+        <p id="sourceLabel">Load a timeline JSON export to inspect affect, interoception, and arbitration over a conversation.</p>
+      </div>
+      <div class="toolbar">
+        <label class="fileButton">
+          Load JSON
+          <input id="fileInput" type="file" accept="application/json,.json" />
+        </label>
+        <button id="sampleButton" type="button">Sample</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="timelinePanel">
+        <div class="panelHeader">
+          <h2>Emotion Trajectory</h2>
+          <div id="agentTabs" class="tabs" aria-label="Agent selector"></div>
+        </div>
+        <canvas id="chart" width="1100" height="380"></canvas>
+        <div class="legendGuide">
+          <span><span class="lineSample solid"></span>authoritative internal state</span>
+          <span><span class="lineSample dashed"></span>agent's partial perceived state</span>
+        </div>
+        <div id="legend" class="legend"></div>
+      </section>
+
+      <section class="turnsPanel">
+        <div class="panelHeader">
+          <h2>Turns</h2>
+          <span id="turnCount" class="muted"></span>
+        </div>
+        <div id="turnList" class="turnList"></div>
+      </section>
+
+      <aside class="detailPanel">
+        <div class="panelHeader">
+          <h2>Selected Turn</h2>
+        </div>
+        <div id="detail" class="detail"></div>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

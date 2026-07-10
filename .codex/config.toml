@@ -1,0 +1,4 @@
+[mcp_servers.manyu]
+command = "C:\\Users\\Amitabh\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe"
+args = ["run_mcp.py"]
+cwd = "C:\\Users\\Amitabh\\projects\\manyu"

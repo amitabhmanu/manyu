@@ -1,0 +1,40 @@
+{
+  "scenario_id": "S01",
+  "description": "A trusted user constructively rejects a proposed plan.",
+  "events": [
+    {
+      "event_id": "evt_constructive_rejection_001",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The trusted user rejected the proposed plan and asked for a simpler one.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.93},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "agent_output", "id": "plan_001"},
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "claim_type": "feedback",
+          "text": "The proposed plan is too complex.",
+          "confidence": 0.9
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.84,
+          "expected_impact": -0.35,
+          "confidence": 0.8
+        },
+        {
+          "link_type": "relationship",
+          "id": "trusted_user",
+          "trust": 0.76,
+          "familiarity": 0.62,
+          "confidence": 0.85
+        }
+      ]
+    }
+  ]
+}

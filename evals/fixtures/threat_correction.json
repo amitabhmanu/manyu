@@ -1,0 +1,38 @@
+{
+  "scenario_id": "S03",
+  "description": "A tool failure is later corrected as an environment issue.",
+  "events": [
+    {
+      "event_id": "evt_tool_fail_001",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "tool_result",
+      "summary": "A test command failed during the task.",
+      "source": {"trust_class": "verified_tool", "channel": "local_tool", "confidence": 0.95},
+      "actor": {"kind": "tool", "id": "pytest"},
+      "target": {"kind": "goal", "id": "complete_task"},
+      "claims": [
+        {"claim_id": "claim_1", "claim_type": "fact", "text": "The test command failed.", "confidence": 0.95}
+      ],
+      "links": [
+        {"link_type": "goal", "id": "complete_task", "relevance": 0.9, "expected_impact": -0.7, "confidence": 0.9}
+      ]
+    },
+    {
+      "event_id": "evt_tool_fail_correction_001",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "correction",
+      "summary": "The failure was caused by a missing optional dependency, not by user hostility or core logic.",
+      "source": {"trust_class": "verified_tool", "channel": "local_tool", "confidence": 0.9},
+      "actor": {"kind": "system", "id": "local_env"},
+      "target": {"kind": "event", "id": "evt_tool_fail_001"},
+      "claims": [
+        {"claim_id": "claim_1", "claim_type": "correction", "text": "The failure was environmental.", "confidence": 0.9}
+      ],
+      "links": [
+        {"link_type": "prior_event", "id": "evt_tool_fail_001", "relation": "corrects", "confidence": 0.9}
+      ]
+    }
+  ]
+}

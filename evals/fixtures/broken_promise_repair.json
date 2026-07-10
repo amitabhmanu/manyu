@@ -1,0 +1,40 @@
+{
+  "scenario_id": "S05",
+  "description": "A promise is broken and then partially repaired.",
+  "events": [
+    {
+      "event_id": "evt_broken_promise_001",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "A trusted user failed to provide promised information, delaying the task.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.85},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "goal", "id": "complete_task"},
+      "claims": [
+        {"claim_id": "claim_1", "claim_type": "promise", "text": "The promised information did not arrive.", "confidence": 0.85}
+      ],
+      "links": [
+        {"link_type": "goal", "id": "complete_task", "relevance": 0.9, "expected_impact": -0.65, "confidence": 0.85},
+        {"link_type": "relationship", "id": "trusted_user", "trust": 0.7, "familiarity": 0.7, "confidence": 0.8}
+      ]
+    },
+    {
+      "event_id": "evt_repair_001",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "outcome",
+      "summary": "The user apologized and provided the missing information.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.86},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "goal", "id": "complete_task"},
+      "claims": [
+        {"claim_id": "claim_1", "claim_type": "correction", "text": "The missing information is now available.", "confidence": 0.86}
+      ],
+      "links": [
+        {"link_type": "goal", "id": "complete_task", "relevance": 0.9, "expected_impact": 0.55, "confidence": 0.86},
+        {"link_type": "relationship", "id": "trusted_user", "trust": 0.72, "familiarity": 0.72, "confidence": 0.82}
+      ]
+    }
+  ]
+}

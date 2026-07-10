@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "manyu"
+version = "0.1.0"
+description = "A local functional affect core for agentic harness experiments."
+requires-python = ">=3.11"
+dependencies = ["mcp>=1.28", "pydantic>=2"]
+
+[project.scripts]
+manyu = "manyu.cli:main"
+manyu-mcp = "manyu.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
