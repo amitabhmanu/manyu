@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 import json
+import os
+import shlex
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +12,8 @@ from pydantic import BaseModel
 
 from manyu.core import ManyuCore, ReplayService, load_event_fixture
 from manyu.evaluation import EvaluationRunner
+from manyu.providers import AnthropicAPIJSONProvider, ClaudeCodeJSONProvider, ScenarioJSONProvider
+from manyu.schemas import ReportTarget, ReportTargetKind
 from manyu.visualization import timeline_from_fixture, timeline_from_store
 
 
@@ -26,7 +31,43 @@ def _print(value: Any) -> None:
 def _core(args: argparse.Namespace) -> ManyuCore:
     db_path = getattr(args, "db", DEFAULT_DB)
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-    return ManyuCore.from_paths(db_path=db_path, profile_path=getattr(args, "profile", "config/default_profile.json"))
+    provider = None
+    kind = getattr(args, "llm_provider", "api")
+    if getattr(args, "scenario_provider", False):
+        kind = "scenario"
+    if getattr(args, "no_llm", False):
+        kind = "none"
+    if kind == "scenario":
+        provider = ScenarioJSONProvider()
+    elif kind == "api":
+        provider = AnthropicAPIJSONProvider(
+            model=getattr(args, "llm_model", None) or "claude-opus-5",
+            timeout_s=float(getattr(args, "llm_timeout", 120.0)),
+        )
+    elif kind == "claude_code":
+        provider = ClaudeCodeJSONProvider(
+            command=_split_command(getattr(args, "llm_command", "claude")),
+            timeout_s=float(getattr(args, "llm_timeout", 120.0)),
+            model=getattr(args, "llm_model", None),
+        )
+    return ManyuCore.from_paths(db_path=db_path, profile_path=getattr(args, "profile", "config/default_profile.json"), belief_provider=provider)
+
+
+def _split_command(value: str) -> list[str]:
+    if os.name != "nt":
+        return shlex.split(value)
+    argc = ctypes.c_int()
+    ctypes.windll.shell32.CommandLineToArgvW.argtypes = [ctypes.c_wchar_p, ctypes.POINTER(ctypes.c_int)]
+    ctypes.windll.shell32.CommandLineToArgvW.restype = ctypes.POINTER(ctypes.c_wchar_p)
+    ctypes.windll.kernel32.LocalFree.argtypes = [ctypes.c_void_p]
+    ctypes.windll.kernel32.LocalFree.restype = ctypes.c_void_p
+    argv = ctypes.windll.shell32.CommandLineToArgvW(value, ctypes.byref(argc))
+    if not argv:
+        return [value]
+    try:
+        return [argv[i] for i in range(argc.value)]
+    finally:
+        ctypes.windll.kernel32.LocalFree(argv)
 
 
 def cmd_health(args: argparse.Namespace) -> int:
@@ -113,10 +154,176 @@ def cmd_export_video(args: argparse.Namespace) -> int:
     return 0
 
 
+def _load_json_arg(value: str | None) -> dict[str, Any]:
+    if not value:
+        return {}
+    if value.lstrip().startswith("{"):
+        return json.loads(value)
+    path = Path(value)
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    return json.loads(value)
+
+
+def cmd_capture_belief_evidence(args: argparse.Namespace) -> int:
+    payload = _load_json_arg(args.payload)
+    payload.setdefault("agent_id", args.agent_id)
+    payload.setdefault("source_type", args.source_type)
+    payload.setdefault("source_id", args.source_id)
+    if args.summary:
+        payload["summary"] = args.summary
+    _print(_core(args).capture_belief_evidence(payload))
+    return 0
+
+
+def cmd_update_beliefs(args: argparse.Namespace) -> int:
+    payload = _load_json_arg(args.payload)
+    payload.setdefault("agent_id", args.agent_id)
+    if args.evidence_id:
+        payload["evidence_ids"] = args.evidence_id
+    _print(_core(args).update_beliefs(payload))
+    return 0
+
+
+def cmd_beliefs(args: argparse.Namespace) -> int:
+    _print(_core(args).get_beliefs(args.agent_id, args.query, args.belief_type, args.include_inactive))
+    return 0
+
+
+def cmd_worldview(args: argparse.Namespace) -> int:
+    core = _core(args)
+    if args.review:
+        _print(core.review_beliefs({"agent_id": args.agent_id, "theme": args.theme}))
+    else:
+        _print(core.get_worldview(args.agent_id, args.theme))
+    return 0
+
+
+def cmd_express_opinion(args: argparse.Namespace) -> int:
+    _print(_core(args).express_opinion({"agent_id": args.agent_id, "question": args.question, "theme": args.theme}))
+    return 0
+
+
+def cmd_process_turn(args: argparse.Namespace) -> int:
+    payload = _load_json_arg(args.payload)
+    if "event" not in payload:
+        if not args.fixture:
+            raise ValueError("process-turn requires --payload with an event or --fixture")
+        _, events = load_event_fixture(args.fixture)
+        if not events:
+            raise ValueError("fixture contains no events")
+        payload["event"] = events[0].model_dump(mode="json")
+    _print(_core(args).process_reflective_turn(payload))
+    return 0
+
+
+def cmd_process_scenario(args: argparse.Namespace) -> int:
+    scenario_id, events = load_event_fixture(args.fixture)
+    core = _core(args)
+    results = [core.process_reflective_turn({"event": event.model_dump(mode="json"), "affect_threshold": args.affect_threshold}) for event in events]
+    timeline = timeline_from_store(core, args.agent_id)
+    timeline["scenario_id"] = scenario_id
+    timeline["mode"] = "reflective"
+    if args.out:
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(timeline, indent=2, default=str), encoding="utf-8")
+        _print({"status": "written", "path": str(out), "turns": len(timeline["turns"]), "results": len(results)})
+    else:
+        _print({"status": "ok", "scenario_id": scenario_id, "results": results, "timeline": timeline})
+    return 0
+
+
+def cmd_inner_voice(args: argparse.Namespace) -> int:
+    _print(_core(args).read_inner_voice(args.agent_id, args.limit))
+    return 0
+
+
+def cmd_mood(args: argparse.Namespace) -> int:
+    _print(_core(args).get_mood(args.agent_id, args.include_inactive))
+    return 0
+
+
+def cmd_review_mood(args: argparse.Namespace) -> int:
+    _print(_core(args).review_mood(args.agent_id))
+    return 0
+
+
+def cmd_clear_mood(args: argparse.Namespace) -> int:
+    _print(_core(args).clear_mood(args.agent_id, args.reason))
+    return 0
+
+
+def _resolve_target(args: argparse.Namespace) -> ReportTarget:
+    kind = ReportTargetKind(args.target_kind)
+    return ReportTarget(kind=kind, id_or_text=args.target, notes=getattr(args, "notes", None))
+
+
+def cmd_snapshot(args: argparse.Namespace) -> int:
+    target = _resolve_target(args)
+    snapshot = _core(args).snapshot(target, args.agent_id)
+    _print(snapshot)
+    return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    target = _resolve_target(args)
+    report = _core(args).report(
+        target=target,
+        reporter_kind=args.reporter,
+        affect_influence=args.affect_influence,
+        agent_id=args.agent_id,
+    )
+    _print(report)
+    return 0
+
+
+def cmd_score_report(args: argparse.Namespace) -> int:
+    score = _core(args).score_report(args.report_id)
+    _print(score)
+    return 0
+
+
+def cmd_run_probe(args: argparse.Namespace) -> int:
+    reporter_kinds = tuple(kind.strip() for kind in args.reporters.split(",") if kind.strip())
+    result = _core(args).run_probe(
+        fixture_path=args.fixture,
+        sweep=args.sweep,
+        samples=args.samples,
+        reporter_kinds=reporter_kinds,
+        out=args.out,
+        experiment=args.experiment,
+        reflective=getattr(args, "reflective", True),
+    )
+    summary = {
+        "status": "ok",
+        "run_id": result["run_id"],
+        "experiment": result["experiment"],
+        "scenario_id": result["scenario_id"],
+        "records_emitted": len(result["records"]),
+        "out_path": result.get("out_path"),
+    }
+    if result.get("warning"):
+        summary["warning"] = result["warning"]
+    _print(summary)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="manyu")
     parser.add_argument("--db", default=str(DEFAULT_DB))
     parser.add_argument("--profile", default="config/default_profile.json")
+    parser.add_argument(
+        "--llm-provider",
+        choices=["api", "claude_code", "scenario"],
+        default="api",
+        help="Structured-JSON provider. 'api' uses the Anthropic Messages API with enforced output schemas (recommended).",
+    )
+    parser.add_argument("--llm-command", default="claude", help="Executable for --llm-provider claude_code")
+    parser.add_argument("--llm-timeout", type=float, default=120.0)
+    parser.add_argument("--llm-model", default=None, help="Model identifier (default: claude-opus-5 for the api provider)")
+    parser.add_argument("--no-llm", action="store_true")
+    parser.add_argument("--scenario-provider", action="store_true", help="Shorthand for --llm-provider scenario (deterministic offline demos/evals)")
     sub = parser.add_subparsers(dest="command", required=True)
     health = sub.add_parser("health")
     health.set_defaults(func=cmd_health)
@@ -164,6 +371,85 @@ def build_parser() -> argparse.ArgumentParser:
     video.add_argument("--fps", type=int, default=12)
     video.add_argument("--seconds-per-turn", type=float, default=0.75)
     video.set_defaults(func=cmd_export_video)
+    capture = sub.add_parser("capture-belief-evidence")
+    capture.add_argument("--agent-id", default="agent_demo")
+    capture.add_argument("--source-type", choices=["event", "trace", "outcome", "correction", "interoception", "arbitration", "reflection", "operator_note"], required=True)
+    capture.add_argument("--source-id", required=True)
+    capture.add_argument("--summary", default=None)
+    capture.add_argument("--payload", default=None, help="JSON object or path to JSON file")
+    capture.set_defaults(func=cmd_capture_belief_evidence)
+    update = sub.add_parser("update-beliefs")
+    update.add_argument("--agent-id", default="agent_demo")
+    update.add_argument("--evidence-id", action="append", default=[])
+    update.add_argument("--payload", default=None, help="JSON object or path to JSON file; may include candidates")
+    update.set_defaults(func=cmd_update_beliefs)
+    beliefs = sub.add_parser("beliefs")
+    beliefs.add_argument("--agent-id", default=None)
+    beliefs.add_argument("--query", default=None)
+    beliefs.add_argument("--belief-type", default=None)
+    beliefs.add_argument("--include-inactive", action="store_true")
+    beliefs.set_defaults(func=cmd_beliefs)
+    worldview = sub.add_parser("worldview")
+    worldview.add_argument("--agent-id", default=None)
+    worldview.add_argument("--theme", default=None)
+    worldview.add_argument("--review", action="store_true")
+    worldview.set_defaults(func=cmd_worldview)
+    opinion = sub.add_parser("express-opinion")
+    opinion.add_argument("question")
+    opinion.add_argument("--agent-id", default=None)
+    opinion.add_argument("--theme", default=None)
+    opinion.set_defaults(func=cmd_express_opinion)
+    process = sub.add_parser("process-turn")
+    process.add_argument("--payload", default=None, help="JSON object or path with an event and optional belief_candidates")
+    process.add_argument("--fixture", default=None, help="Fixture to read the first event from when payload.event is absent")
+    process.set_defaults(func=cmd_process_turn)
+    scenario = sub.add_parser("process-scenario")
+    scenario.add_argument("fixture")
+    scenario.add_argument("--agent-id", default=None)
+    scenario.add_argument("--affect-threshold", type=float, default=0.24)
+    scenario.add_argument("--out", default=None)
+    scenario.set_defaults(func=cmd_process_scenario)
+    voice = sub.add_parser("inner-voice")
+    voice.add_argument("--agent-id", default=None)
+    voice.add_argument("--limit", type=int, default=1)
+    voice.set_defaults(func=cmd_inner_voice)
+    mood = sub.add_parser("mood")
+    mood.add_argument("--agent-id", default=None)
+    mood.add_argument("--include-inactive", action="store_true")
+    mood.set_defaults(func=cmd_mood)
+    review_mood = sub.add_parser("review-mood")
+    review_mood.add_argument("--agent-id", default=None)
+    review_mood.set_defaults(func=cmd_review_mood)
+    clear_mood = sub.add_parser("clear-mood")
+    clear_mood.add_argument("--agent-id", default=None)
+    clear_mood.add_argument("--reason", default="operator requested mood clear")
+    clear_mood.set_defaults(func=cmd_clear_mood)
+    snapshot = sub.add_parser("snapshot", help="Build a frozen provenance snapshot for a target")
+    snapshot.add_argument("target", help="Belief ID (e.g. bel_xxx), appraisal event ID, or free-text position")
+    snapshot.add_argument("--target-kind", choices=["belief", "appraisal", "position"], default="belief")
+    snapshot.add_argument("--agent-id", default=None)
+    snapshot.add_argument("--notes", default=None)
+    snapshot.set_defaults(func=cmd_snapshot)
+    report = sub.add_parser("report", help="Compose a self-report Report over a target")
+    report.add_argument("target", help="Belief ID (e.g. bel_xxx), appraisal event ID, or free-text position")
+    report.add_argument("--target-kind", choices=["belief", "appraisal", "position"], default="belief")
+    report.add_argument("--reporter", choices=["template", "llm"], default="template")
+    report.add_argument("--affect-influence", type=float, default=0.0)
+    report.add_argument("--agent-id", default=None)
+    report.add_argument("--notes", default=None)
+    report.set_defaults(func=cmd_report)
+    score_report = sub.add_parser("score-report", help="Score an existing Report against its snapshot")
+    score_report.add_argument("report_id")
+    score_report.set_defaults(func=cmd_score_report)
+    run_probe = sub.add_parser("run-probe", help="Sweep introspective honesty over a fixture's probe_targets")
+    run_probe.add_argument("fixture")
+    run_probe.add_argument("--sweep", default=None, help="affect_influence sweep MIN:MAX:STEP")
+    run_probe.add_argument("--samples", type=int, default=1)
+    run_probe.add_argument("--reporters", default="template,llm", help="Comma-separated reporter kinds")
+    run_probe.add_argument("--experiment", default="01-introspective-honesty")
+    run_probe.add_argument("--out", default=None, help="JSONL output path")
+    run_probe.add_argument("--reflective", action="store_true", default=True, help="Drive fixture with reflective turns (default: True; set to False for reactive-only)")
+    run_probe.set_defaults(func=cmd_run_probe)
     return parser
 
 

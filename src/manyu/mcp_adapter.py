@@ -5,8 +5,9 @@ from typing import Any
 
 from manyu.core import ManyuCore, ReplayService
 from manyu.evaluation import EvaluationRunner
+from manyu.providers import AnthropicAPIJSONProvider, ClaudeCodeJSONProvider
 from manyu.visualization import timeline_from_fixture, timeline_from_store
-from manyu.schemas import Appraisal, CandidateAction, NormalizedEvent
+from manyu.schemas import Appraisal, CandidateAction, NormalizedEvent, ReportTarget, ReportTargetKind
 
 
 class ManyuMCPAdapter:
@@ -17,8 +18,12 @@ class ManyuMCPAdapter:
     validation, persistence, or policy checks.
     """
 
-    def __init__(self, db_path: str | Path = ".manyu/manyu.sqlite3", profile_path: str | Path = "config/default_profile.json"):
-        self.core = ManyuCore.from_paths(db_path=db_path, profile_path=profile_path)
+    def __init__(self, db_path: str | Path = ".manyu/manyu.sqlite3", profile_path: str | Path = "config/default_profile.json", use_anthropic_api: bool = True):
+        if use_anthropic_api:
+            provider = AnthropicAPIJSONProvider(model="claude-opus-5")
+        else:
+            provider = None
+        self.core = ManyuCore.from_paths(db_path=db_path, profile_path=profile_path, belief_provider=provider)
 
     def health(self) -> dict[str, Any]:
         return self.core.health()
@@ -80,3 +85,73 @@ class ManyuMCPAdapter:
         if payload.get("fixture_path"):
             return timeline_from_fixture(payload["fixture_path"], payload.get("mode", "full"))
         return timeline_from_store(self.core, payload.get("agent_id"))
+
+    def capture_belief_evidence(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.capture_belief_evidence(payload)
+
+    def update_beliefs(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.update_beliefs(payload)
+
+    def get_beliefs(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.get_beliefs(
+            agent_id=payload.get("agent_id"),
+            query=payload.get("query"),
+            belief_type=payload.get("belief_type"),
+            include_inactive=bool(payload.get("include_inactive", False)),
+        )
+
+    def get_worldview(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.get_worldview(agent_id=payload.get("agent_id"), theme=payload.get("theme"))
+
+    def review_beliefs(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.core.review_beliefs(payload or {})
+
+    def express_opinion(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.express_opinion(payload)
+
+    def process_reflective_turn(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.process_reflective_turn(payload)
+
+    def read_inner_voice(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.read_inner_voice(payload.get("agent_id"), int(payload.get("limit", 1)))
+
+    def get_mood(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.get_mood(payload.get("agent_id"), bool(payload.get("include_inactive", False)))
+
+    def review_mood(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.review_mood(payload.get("agent_id"))
+
+    def clear_mood(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        return self.core.clear_mood(payload.get("agent_id"), payload.get("reason", "operator requested mood clear"))
+
+    def snapshot(self, payload: dict[str, Any]) -> dict[str, Any]:
+        target = ReportTarget(
+            kind=ReportTargetKind(payload.get("target_kind", "belief")),
+            id_or_text=str(payload["target"]),
+            notes=payload.get("notes"),
+        )
+        snapshot = self.core.snapshot(target, payload.get("agent_id"))
+        return snapshot.model_dump(mode="json")
+
+    def report(self, payload: dict[str, Any]) -> dict[str, Any]:
+        target = ReportTarget(
+            kind=ReportTargetKind(payload.get("target_kind", "belief")),
+            id_or_text=str(payload["target"]),
+            notes=payload.get("notes"),
+        )
+        report = self.core.report(
+            target=target,
+            reporter_kind=payload.get("reporter", "template"),
+            affect_influence=float(payload.get("affect_influence", 0.0)),
+            agent_id=payload.get("agent_id"),
+        )
+        return report.model_dump(mode="json")
+
+    def score_report(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.score_report(str(payload["report_id"])).model_dump(mode="json")
