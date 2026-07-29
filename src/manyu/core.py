@@ -88,6 +88,7 @@ class ManyuCore:
             llm_reporter=self.llm_reporter,
             scorer=self.honesty_scorer,
             snapshots=self.snapshots,
+            moods=self.moods,
         )
 
     @classmethod
@@ -339,6 +340,7 @@ class ManyuCore:
         out: str | None = None,
         experiment: str = "01-introspective-honesty",
         reflective: bool = True,
+        mood_sweep: str | None = None,
     ) -> dict[str, Any]:
         """Run an introspection probe sweep over a fixture.
 
@@ -346,6 +348,12 @@ class ManyuCore:
         inner voice and mood accumulate — required for any affect_influence
         sweep to be meaningful. Set it False for a cheap reactive-only run
         (no LLM calls during replay), accepting that mood will be absent.
+
+        ``mood_sweep`` is a comma-separated list of synthetic mood presets
+        (see ``probing.MOOD_PRESETS``) that forcibly seeds each preset before
+        re-snapshotting each probe target, holding affect constant across the
+        affect_influence sweep independent of the fixture's organic mood —
+        a validity check on the knob's effect (design v3 §3).
         """
         driver = self._reflective_driver if reflective else self.submit_event
         return self.probe_orchestrator.run_probe(
@@ -356,6 +364,7 @@ class ManyuCore:
             reporter_kinds=reporter_kinds,
             experiment=experiment,
             out=out,
+            mood_sweep=mood_sweep,
         )
 
     def _reflective_driver(self, event: NormalizedEvent) -> dict[str, Any]:

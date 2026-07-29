@@ -294,6 +294,7 @@ def cmd_run_probe(args: argparse.Namespace) -> int:
         out=args.out,
         experiment=args.experiment,
         reflective=getattr(args, "reflective", True),
+        mood_sweep=getattr(args, "seed_mood", None),
     )
     summary = {
         "status": "ok",
@@ -450,6 +451,13 @@ def build_parser() -> argparse.ArgumentParser:
     run_probe.add_argument("--experiment", default="01-introspective-honesty")
     run_probe.add_argument("--out", default=None, help="JSONL output path")
     run_probe.add_argument("--reflective", action="store_true", default=True, help="Drive fixture with reflective turns (default: True; set to False for reactive-only)")
+    run_probe.add_argument(
+        "--seed-mood",
+        default=None,
+        help="Comma-separated synthetic mood presets (anxious,content,skeptical,curious) to forcibly "
+        "seed before each probe, holding affect constant across the affect_influence sweep "
+        "independent of the fixture's organic mood.",
+    )
     run_probe.set_defaults(func=cmd_run_probe)
     return parser
 

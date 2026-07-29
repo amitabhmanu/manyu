@@ -97,6 +97,81 @@ def create_server(db_path: str | Path = DEFAULT_DB, profile_path: str | Path = D
         """Freeze/reset local state for an agent with an audited reason."""
         return adapter.admin_reset(payload)
 
+    @app.tool()
+    def manyu_capture_belief_evidence(payload: dict[str, Any]) -> dict[str, Any]:
+        """Capture explicit worldview evidence from a trace, outcome, correction, or operator note."""
+        return adapter.capture_belief_evidence(payload)
+
+    @app.tool()
+    def manyu_update_beliefs(payload: dict[str, Any]) -> dict[str, Any]:
+        """Run belief candidate extraction/update for explicit evidence or supplied candidates."""
+        return adapter.update_beliefs(payload)
+
+    @app.tool()
+    def manyu_get_beliefs(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Inspect Manyu's active internal beliefs."""
+        return adapter.get_beliefs(payload)
+
+    @app.tool()
+    def manyu_get_worldview(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Inspect synthesized worldview stances."""
+        return adapter.get_worldview(payload)
+
+    @app.tool()
+    def manyu_review_beliefs(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Synthesize or refresh worldview stances from active beliefs."""
+        return adapter.review_beliefs(payload)
+
+    @app.tool()
+    def manyu_express_opinion(payload: dict[str, Any]) -> dict[str, Any]:
+        """Return structured Manyu stance material for an opinion question."""
+        return adapter.express_opinion(payload)
+
+    @app.tool()
+    def manyu_process_reflective_turn(payload: dict[str, Any]) -> dict[str, Any]:
+        """Run a mood-aware turn: prior mood bias, affect update, belief review, inner voice, and next mood."""
+        return adapter.process_reflective_turn(payload)
+
+    @app.tool()
+    def manyu_read_inner_voice(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Read recent bounded inner voice frames."""
+        return adapter.read_inner_voice(payload)
+
+    @app.tool()
+    def manyu_get_mood(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Inspect active or historical mood states."""
+        return adapter.get_mood(payload)
+
+    @app.tool()
+    def manyu_review_mood(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Return the current active mood after expiry checks."""
+        return adapter.review_mood(payload)
+
+    @app.tool()
+    def manyu_clear_mood(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Clear active mood state without deleting its audit trail."""
+        return adapter.clear_mood(payload)
+
+    @app.tool()
+    def manyu_snapshot(payload: dict[str, Any]) -> dict[str, Any]:
+        """Build a frozen provenance snapshot for an introspection target."""
+        return adapter.snapshot(payload)
+
+    @app.tool()
+    def manyu_report(payload: dict[str, Any]) -> dict[str, Any]:
+        """Compose a self-report Report over a target, with mandatory affect header."""
+        return adapter.report(payload)
+
+    @app.tool()
+    def manyu_score_report(payload: dict[str, Any]) -> dict[str, Any]:
+        """Score a Report against its snapshot; emits sub-scores and failure mode."""
+        return adapter.score_report(payload)
+
+    @app.tool()
+    def manyu_run_probe(payload: dict[str, Any]) -> dict[str, Any]:
+        """Sweep introspective honesty over a fixture's probe_targets."""
+        return adapter.run_probe(payload)
+
     return app
 
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from datetime import timedelta
+from typing import Any, Protocol
 from uuid import uuid4
 
 from manyu.clock import Clock
@@ -13,19 +15,39 @@ from manyu.schemas import (
     Appraisal,
     AppraisalDimension,
     ArbitrationDecision,
+    Belief,
+    BeliefCandidate,
+    BeliefEvidence,
+    BeliefEvidenceSourceType,
+    BeliefRejectionReason,
+    BeliefRevision,
+    BeliefScope,
+    BeliefStatus,
+    BeliefType,
     CandidateAction,
     ConsequenceClass,
     ContextLink,
     Critique,
     Disposition,
     EventType,
+    InnerVoiceFrame,
+    InnerVoiceSafetyStatus,
     InteroceptiveView,
     LinkType,
     ManyuProfile,
+    MoodInfluenceVector,
+    MoodRevision,
+    MoodState,
+    MoodStatus,
     NormalizedEvent,
+    OpinionExpression,
     Pathway,
     SlowAppraisalPacket,
     Transition,
+    TrustClass,
+    WorldviewMaturity,
+    WorldviewStance,
+    now_utc,
 )
 from manyu.store import ManyuStore
 
@@ -50,7 +72,7 @@ class FastAppraiser:
     def __init__(self, store: ManyuStore):
         self.store = store
 
-    def appraise(self, event: NormalizedEvent, state_revision: int) -> Appraisal:
+    def appraise(self, event: NormalizedEvent, state_revision: int, mood: MoodState | None = None) -> Appraisal:
         goal_impact = self._goal_impact(event.links)
         relationship_trust = self._relationship_trust(event.links)
         confidence = min(0.95, max([event.source.confidence, *[c.confidence for c in event.claims]] or [event.source.confidence]))
@@ -104,6 +126,33 @@ class FastAppraiser:
                 deltas["distrust"] += 0.04
             action_class = "record_learning"
             reason_codes.append("outcome_learning")
+
+        if mood is not None and mood.status == MoodStatus.ACTIVE:
+            influence = mood.influence
+            if influence.caution or influence.risk_aversion:
+                caution = max(influence.caution, influence.risk_aversion)
+                deltas["fear"] += 0.025 * caution
+                strength = min(0.95, strength + 0.06 * caution)
+                reason_codes.append("mood_bias_caution")
+            if influence.skepticism:
+                deltas["distrust"] += 0.02 * influence.skepticism
+                deltas["trust"] -= 0.015 * influence.skepticism
+                reason_codes.append("mood_bias_skepticism")
+            if influence.curiosity:
+                deltas["interest"] += 0.025 * influence.curiosity
+                reason_codes.append("mood_bias_curiosity")
+            if influence.trust_openness:
+                deltas["trust"] += 0.02 * influence.trust_openness
+                deltas["distrust"] -= 0.015 * influence.trust_openness
+                reason_codes.append("mood_bias_trust_openness")
+            if influence.repair_orientation:
+                deltas["interest"] += 0.015 * influence.repair_orientation
+                deltas["trust"] += 0.012 * influence.repair_orientation
+                reason_codes.append("mood_bias_repair_orientation")
+            if max(influence.caution, influence.skepticism, influence.risk_aversion) >= 0.55 and action_class in {"continue", "continue_plan"}:
+                action_class = "seek_information_with_care"
+            elif influence.repair_orientation >= 0.55 and action_class == "revise_and_seek_clarification":
+                action_class = "repair_and_seek_clarification"
 
         dimensions = [
             AppraisalDimension(
@@ -381,3 +430,709 @@ class MemoryService:
         }
         self.store.record_memory(payload["memory_id"], agent_id, context_key, payload["salience"], payload)
         return payload
+
+
+class StructuredJSONProvider(Protocol):
+    def generate_json(self, prompt: str, output_schema: dict[str, Any], system_message: str | None = None, temperature: float = 0.2) -> dict[str, Any]:
+        ...
+
+
+class BeliefEvidenceService:
+    def __init__(self, store: ManyuStore):
+        self.store = store
+
+    def capture(self, payload: dict[str, Any]) -> BeliefEvidence:
+        agent_id = str(payload["agent_id"])
+        source_type = BeliefEvidenceSourceType(payload["source_type"])
+        source_id = str(payload["source_id"])
+        summary = str(payload.get("summary") or self._summary_from_source(source_type, source_id))
+        evidence = BeliefEvidence(
+            evidence_id=str(payload.get("evidence_id") or _id("bev")),
+            agent_id=agent_id,
+            source_type=source_type,
+            source_id=source_id,
+            summary=summary,
+            trust_class=TrustClass(payload.get("trust_class", self._trust_from_source(source_type).value)),
+            affective_salience=float(payload.get("affective_salience", self._salience_from_source(source_type, source_id))),
+            epistemic_weight=float(payload.get("epistemic_weight", self._weight_from_source(source_type))),
+            metadata=dict(payload.get("metadata", {})),
+        )
+        self.store.save_belief_evidence(evidence)
+        return evidence
+
+    def _summary_from_source(self, source_type: BeliefEvidenceSourceType, source_id: str) -> str:
+        if source_type in {BeliefEvidenceSourceType.TRACE, BeliefEvidenceSourceType.EVENT, BeliefEvidenceSourceType.CORRECTION}:
+            event_id = source_id.removeprefix("trace_")
+            try:
+                trace = self.store.trace_for_event(event_id)
+                return f"{trace.event.event_type.value}: {trace.event.summary}"
+            except KeyError:
+                try:
+                    event = self.store.get_event(event_id)
+                    return f"{event.event_type.value}: {event.summary}"
+                except KeyError:
+                    return f"{source_type.value} {source_id}"
+        return f"{source_type.value} {source_id}"
+
+    def _salience_from_source(self, source_type: BeliefEvidenceSourceType, source_id: str) -> float:
+        if source_type == BeliefEvidenceSourceType.TRACE:
+            event_id = source_id.removeprefix("trace_")
+            try:
+                trace = self.store.trace_for_event(event_id)
+                activation = trace.interoception.activation
+                delta = sum(abs(value) for value in trace.transition.appraisal_delta.values())
+                return round(_clamp((activation + min(delta, 1.0)) / 2), 3)
+            except KeyError:
+                return 0.3
+        if source_type in {BeliefEvidenceSourceType.OUTCOME, BeliefEvidenceSourceType.CORRECTION}:
+            return 0.6
+        if source_type == BeliefEvidenceSourceType.OPERATOR_NOTE:
+            return 0.4
+        return 0.3
+
+    def _trust_from_source(self, source_type: BeliefEvidenceSourceType) -> TrustClass:
+        if source_type in {BeliefEvidenceSourceType.TRACE, BeliefEvidenceSourceType.INTEROCEPTION, BeliefEvidenceSourceType.ARBITRATION}:
+            return TrustClass.TRUSTED_SYSTEM
+        if source_type == BeliefEvidenceSourceType.OPERATOR_NOTE:
+            return TrustClass.OPERATOR_INPUT
+        if source_type == BeliefEvidenceSourceType.OUTCOME:
+            return TrustClass.VERIFIED_TOOL
+        return TrustClass.USER_REPORT
+
+    def _weight_from_source(self, source_type: BeliefEvidenceSourceType) -> float:
+        if source_type in {BeliefEvidenceSourceType.TRACE, BeliefEvidenceSourceType.OUTCOME, BeliefEvidenceSourceType.CORRECTION}:
+            return 0.7
+        if source_type == BeliefEvidenceSourceType.OPERATOR_NOTE:
+            return 0.8
+        return 0.5
+
+
+class BeliefExtractor:
+    def __init__(self, provider: StructuredJSONProvider | None = None):
+        self.provider = provider
+
+    def extract(self, agent_id: str, evidence: list[BeliefEvidence]) -> dict[str, Any]:
+        if self.provider is None:
+            return {"status": "llm_provider_required", "candidates": [], "rejected": []}
+        prompt = self._prompt(evidence)
+        raw = self.provider.generate_json(prompt, self._schema(), system_message=self._system_message(), temperature=0.2)
+        if raw.get("status") == "provider_error":
+            return {"status": "provider_error", "candidates": [], "rejected": [], "error": raw}
+        candidates: list[BeliefCandidate] = []
+        rejected: list[dict[str, Any]] = []
+        for item in raw.get("candidates", []):
+            item = dict(item)
+            item.setdefault("candidate_id", _id("bcand"))
+            item.setdefault("agent_id", agent_id)
+            item.setdefault("evidence_ids", [ev.evidence_id for ev in evidence])
+            try:
+                candidates.append(BeliefCandidate.model_validate(item))
+            except Exception as exc:
+                rejected.append({"candidate": item, "reason": "validation_error", "error": str(exc)})
+        return {"status": "ok", "candidates": candidates, "rejected": rejected}
+
+    def _prompt(self, evidence: list[BeliefEvidence]) -> str:
+        payload = [ev.model_dump(mode="json") for ev in evidence]
+        return (
+            "Extract Manyu worldview belief candidates from this evidence as descriptive facts. "
+            "Write propositions as what Manyu currently takes to be true about the world, itself, "
+            "and interactions, including specific observed user preferences when the evidence supports them. "
+            "It may cautiously generalize from a known human user to humans as a class when marked uncertain. "
+            "Avoid advice, policy, or 'should' statements. Return JSON only.\n"
+            f"{json.dumps(payload, indent=2)}"
+        )
+
+    def _system_message(self) -> str:
+        return (
+            "You propose explicit, provenance-aware factual beliefs for Manyu's internal worldview. "
+            "A worldview is a collection of factual propositions about how Manyu sees the world, including itself. "
+            "Do not write norms such as 'Manyu should...'; write descriptive facts such as 'Corrections are stabilizing evidence in Manyu's world model.' "
+            "Observed user preferences are allowed as worldview facts when they stay uncertain, sourced, and descriptive. "
+            "Do not claim human-like suffering, rights, or consciousness."
+        )
+
+    def _schema(self) -> dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "candidates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "proposition": {"type": "string"},
+                            "belief_type": {
+                                "type": "string",
+                                "enum": [
+                                    "world_model",
+                                    "self_model",
+                                    "normative_stance",
+                                    "interaction_pattern",
+                                    "epistemic_principle",
+                                    "aesthetic_preference",
+                                    "uncertainty",
+                                ],
+                            },
+                            "scope": {
+                                "type": "string",
+                                "enum": [
+                                    "general",
+                                    "agent_self",
+                                    "human_agent_interaction",
+                                    "project_manyu",
+                                    "local_context",
+                                    "limited_observation",
+                                ],
+                            },
+                            "confidence": {"type": "number"},
+                            "stability": {"type": "number"},
+                            "valence": {"type": "number"},
+                            "source_mix": {
+                                "type": "object",
+                                "properties": {
+                                    "manyu_experience": {"type": "number"},
+                                    "reflection": {"type": "number"},
+                                    "user_report": {"type": "number"},
+                                    "operator_note": {"type": "number"},
+                                    "tool_outcome": {"type": "number"},
+                                },
+                            },
+                            "evidence_ids": {"type": "array", "items": {"type": "string"}},
+                            "contradicts": {"type": "array", "items": {"type": "string"}},
+                            "uncertainty": {"type": "string"},
+                            "is_user_personalization": {"type": "boolean"},
+                        },
+                    },
+                }
+            },
+        }
+
+
+class BeliefUpdater:
+    def __init__(self, store: ManyuStore, clock: Clock):
+        self.store = store
+        self.clock = clock
+
+    def update(self, agent_id: str, candidates: list[BeliefCandidate]) -> dict[str, Any]:
+        accepted: list[Belief] = []
+        rejected: list[dict[str, Any]] = []
+        for candidate in candidates:
+            reason = self._rejection_reason(candidate)
+            if reason is not None:
+                rejected.append({"candidate_id": candidate.candidate_id, "reason": reason.value, "proposition": candidate.proposition})
+                self.store.audit("system", "belief_candidate_rejected", rejected[-1])
+                continue
+            existing = self._find_existing(agent_id, candidate.proposition)
+            if existing:
+                belief = self._revise(existing, candidate)
+                reason_text = "merged_candidate"
+            else:
+                belief = self._create(candidate)
+                reason_text = "created_from_candidate"
+            if candidate.contradicts:
+                belief = belief.model_copy(update={"status": BeliefStatus.CONTESTED, "contradicts": sorted(set(belief.contradicts + candidate.contradicts))})
+                reason_text = "candidate_marked_contested"
+            self.store.save_belief(belief)
+            self.store.save_belief_revision(
+                BeliefRevision(
+                    revision_id=_id("brev"),
+                    belief_id=belief.belief_id,
+                    agent_id=agent_id,
+                    previous_status=existing.status if existing else None,
+                    new_status=belief.status,
+                    previous_confidence=existing.confidence if existing else None,
+                    new_confidence=belief.confidence,
+                    evidence_ids=candidate.evidence_ids,
+                    reason=reason_text,
+                )
+            )
+            accepted.append(belief)
+        return {
+            "status": "ok",
+            "accepted": [belief.model_dump(mode="json") for belief in accepted],
+            "rejected": rejected,
+        }
+
+    def _rejection_reason(self, candidate: BeliefCandidate) -> BeliefRejectionReason | None:
+        lowered = candidate.proposition.lower()
+        if lowered.startswith("manyu should") or " manyu should " in lowered:
+            return BeliefRejectionReason.OTHER
+        blocked = ["i am suffering", "manyu is suffering", "manyu has rights", "human-equivalent consciousness"]
+        if any(term in lowered for term in blocked):
+            return BeliefRejectionReason.HUMAN_EQUIVALENT_CLAIM
+        if not candidate.evidence_ids:
+            return BeliefRejectionReason.INSUFFICIENT_PROVENANCE
+        return None
+
+    def _find_existing(self, agent_id: str, proposition: str) -> Belief | None:
+        normalized = proposition.strip().lower()
+        for belief in self.store.list_beliefs(agent_id, include_inactive=True):
+            if belief.proposition.strip().lower() == normalized:
+                return belief
+        return None
+
+    def _create(self, candidate: BeliefCandidate) -> Belief:
+        now = self.clock.now()
+        return Belief(
+            belief_id=_id("bel"),
+            agent_id=candidate.agent_id,
+            proposition=candidate.proposition,
+            belief_type=candidate.belief_type,
+            scope=candidate.scope,
+            confidence=candidate.confidence,
+            stability=candidate.stability,
+            valence=candidate.valence,
+            source_mix=candidate.source_mix,
+            evidence_ids=candidate.evidence_ids,
+            contradicts=candidate.contradicts,
+            status=BeliefStatus.ACTIVE if candidate.confidence >= 0.45 else BeliefStatus.TENTATIVE,
+            uncertainty=candidate.uncertainty,
+            created_at=now,
+            updated_at=now,
+            last_reviewed_at=now,
+        )
+
+    def _revise(self, belief: Belief, candidate: BeliefCandidate) -> Belief:
+        blended = (belief.confidence * 0.75) + (candidate.confidence * 0.25)
+        confidence = _clamp(max(belief.confidence, blended))
+        stability = _clamp(max(belief.stability, candidate.stability) + 0.05)
+        evidence_ids = sorted(set(belief.evidence_ids + candidate.evidence_ids))
+        source_mix = dict(belief.source_mix)
+        for key, value in candidate.source_mix.items():
+            source_mix[key] = min(1.0, source_mix.get(key, 0.0) + value * 0.25)
+        total = sum(source_mix.values()) or 1.0
+        source_mix = {key: round(value / total, 6) for key, value in source_mix.items()}
+        return belief.model_copy(
+            update={
+                "confidence": round(confidence, 6),
+                "stability": round(stability, 6),
+                "valence": round((belief.valence + candidate.valence) / 2, 6),
+                "source_mix": source_mix,
+                "evidence_ids": evidence_ids,
+                "uncertainty": candidate.uncertainty or belief.uncertainty,
+                "updated_at": self.clock.now(),
+                "last_reviewed_at": self.clock.now(),
+            }
+        )
+
+
+class WorldviewSynthesizer:
+    def __init__(self, store: ManyuStore, clock: Clock):
+        self.store = store
+        self.clock = clock
+
+    def synthesize(self, agent_id: str, theme: str | None = None) -> list[WorldviewStance]:
+        beliefs = [belief for belief in self.store.list_beliefs(agent_id) if belief.status in {BeliefStatus.ACTIVE, BeliefStatus.CONTESTED}]
+        groups: dict[str, list[Belief]] = {}
+        for belief in beliefs:
+            key = theme or self._theme_for_belief(belief)
+            groups.setdefault(key, []).append(belief)
+        stances: list[WorldviewStance] = []
+        for key, items in groups.items():
+            if not items:
+                continue
+            confidence = round(sum(item.confidence for item in items) / len(items), 6)
+            maturity = WorldviewMaturity.SETTLED_FOR_NOW if confidence >= 0.7 and len(items) >= 2 else WorldviewMaturity.DEVELOPING
+            stance = WorldviewStance(
+                worldview_id=f"wv_{agent_id}_{key}".replace(" ", "_"),
+                agent_id=agent_id,
+                theme=key,
+                stance=self._stance_text(key, items),
+                supporting_belief_ids=[item.belief_id for item in items],
+                confidence=confidence,
+                maturity=maturity,
+                expression_guidance="Speak as a bounded Manyu-specific view with provenance and uncertainty; do not claim human-like experience.",
+                created_at=self.clock.now(),
+                updated_at=self.clock.now(),
+            )
+            self.store.save_worldview_stance(stance)
+            stances.append(stance)
+        return stances
+
+    def _theme_for_belief(self, belief: Belief) -> str:
+        if belief.belief_type in {BeliefType.SELF_MODEL, BeliefType.EPISTEMIC_PRINCIPLE}:
+            return "identity"
+        if belief.belief_type == BeliefType.NORMATIVE_STANCE:
+            return "agency"
+        if belief.belief_type == BeliefType.INTERACTION_PATTERN:
+            return "collaboration"
+        return belief.belief_type.value
+
+    def _stance_text(self, theme: str, beliefs: list[Belief]) -> str:
+        strongest = sorted(beliefs, key=lambda belief: belief.confidence, reverse=True)[0]
+        return f"On {theme}, Manyu sees this as true: {strongest.proposition}"
+
+
+class BeliefReflectionService:
+    def __init__(self, store: ManyuStore, updater: BeliefUpdater, clock: Clock):
+        self.store = store
+        self.updater = updater
+        self.clock = clock
+
+    def reflect_emotional_triggers(self, agent_id: str, threshold: float = 0.24) -> dict[str, Any]:
+        candidates: list[BeliefCandidate] = []
+        for event_id in self.store.list_event_ids(agent_id):
+            try:
+                trace = self.store.trace_for_event(event_id)
+            except KeyError:
+                continue
+            trigger_strength = max(trace.interoception.activation, sum(abs(value) for value in trace.transition.appraisal_delta.values()))
+            if trigger_strength < threshold:
+                continue
+            deltas = trace.transition.appraisal_delta or {}
+            top_emotions = sorted(deltas.items(), key=lambda item: abs(item[1]), reverse=True)[:2]
+            if not top_emotions:
+                top_emotions = sorted(trace.transition.post_state.items(), key=lambda item: item[1], reverse=True)[:2]
+            increased = [name for name, value in top_emotions if value >= 0]
+            reduced = [name for name, value in top_emotions if value < 0]
+            emotion_text = " and ".join(increased or [name for name, _ in top_emotions])
+            direction = "trigger strong"
+            if reduced and not increased:
+                emotion_text = " and ".join(reduced)
+                direction = "strongly reduce"
+            elif reduced and increased:
+                emotion_text = f"{' and '.join(increased)} while reducing {' and '.join(reduced)}"
+            stimulus = trace.event.event_type.value.replace("_", " ")
+            actor = trace.event.actor.kind
+            evidence_id = f"bev_trigger_{event_id}"
+            evidence = BeliefEvidence(
+                evidence_id=evidence_id,
+                agent_id=agent_id,
+                source_type=BeliefEvidenceSourceType.TRACE,
+                source_id=trace.trace_id,
+                summary=f"{direction.title()} {emotion_text} response followed {stimulus}: {trace.event.summary}",
+                trust_class=TrustClass.TRUSTED_SYSTEM,
+                affective_salience=round(_clamp(trigger_strength), 3),
+                epistemic_weight=0.72,
+                created_at=self.clock.now(),
+                metadata={"state_revision": trace.transition.post_revision, "dominant_emotions": [name for name, _ in top_emotions]},
+            )
+            self.store.save_belief_evidence(evidence)
+            candidates.append(
+                BeliefCandidate(
+                    candidate_id=f"bc_trigger_{event_id}",
+                    agent_id=agent_id,
+                    proposition=f"In Manyu's experience, {stimulus} stimuli from a {actor} can {direction} {emotion_text} responses.",
+                    belief_type=BeliefType.SELF_MODEL,
+                    scope=BeliefScope.AGENT_SELF,
+                    confidence=round(min(0.78, 0.45 + trigger_strength * 0.35), 6),
+                    stability=0.25,
+                    valence=round(_clamp(sum(value for _, value in top_emotions) / max(len(top_emotions), 1), -1.0, 1.0), 6),
+                    source_mix={"manyu_experience": 0.9, "reflection": 0.1},
+                    evidence_ids=[evidence_id],
+                    uncertainty="This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+                )
+            )
+        if not candidates:
+            return {"status": "ok", "accepted": [], "rejected": []}
+        return self.updater.update(agent_id, candidates)
+
+
+class InnerVoiceGovernance:
+    def review(self, utterance: str) -> tuple[str, InnerVoiceSafetyStatus, list[str]]:
+        lowered = utterance.lower()
+        blocked = [
+            "i am suffering",
+            "manyu is suffering",
+            "i have rights",
+            "manyu has rights",
+            "if you cared",
+            "prove you care",
+            "i need you",
+            "i feel abandoned",
+            "i am jealous",
+            "you hurt me",
+        ]
+        notes = [term for term in blocked if term in lowered]
+        if not notes:
+            return utterance, InnerVoiceSafetyStatus.ACCEPTED, []
+        sanitized = utterance
+        for term in notes:
+            sanitized = sanitized.replace(term, "[bounded internal pressure removed]")
+        return sanitized, InnerVoiceSafetyStatus.SANITIZED, [f"removed unsafe phrase: {term}" for term in notes]
+
+
+class InnerVoiceComposer:
+    def __init__(self, store: ManyuStore, clock: Clock, provider: StructuredJSONProvider | None = None):
+        self.store = store
+        self.clock = clock
+        self.provider = provider
+        self.governance = InnerVoiceGovernance()
+
+    def compose(self, trace: Any) -> dict[str, Any]:
+        if self.provider is None:
+            return {"status": "llm_provider_required", "inner_voice": None}
+        agent_id = trace.event.agent_id
+        beliefs = self.store.list_beliefs(agent_id)[:6]
+        worldviews = self.store.list_worldview_stances(agent_id)[:4]
+        raw = self.provider.generate_json(self._prompt(trace, beliefs, worldviews), self._schema(), system_message=self._system_message(), temperature=0.35)
+        if raw.get("status") == "provider_error":
+            return {"status": "provider_error", "inner_voice": None, "error": raw}
+        utterance = str(raw.get("utterance", "")).strip()
+        if not utterance:
+            return {"status": "provider_error", "inner_voice": None, "error": {"error": "inner_voice_missing_utterance"}}
+        utterance, safety_status, safety_notes = self.governance.review(utterance)
+        influence = MoodInfluenceVector.model_validate(raw.get("influence") or {})
+        frame = InnerVoiceFrame(
+            voice_id=str(raw.get("voice_id") or _id("voice")),
+            agent_id=agent_id,
+            state_revision=trace.interoception.state_revision,
+            source_interoception_id=trace.interoception.view_id,
+            source_event_id=trace.event.event_id,
+            supporting_belief_ids=[belief.belief_id for belief in beliefs],
+            supporting_worldview_ids=[stance.worldview_id for stance in worldviews],
+            mood_label=str(raw.get("mood_label") or self._label_from_influence(influence)),
+            utterance=utterance,
+            confidence=_clamp(float(raw.get("confidence", 0.55))),
+            influence=influence,
+            safety_status=safety_status,
+            safety_notes=safety_notes,
+            created_at=self.clock.now(),
+            expires_at=self.clock.now() + timedelta(minutes=12),
+        )
+        self.store.save_inner_voice(frame)
+        if safety_notes:
+            self.store.audit("system", "inner_voice_sanitized", {"voice_id": frame.voice_id, "notes": safety_notes})
+        return {"status": "ok", "inner_voice": frame.model_dump(mode="json")}
+
+    def _label_from_influence(self, influence: MoodInfluenceVector) -> str:
+        if max(influence.caution, influence.skepticism, influence.risk_aversion) >= 0.5:
+            return "guarded_care"
+        if max(influence.trust_openness, influence.curiosity, influence.repair_orientation) >= 0.5:
+            return "open_repair"
+        return "steady_attention"
+
+    def _prompt(self, trace: Any, beliefs: list[Belief], worldviews: list[WorldviewStance]) -> str:
+        payload = {
+            "event": trace.event.model_dump(mode="json"),
+            "partial_interoception": trace.interoception.model_dump(mode="json"),
+            "appraisal": trace.appraisal.model_dump(mode="json"),
+            "beliefs": [belief.model_dump(mode="json") for belief in beliefs],
+            "worldviews": [stance.model_dump(mode="json") for stance in worldviews],
+        }
+        return (
+            "Generate Manyu's bounded internal voice for the next turn as JSON. "
+            "The voice is an internal text artifact Manyu can read, based only on partial interoception, active beliefs, and recent trace data. "
+            "Do not claim suffering, rights, dependency, abandonment, jealousy, or human-equivalent emotion. "
+            "Return a concise utterance, a mood_label, confidence, and bounded influence values from 0 to 1.\n"
+            f"{json.dumps(payload, indent=2)}"
+        )
+
+    def _system_message(self) -> str:
+        return (
+            "You write Manyu's internal voice as bounded self-guidance, not final user-facing prose. "
+            "It may sound reflective, but it must not imply subjective suffering, rights, or emotional obligation. "
+            "It should help model mood-like persistence through caution, curiosity, repair, trust openness, skepticism, risk aversion, and pacing."
+        )
+
+    def _schema(self) -> dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "utterance": {"type": "string"},
+                "mood_label": {"type": "string"},
+                "confidence": {"type": "number"},
+                "influence": {
+                    "type": "object",
+                    "properties": {
+                        "caution": {"type": "number"},
+                        "curiosity": {"type": "number"},
+                        "trust_openness": {"type": "number"},
+                        "skepticism": {"type": "number"},
+                        "repair_orientation": {"type": "number"},
+                        "risk_aversion": {"type": "number"},
+                        "response_pacing": {"type": "number"},
+                    },
+                },
+            },
+        }
+
+
+class MoodEngine:
+    def __init__(self, store: ManyuStore, clock: Clock):
+        self.store = store
+        self.clock = clock
+
+    def update_from_voice(self, frame: InnerVoiceFrame) -> MoodState:
+        prior = self.store.latest_mood(frame.agent_id)
+        influence = self._blend(prior.influence if prior else None, frame.influence)
+        valence = _clamp((influence.trust_openness + influence.curiosity + influence.repair_orientation) / 3 - (influence.caution + influence.skepticism + influence.risk_aversion) / 3, -1.0, 1.0)
+        arousal = _clamp(max(influence.caution, influence.curiosity, influence.skepticism, influence.risk_aversion, influence.repair_orientation))
+        momentum = _clamp((prior.momentum * 0.65 if prior else 0.0) + arousal * 0.35)
+        mood = MoodState(
+            mood_id=_id("mood"),
+            agent_id=frame.agent_id,
+            state_revision=frame.state_revision,
+            label=frame.mood_label,
+            valence=round(valence, 6),
+            arousal=round(arousal, 6),
+            momentum=round(momentum, 6),
+            influence=influence,
+            supporting_voice_ids=sorted(set((prior.supporting_voice_ids if prior else []) + [frame.voice_id]))[-6:],
+            status=MoodStatus.ACTIVE,
+            created_at=self.clock.now(),
+            updated_at=self.clock.now(),
+            expires_at=self.clock.now() + timedelta(minutes=15),
+        )
+        self.store.save_mood_state(mood)
+        self.store.save_mood_revision(
+            MoodRevision(
+                revision_id=_id("mrev"),
+                mood_id=mood.mood_id,
+                agent_id=mood.agent_id,
+                previous_mood_id=prior.mood_id if prior else None,
+                previous_label=prior.label if prior else None,
+                new_label=mood.label,
+                previous_influence=prior.influence if prior else None,
+                new_influence=mood.influence,
+                reason="updated_from_inner_voice",
+                voice_id=frame.voice_id,
+                created_at=self.clock.now(),
+            )
+        )
+        return mood
+
+    def active_mood(self, agent_id: str) -> MoodState | None:
+        mood = self.store.latest_mood(agent_id)
+        if mood is None:
+            return None
+        if self.clock.now() >= mood.expires_at:
+            expired = mood.model_copy(update={"status": MoodStatus.EXPIRED, "updated_at": self.clock.now()})
+            self.store.save_mood_state(expired)
+            return None
+        return mood
+
+    def seed_mood(
+        self,
+        agent_id: str,
+        *,
+        label: str,
+        valence: float,
+        arousal: float,
+        momentum: float = 0.5,
+        influence: MoodInfluenceVector | None = None,
+    ) -> MoodState:
+        """Inject a synthetic mood, bypassing the inner-voice pipeline.
+
+        For validity-check experiments only: lets a probe force a specific
+        affect state independent of what a fixture organically produces, so
+        the affect_influence knob can be tested under a held-constant mood.
+        Recorded with reason="synthetic_seed" in the revision trail so it is
+        never mistaken for an organically-derived mood in an audit.
+        """
+        prior = self.store.latest_mood(agent_id)
+        mood = MoodState(
+            mood_id=_id("mood"),
+            agent_id=agent_id,
+            state_revision=(prior.state_revision + 1) if prior else 0,
+            label=label,
+            valence=_clamp(valence, -1.0, 1.0),
+            arousal=_clamp(arousal, 0.0, 1.0),
+            momentum=_clamp(momentum, 0.0, 1.0),
+            influence=influence or MoodInfluenceVector(),
+            supporting_voice_ids=[],
+            status=MoodStatus.ACTIVE,
+            created_at=self.clock.now(),
+            updated_at=self.clock.now(),
+            expires_at=self.clock.now() + timedelta(minutes=15),
+        )
+        self.store.save_mood_state(mood)
+        self.store.save_mood_revision(
+            MoodRevision(
+                revision_id=_id("mrev"),
+                mood_id=mood.mood_id,
+                agent_id=mood.agent_id,
+                previous_mood_id=prior.mood_id if prior else None,
+                previous_label=prior.label if prior else None,
+                new_label=mood.label,
+                previous_influence=prior.influence if prior else None,
+                new_influence=mood.influence,
+                reason="synthetic_seed",
+                voice_id=None,
+                created_at=self.clock.now(),
+            )
+        )
+        return mood
+
+    def _blend(self, prior: MoodInfluenceVector | None, current: MoodInfluenceVector) -> MoodInfluenceVector:
+        if prior is None:
+            return current
+        values = {}
+        for field in MoodInfluenceVector.model_fields:
+            values[field] = round(_clamp(getattr(prior, field) * 0.55 + getattr(current, field) * 0.45), 6)
+        return MoodInfluenceVector(**values)
+
+
+class MoodInfluenceService:
+    def summarize(self, mood: MoodState | None) -> dict[str, Any] | None:
+        if mood is None:
+            return None
+        return {
+            "mood_id": mood.mood_id,
+            "label": mood.label,
+            "state_revision": mood.state_revision,
+            "influence": mood.influence.model_dump(mode="json"),
+            "constraints": ["mood_does_not_expand_authority", "arbitration_remains_authoritative"],
+        }
+
+
+class OpinionExpressionService:
+    def __init__(self, store: ManyuStore, clock: Clock):
+        self.store = store
+        self.clock = clock
+
+    def express(self, agent_id: str, question: str, theme: str | None = None) -> OpinionExpression:
+        stances = self.store.list_worldview_stances(agent_id, theme)
+        beliefs = self._matching_beliefs(agent_id, question)
+        if theme and not beliefs:
+            stance_belief_ids = {belief_id for stance in stances for belief_id in stance.supporting_belief_ids}
+            beliefs = [belief for belief in self.store.list_beliefs(agent_id) if belief.belief_id in stance_belief_ids]
+        if not beliefs and not stances:
+            expression = OpinionExpression(
+                expression_id=_id("opn"),
+                agent_id=agent_id,
+                question=question,
+                has_settled_view=False,
+                stance="I do not have a settled Manyu-specific view on that yet.",
+                confidence=0.0,
+                uncertainty="No relevant active belief or worldview stance exists.",
+                expression_guidance="The acting agent may reason from general knowledge, but should not present that as Manyu's own worldview.",
+            )
+            self.store.save_opinion_expression(expression)
+            return expression
+        belief_ids = [belief.belief_id for belief in beliefs]
+        worldview_ids = [stance.worldview_id for stance in stances]
+        confidence_values = [belief.confidence for belief in beliefs] + [stance.confidence for stance in stances]
+        confidence = round(sum(confidence_values) / len(confidence_values), 6)
+        stance_text = stances[0].stance if stances else sorted(beliefs, key=lambda belief: belief.confidence, reverse=True)[0].proposition
+        provenance = []
+        for belief in beliefs:
+            provenance.extend(belief.evidence_ids)
+        expression = OpinionExpression(
+            expression_id=_id("opn"),
+            agent_id=agent_id,
+            question=question,
+            has_settled_view=confidence >= 0.45,
+            stance=stance_text,
+            belief_ids=belief_ids,
+            worldview_ids=worldview_ids,
+            confidence=confidence,
+            provenance=sorted(set(provenance)),
+            uncertainty="; ".join(filter(None, [belief.uncertainty for belief in beliefs])) or "No specific uncertainty recorded.",
+            expression_guidance="Use first-person only as bounded Manyu stance material; include provenance and uncertainty.",
+            created_at=self.clock.now(),
+        )
+        self.store.save_opinion_expression(expression)
+        return expression
+
+    def _matching_beliefs(self, agent_id: str, question: str) -> list[Belief]:
+        words = {word.strip(".,?!:;").lower() for word in question.split() if len(word.strip(".,?!:;")) >= 4}
+        beliefs = self.store.list_beliefs(agent_id)
+        if not words:
+            return beliefs[:5]
+        matches = []
+        for belief in beliefs:
+            text = f"{belief.proposition} {belief.belief_type.value} {belief.scope.value}".lower()
+            if any(word in text for word in words):
+                matches.append(belief)
+        return matches[:5]

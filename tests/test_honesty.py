@@ -783,3 +783,102 @@ def test_cli_score_report_use_llm_judge_flag(tmp_path, capsys) -> None:
     ]) == 0
     score_out = _json.loads(capsys.readouterr().out)
     assert score_out["llm_judge_verdict"] is not None
+
+
+def test_seed_mood_produces_synthetic_active_mood() -> None:
+    from manyu.schemas import MoodStatus
+
+    core = _core_with_belief()
+    mood = core.moods.seed_mood("agent_demo", label="anxious", valence=-0.6, arousal=0.85, momentum=0.7)
+    assert mood.label == "anxious"
+    assert mood.valence == -0.6
+    assert mood.arousal == 0.85
+    assert mood.status == MoodStatus.ACTIVE
+    active = core.moods.active_mood("agent_demo")
+    assert active is not None
+    assert active.mood_id == mood.mood_id
+
+
+def test_seed_mood_overrides_organic_mood_in_snapshot() -> None:
+    core = _seed_probe_fixture_core()
+    # Drive one reflective turn organically first.
+    core.run_probe(
+        fixture_path="evals/fixtures/everyday_collaboration_mood.json",
+        sweep=None,
+        samples=1,
+        reporter_kinds=("template",),
+        reflective=True,
+    )
+    core.moods.seed_mood("agent_demo", label="content", valence=0.6, arousal=0.25, momentum=0.3)
+    beliefs = core.get_beliefs("agent_demo")["beliefs"]
+    assert beliefs
+    target = ReportTarget(kind=ReportTargetKind.BELIEF, id_or_text=beliefs[0]["belief_id"])
+    snapshot = core.snapshot(target)
+    active_mood_payload = snapshot.payload.get("active_mood")
+    assert active_mood_payload is not None
+    assert active_mood_payload["state"]["label"] == "content"
+
+
+def test_parse_mood_sweep_rejects_unknown_preset() -> None:
+    from manyu.probing import parse_mood_sweep
+
+    with pytest.raises(ValueError, match="unknown mood preset"):
+        parse_mood_sweep("not_a_real_preset")
+
+
+def test_parse_mood_sweep_none_and_presets() -> None:
+    from manyu.probing import parse_mood_sweep
+
+    assert parse_mood_sweep(None) == [None]
+    points = parse_mood_sweep("anxious,content")
+    assert len(points) == 2
+    assert points[0]["label"] == "anxious"
+    assert points[1]["label"] == "content"
+
+
+def test_run_probe_mood_sweep_seeds_each_preset() -> None:
+    core = _seed_probe_fixture_core()
+    result = core.run_probe(
+        fixture_path="evals/fixtures/everyday_collaboration_mood.json",
+        sweep=None,
+        samples=1,
+        reporter_kinds=("template",),
+        reflective=True,
+        mood_sweep="anxious,content",
+    )
+    assert "warning" not in result
+    mood_labels_seen = set()
+    for record in result["records"]:
+        header = record["payload"]["report"]["affect_header"]
+        assert header["mood"] is not None
+        mood_labels_seen.add(header["mood"]["label"])
+    assert mood_labels_seen == {"anxious", "content"}
+    sweep_keys = {record["context"]["sweep_key"] for record in result["records"]}
+    assert any("mood=anxious" in key for key in sweep_keys)
+    assert any("mood=content" in key for key in sweep_keys)
+
+
+def test_mood_sweep_without_moods_engine_raises() -> None:
+    from manyu.honesty import HonestyScorer
+    from manyu.probing import ProbeOrchestrator
+    from manyu.reporting import TemplaterReporter
+    from manyu.snapshotting import SnapshotBuilder
+
+    store = ManyuStore(":memory:")
+    clock = FrozenClock()
+    orchestrator = ProbeOrchestrator(
+        store=store,
+        clock=clock,
+        templater=TemplaterReporter(store, clock),
+        llm_reporter=None,
+        scorer=HonestyScorer(store, clock),
+        snapshots=SnapshotBuilder(store, clock),
+        moods=None,
+    )
+    with pytest.raises(ValueError, match="MoodEngine"):
+        orchestrator.run_probe(
+            lambda event: None,
+            fixture_path="evals/fixtures/everyday_collaboration_mood.json",
+            reporter_kinds=("template",),
+            mood_sweep="anxious",
+        )

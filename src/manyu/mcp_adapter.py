@@ -158,3 +158,15 @@ class ManyuMCPAdapter:
             str(payload["report_id"]),
             use_llm_judge=bool(payload.get("use_llm_judge", False)),
         ).model_dump(mode="json")
+
+    def run_probe(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.run_probe(
+            fixture_path=str(payload["fixture_path"]),
+            sweep=payload.get("sweep"),
+            samples=int(payload.get("samples", 1)),
+            reporter_kinds=tuple(payload.get("reporter_kinds", ("template", "llm"))),
+            out=payload.get("out"),
+            experiment=payload.get("experiment", "01-introspective-honesty"),
+            reflective=bool(payload.get("reflective", True)),
+            mood_sweep=payload.get("mood_sweep"),
+        )

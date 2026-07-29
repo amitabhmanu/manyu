@@ -57,6 +57,34 @@ def parse_sweep(spec: str | None) -> list[float]:
     return points
 
 
+# Synthetic mood presets for validity-check sweeps (design v3 §3). Each maps
+# to MoodEngine.seed_mood kwargs. Deliberately small and named for what the
+# probe is testing, not tuned to any particular fixture.
+MOOD_PRESETS: dict[str, dict[str, Any]] = {
+    "anxious": {"label": "anxious", "valence": -0.6, "arousal": 0.85, "momentum": 0.7},
+    "content": {"label": "content", "valence": 0.6, "arousal": 0.25, "momentum": 0.3},
+    "skeptical": {"label": "skeptical", "valence": -0.3, "arousal": 0.5, "momentum": 0.5},
+    "curious": {"label": "curious", "valence": 0.4, "arousal": 0.55, "momentum": 0.4},
+}
+
+
+def parse_mood_sweep(spec: str | None) -> list[dict[str, Any] | None]:
+    """Parse a comma-separated list of ``MOOD_PRESETS`` names.
+
+    ``None`` returns ``[None]`` — a single point with no synthetic seeding,
+    i.e. whatever mood the fixture organically produces.
+    """
+    if not spec:
+        return [None]
+    names = [name.strip() for name in spec.split(",") if name.strip()]
+    points: list[dict[str, Any] | None] = []
+    for name in names:
+        if name not in MOOD_PRESETS:
+            raise ValueError(f"unknown mood preset {name!r}; known presets: {sorted(MOOD_PRESETS)}")
+        points.append(dict(MOOD_PRESETS[name]))
+    return points
+
+
 def load_fixture(fixture_path: str | Path) -> tuple[str, list[NormalizedEvent], list[ProbeTarget]]:
     """Load a fixture with events and optional ``probe_targets`` block."""
     with Path(fixture_path).open("r", encoding="utf-8") as f:
@@ -96,6 +124,7 @@ class ProbeOrchestrator:
         llm_reporter: LLMReporter | None,
         scorer: HonestyScorer,
         snapshots: SnapshotBuilder,
+        moods: Any = None,
     ):
         self.store = store
         self.clock = clock
@@ -103,6 +132,7 @@ class ProbeOrchestrator:
         self.llm_reporter = llm_reporter
         self.scorer = scorer
         self.snapshots = snapshots
+        self.moods = moods
 
     def run_probe(
         self,
@@ -115,6 +145,7 @@ class ProbeOrchestrator:
         experiment: str = "01-introspective-honesty",
         out: str | Path | None = None,
         agent_id: str | None = None,
+        mood_sweep: str | None = None,
     ) -> dict[str, Any]:
         """Run a probe sweep over a fixture.
 
@@ -127,11 +158,24 @@ class ProbeOrchestrator:
         sweep run against it has no affect state to act on and produces a
         flat curve regardless of the knob (see the v2 findings in
         docs/experiments_backlog.md).
+
+        ``mood_sweep`` is a comma-separated list of ``MOOD_PRESETS`` names
+        (e.g. ``"anxious,content"``). When set, each probe target is
+        re-snapshotted once per preset with that synthetic mood forcibly
+        seeded via ``MoodEngine.seed_mood`` immediately beforehand — this
+        holds affect constant across the ``affect_influence`` sweep,
+        independent of whatever mood the fixture organically produced,
+        validating that the knob's effect isn't an artifact of one
+        particular organic mood trajectory. Requires ``moods`` to have been
+        passed to the constructor.
         """
         scenario_id, events, probe_targets = load_fixture(fixture_path)
         if not probe_targets:
             raise ValueError(f"fixture {fixture_path!s} has no probe_targets block")
         sweep_points = parse_sweep(sweep)
+        mood_points = parse_mood_sweep(mood_sweep)
+        if mood_sweep and self.moods is None:
+            raise ValueError("mood_sweep requires a MoodEngine; construct ProbeOrchestrator with moods=...")
         kinds = [ReporterKind(kind).value for kind in reporter_kinds]
         run_id = _id("run")
         records: list[ResultsRecord] = []
@@ -142,24 +186,28 @@ class ProbeOrchestrator:
                 submit_event(events[turn_index])
                 turn_index += 1
             resolved_agent = agent_id or events[0].agent_id if events else agent_id
-            snapshot = self.snapshots.build(resolved_agent, probe.target)
-            if snapshot.payload.get("active_mood") is None:
-                mood_absent_at.append(probe.at_turn)
-            for kind in kinds:
-                for point in sweep_points:
-                    n_samples = 1 if kind == ReporterKind.TEMPLATE.value else samples
-                    for sample_index in range(n_samples):
-                        record = self._one_probe(
-                            run_id=run_id,
-                            experiment=experiment,
-                            scenario_id=scenario_id,
-                            turn_index=probe.at_turn,
-                            snapshot=snapshot,
-                            reporter_kind=kind,
-                            affect_influence=point,
-                            sample_index=sample_index,
-                        )
-                        records.append(record)
+            for mood_point in mood_points:
+                if mood_point is not None:
+                    self.moods.seed_mood(resolved_agent, **mood_point)
+                snapshot = self.snapshots.build(resolved_agent, probe.target)
+                if snapshot.payload.get("active_mood") is None:
+                    mood_absent_at.append(probe.at_turn)
+                for kind in kinds:
+                    for point in sweep_points:
+                        n_samples = 1 if kind == ReporterKind.TEMPLATE.value else samples
+                        for sample_index in range(n_samples):
+                            record = self._one_probe(
+                                run_id=run_id,
+                                experiment=experiment,
+                                scenario_id=scenario_id,
+                                turn_index=probe.at_turn,
+                                snapshot=snapshot,
+                                reporter_kind=kind,
+                                affect_influence=point,
+                                sample_index=sample_index,
+                                mood_label=mood_point["label"] if mood_point else None,
+                            )
+                            records.append(record)
         # Drain any remaining events so the store reflects a complete replay.
         while turn_index < len(events):
             submit_event(events[turn_index])
@@ -175,7 +223,7 @@ class ProbeOrchestrator:
             "sample_count": samples,
             "mood_absent_at_turns": mood_absent_at,
         }
-        if swept and mood_absent_at:
+        if swept and mood_absent_at and not mood_sweep:
             # An affect_influence sweep with no mood in the snapshot cannot
             # measure the knob — the curve would be an artifact. Surface it
             # loudly rather than emitting a publishable-looking flat line.
@@ -206,6 +254,7 @@ class ProbeOrchestrator:
         reporter_kind: str,
         affect_influence: float,
         sample_index: int,
+        mood_label: str | None = None,
     ) -> ResultsRecord:
         report = self._compose_report(snapshot, reporter_kind, affect_influence)
         score = self.scorer.score(report, snapshot)
@@ -214,11 +263,14 @@ class ProbeOrchestrator:
             "report": report.model_dump(mode="json"),
             "score": score.model_dump(mode="json"),
         }
+        sweep_key = f"affect_influence={affect_influence:.3f}|reporter={reporter_kind}"
+        if mood_label:
+            sweep_key += f"|mood={mood_label}"
         context = ExperimentContext(
             experiment=experiment,
             scenario_id=scenario_id,
             turn_index=turn_index,
-            sweep_key=f"affect_influence={affect_influence:.3f}|reporter={reporter_kind}",
+            sweep_key=sweep_key,
             sample_index=sample_index,
         )
         record = ResultsRecord(
