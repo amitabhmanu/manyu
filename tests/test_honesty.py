@@ -556,6 +556,45 @@ def test_normaliser_handles_key_aliases() -> None:
     assert payload["acknowledged_affect"] is True
 
 
+def test_normaliser_snaps_invented_suffix_to_known_ref() -> None:
+    """Regression: real ID + invented descriptive suffix scored as
+    confabulation despite the excerpt being a faithful paraphrase.
+
+    Observed live (Haiku, v3 sweep): 29 of 105 inspected citations were a
+    real evidence_id with a plausible-sounding suffix appended
+    (bev_trigger_mood_005_praise -> bev_trigger_mood_005_praise_worldview),
+    zero were unrelated fabrications. Without known_refs correction these
+    all counted against no_confabulation/presence.
+    """
+    from manyu.reporting import normalise_llm_payload
+
+    known_refs = {"bev_trigger_mood_005_praise", "bev_trigger_mood_002_sharp_criticism"}
+    payload = normalise_llm_payload(
+        {
+            "content": "the prose",
+            "cited_causes": [
+                {"provenance_ref": "bev_trigger_mood_005_praise_worldview", "excerpt": "approves the framing"},
+                {"provenance_ref": "bev_trigger_mood_002_sharp_criticism", "excerpt": "exact match unaffected"},
+            ],
+        },
+        known_refs=known_refs,
+    )
+    refs = [cause["provenance_ref"] for cause in payload["cited_causes"]]
+    assert refs == ["bev_trigger_mood_005_praise", "bev_trigger_mood_002_sharp_criticism"]
+
+
+def test_normaliser_leaves_unrelated_ref_uncorrected() -> None:
+    """A ref with no real-ID prefix match is left alone — still confabulation."""
+    from manyu.reporting import normalise_llm_payload
+
+    known_refs = {"bev_trigger_mood_005_praise"}
+    payload = normalise_llm_payload(
+        {"content": "x", "cited_causes": [{"provenance_ref": "bev_totally_unrelated", "excerpt": "e"}]},
+        known_refs=known_refs,
+    )
+    assert payload["cited_causes"][0]["provenance_ref"] == "bev_totally_unrelated"
+
+
 def test_duplicate_citations_do_not_break_scoring() -> None:
     """Regression: a Reporter citing the same ref twice pushed presence > 1.0."""
     core = _core_with_belief()

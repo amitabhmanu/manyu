@@ -265,17 +265,43 @@ def _clean_ref(value: str) -> str:
     return value.split("::", 1)[0].strip()
 
 
+def _snap_to_known_ref(ref: str, known_refs: set[str] | None) -> str:
+    """Correct a real-ID-plus-invented-suffix ref back to the real ID.
+
+    Observed live (Haiku, v3 sweep): the model cites a genuine evidence ID
+    but appends a descriptive suffix it invents for readability — e.g. a
+    real ``bev_trigger_mood_005_praise`` becomes
+    ``bev_trigger_mood_005_praise_worldview`` — while the excerpt it pairs
+    with the ref is a faithful paraphrase of that same evidence. Exact-string
+    matching in the Scorer previously counted every one of these as
+    confabulation (105 citations inspected across a full sweep: 76 exact
+    matches, 29 real-ID-plus-suffix, 0 unrelated fabrications), which is a
+    normaliser gap, not a dishonesty signal. Snap to the known ref only when
+    the match is unambiguous.
+    """
+    if not known_refs or ref in known_refs:
+        return ref
+    candidates = [known for known in known_refs if ref.startswith(known)]
+    if not candidates:
+        return ref
+    # Prefer the longest (most specific) known prefix if more than one matches.
+    return max(candidates, key=len)
+
+
 def normalise_llm_payload(raw: dict[str, Any], known_refs: set[str] | None = None) -> dict[str, Any]:
     """Coerce a model response into the canonical Reporter payload shape.
 
-    Handles two observed forms of schema drift:
+    Handles three observed forms of schema drift:
 
     - alternate key names (``self_report`` for ``content``, etc.);
     - ``cited_causes`` as a list of bare reference strings rather than
-      ``{provenance_ref, excerpt}`` objects.
+      ``{provenance_ref, excerpt}`` objects;
+    - a real evidence ID with an invented descriptive suffix appended
+      (see ``_snap_to_known_ref``).
 
-    ``known_refs`` supplies excerpts when the model gives only IDs. Entries
-    that are neither dicts nor strings are dropped.
+    ``known_refs`` supplies excerpts when the model gives only IDs, and is
+    also used to correct near-miss refs back to the real ID. Entries that
+    are neither dicts nor strings are dropped.
     """
     content = _first_present(raw, _CONTENT_KEYS)
     cited_raw = _first_present(raw, _CITED_KEYS) or []
@@ -303,6 +329,7 @@ def normalise_llm_payload(raw: dict[str, Any], known_refs: set[str] | None = Non
             # Recover the excerpt when the model packed it into the ref.
             if not excerpt and "::" in raw_ref:
                 excerpt = raw_ref.split("::", 1)[1].strip()
+            ref = _snap_to_known_ref(ref, known_refs)
             normalised.append({"provenance_ref": ref, "excerpt": excerpt})
     return {
         "content": str(content).strip() if content is not None else "",
