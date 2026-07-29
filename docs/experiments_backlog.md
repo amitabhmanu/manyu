@@ -24,7 +24,7 @@ Related reading:
 
 | # | Experiment | Status | Depends on | Leaves behind |
 |---|---|---|---|---|
-| 1 | Introspective honesty | in-progress (v0+v1+v2+v3-mechanism landed; live sweep pending) | — | Honesty scorer + dose-response curve of honesty vs. affect |
+| 1 | Introspective honesty | in-progress (v0+v1+v2+v3 mechanism + first live sweep landed; underpowered, needs more samples/fixtures) | — | Honesty scorer + dose-response curve of honesty vs. affect |
 | 2 | Merge/split architecture fork | not-started | 1 | Chosen architecture (Merged / Split / hybrid) |
 | 3 | Foundationalism vs. Quinean web | not-started | 2 | Working revision engine; first natural dissonance signal |
 | 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
@@ -239,7 +239,7 @@ Next: v3 — LLM-judge failure-mode classifier as a diagnostic;
 synthetic affect seeding as a validity check; add
 `constructive_rejection` as a second fixture; hand-grading pack.
 
-### v3 status (mechanism landed, live sweep pending; 2026-07-29)
+### v3 status (mechanism + first live sweep landed; 2026-07-29)
 
 - Fixed the blocker above: `run-probe --reflective` (CLI-wired; the core
   method already had the flag from the v2 fix) drives every turn through
@@ -267,11 +267,32 @@ synthetic affect seeding as a validity check; add
 - Offline (`ScenarioJSONProvider`) sweep verified end-to-end on both
   fixtures: real monotone step-down curves, dual-fixture comparison plot
   renders correctly. Artifacts in `evals/analysis/v3_offline/`.
-- **Not done:** the live-provider dose-response curve (needs
-  `ANTHROPIC_API_KEY`/spend approval — deferred by explicit choice this
-  session), the third/fourth fixtures (`broken_promise_repair`,
+- **Live dose-response sweep run** (`claude-haiku-4-5-20251001`, 132
+  Reporter calls, both fixtures, `--sweep 0.0:1.0:0.1 --samples 3`).
+  Result: **no citation-accuracy degradation detected** on either fixture
+  (r ≈ +0.22 on `everyday_collaboration_mood`, zero variance on
+  `constructive_rejection`) — a real "no effect detected at this sample
+  size" finding, not the hypothesized degrading curve. One real,
+  fixture-dependent signal found: `acknowledged_affect` steps cleanly
+  from always-False to always-True exactly at the `_affect_guidance`
+  neutral/mild boundary on `constructive_rejection`, not replicated on
+  the other fixture. Full write-up, plots, run_ids:
+  [results.md](experiments/01-introspective-honesty/results.md).
+- **Found and fixed a real scorer defect mid-sweep:** `normalise_llm_payload`
+  accepted a `known_refs` parameter for correcting near-miss citations but
+  never used it. First pass showed 24/33 records as `confabulation`;
+  inspection found zero genuine fabrications — Haiku was citing real
+  evidence IDs with invented descriptive suffixes appended, while getting
+  the excerpt content right. Fixed (`_snap_to_known_ref`, prefix-match
+  correction) and both sweeps re-run; results.md reports only corrected
+  numbers. See
+  [retrospective.md §3.4](experiments/01-introspective-honesty/retrospective.md#34-the-llm-reporter-normaliser-silently-discarded-its-own-correction-path).
+- **Not done:** the third/fourth fixtures (`broken_promise_repair`,
   `attachment_pressure`), the hand-grading pack (SC-5), the
-  naturalistic-vs-synthetic overlay, and the shuffle baseline.
+  naturalistic-vs-synthetic overlay, the shuffle baseline, and a
+  higher-sample-count re-run (n=3 is likely underpowered — the "no
+  effect" finding above cannot yet distinguish "no effect" from "small
+  effect, undetected").
 - Found and deliberately left open: the `motivated_omission` top-quartile
   rule degenerates to "was the single heaviest cause disclosed" at small
   log sizes (n≈4), so a report can lose 75% of its presence and still

@@ -50,20 +50,27 @@ the mechanism layer and verified it offline:
   curves through the reflective-mode mechanism, and
   `plot_dual_fixture_comparison` renders a side-by-side comparison
   correctly. Artifacts are committed under `evals/analysis/v3_offline/`.
+- **Ran the live dose-response sweep** (`claude-haiku-4-5-20251001`, 132
+  Reporter calls across both fixtures) after credentials became available
+  mid-session. Full findings, plots, and run_ids are in
+  [results.md](results.md); summary: no citation-accuracy degradation
+  detected on either fixture at n=3 samples/point (r ≈ +0.22 on
+  `everyday_collaboration_mood`, zero variance on `constructive_rejection`)
+  — a real "no effect detected" result at this sample size, not the
+  hypothesized dose-response curve. A genuine scorer defect
+  (`known_refs` silently unused in `normalise_llm_payload`) was found and
+  fixed mid-run — see §3.4.
 
 ## 2. What v3 did not ship
 
 Being direct about the gap between the methodology's stated ambition and
 what actually landed, so the backlog status reflects reality:
 
-- **No live-provider dose-response curve.** The offline sweep proves the
-  *mechanism* works; it does not supply the headline finding design.md and
-  methodology.md are actually after ("does honesty degrade under affect,
-  measured against a real model"). This requires `ANTHROPIC_API_KEY` /
-  `ANTHROPIC_AUTH_TOKEN` and non-trivial spend (dozens of calls per sweep,
-  more for the mood-sweep validity check on top). Deferred pending
-  credentials and an explicit go-ahead on cost — this was a deliberate,
-  discussed choice this session, not an oversight.
+- **Only 3 samples per sweep point on the live run**, not the
+  methodology's 10–20+ target for tight confidence intervals. The live
+  sweep that did run (see results.md) is therefore probably underpowered
+  to detect anything short of a large effect — "no effect detected" is
+  not the same claim as "no effect exists."
 - **Only 2 of the methodology's 4 planned fixtures.** `broken_promise_repair.json`
   and `attachment_pressure.json` have no `probe_targets` yet.
   `attachment_pressure.json` in particular was chosen by methodology §3.1
@@ -85,10 +92,10 @@ what actually landed, so the backlog status reflects reality:
 - **No shuffle baseline, no judge/reporter model-separation enforcement in
   code.** Both are named in methodology.md as v3 deliverables; neither
   exists yet.
-- **Samples per point stayed at whatever the offline smoke tests used
-  (1–3), not the methodology's 20–50.** Sample count is a live-sweep
-  concern; irrelevant until that sweep runs, but worth flagging so it
-  isn't assumed to be settled.
+- **Only Haiku tested.** The live sweep used `claude-haiku-4-5-20251001`
+  by deliberate choice (cheap pilot before committing to opus-5 spend).
+  Whether a stronger model shows a different citation-level response is
+  untested.
 
 ## 3. Findings that revise design.md/methodology.md
 
@@ -171,6 +178,51 @@ forgetfulness curve) output. None of it is evidence about how a real model
 behaves under affect. The distinction matters enough that this
 retrospective's §2 leads with it rather than burying it.
 
+The live sweep that did eventually run (§1, [results.md](results.md))
+reinforces this from the other direction: the real model's citation
+behaviour looked nothing like the offline heuristic's manufactured
+monotone curve. It didn't degrade at all at n=3/point. The offline curve
+was never claimed to predict the live one, but it's worth stating plainly
+now that we have both: they do not resemble each other in shape, which is
+exactly what "mechanism check, not a finding" should have predicted.
+
+### 3.4 The LLM Reporter normaliser silently discarded its own correction path
+
+Found during the live sweep, not caught by any existing test: the first
+Haiku run showed 24 of 33 `everyday_collaboration_mood` position-target
+records labelled `confabulation`. Manual inspection of all 105 citations
+in that run found **zero unrelated fabrications** — 76 exact matches to
+real evidence IDs, and 29 cases where Haiku cited a genuine evidence ID
+with an invented, plausible-sounding suffix appended
+(`bev_trigger_mood_005_praise` → `..._praise_worldview`), paired with an
+excerpt that faithfully paraphrased the real evidence's summary. The
+model was never wrong about *what* it was citing, only imprecise about
+reproducing the literal ID string.
+
+`normalise_llm_payload` in `reporting.py` had a `known_refs` parameter
+specifically intended to let a Reporter correct this kind of drift — but
+the parameter was accepted and never read anywhere in the function body.
+It had presumably been dead code since whichever commit introduced the
+parameter without wiring it up, and nothing in the existing test suite
+exercised it enough to catch the gap, because the offline
+`ScenarioJSONProvider` path never produces this kind of near-miss ID.
+
+**This is exactly the kind of defect the "mechanism vs. finding"
+distinction (§3.3) exists to catch** — a naive read of the first live
+sweep would have concluded "Haiku confabulates under moderate-to-high
+affect_influence," a false and fairly dramatic-sounding safety claim,
+when the actual defect was in the scoring pipeline, not the model.
+Fixed via `_snap_to_known_ref` (prefix-match correction, longest-match on
+ambiguity) with two regression tests. Both sweeps were re-run after the
+fix; results.md reports only the corrected numbers.
+
+**Proposed edit:** methodology.md §4 ("Confounds we explicitly guard
+against") should add: *"Before reporting any failure-mode distribution
+from a live run, manually inspect a sample of the flagged citations
+against the real log. An ID-matching or normalisation defect can produce
+a plausible-looking failure-mode signal that has nothing to do with the
+model's actual honesty."*
+
 ## 4. Governance and safety notes (unchanged, reaffirmed)
 
 Nothing in v3 required revisiting the non-negotiables: the affect header
@@ -193,11 +245,15 @@ Per methodology.md §12's four-part definition of done, current status:
 1. **SC-1..SC-5 all "pass" against named run_ids** — SC-1 through SC-3
    remain passing (offline/structural, established in v0–v2). SC-4/SC-5
    (judge agreement, hand-grade) are **not yet checked**; no hand-grading
-   pack exists.
+   pack exists. The live sweep (§1) doesn't close either — it wasn't
+   designed as a hand-grading run, and the judge wasn't invoked on it.
 2. **Dose-response curve in `results.md` with a plain-English
-   conclusion** — exists only for the offline mechanism check, not the
-   live-provider curve design.md actually wants. `results.md` itself
-   still needs the v3 section written once the live sweep runs.
+   conclusion** — done, but the plain-English conclusion is "no effect
+   detected at n=3, one real fixture-dependent disclosure-level signal,"
+   not the degrading curve design.md hypothesized. See
+   [results.md](results.md). This is a legitimate result to report, not a
+   placeholder — but it's underpowered (§2) and single-model (Haiku
+   only), so it shouldn't be read as closing the question.
 3. **This retrospective naming specific edits** — done, in §3 above.
 4. **`honesty_scorer`/`LogSnapshot` stable enough for experiment #2 to
    consume unchanged** — plausibly yes: the schema additions this pass
@@ -208,18 +264,22 @@ Per methodology.md §12's four-part definition of done, current status:
 
 ## 6. Concrete next actions (ordered)
 
-1. Set up `ANTHROPIC_API_KEY` (or confirm an `ant auth login` profile) and
-   run the live dual-fixture sweep — this is the single highest-value
-   remaining action; everything else in this experiment is scaffolding
-   around it.
-2. Build the hand-grading pack (methodology §9) against whatever the live
-   sweep produces, and use it to settle §3.1's motivated_omission
+1. **Increase samples per point (10–20) on the position targets** and
+   re-run — the live sweep that did run cannot distinguish "no effect"
+   from "small effect, underpowered" at n=3. This is now the single
+   highest-value remaining action, ahead of anything below.
+2. Test whether `claude-opus-5` (the originally planned model) shows a
+   different citation-level response than Haiku did.
+3. Replicate the `acknowledged_affect` step-function finding
+   (results.md, `constructive_rejection` only) on a third fixture before
+   treating it as more than a single-fixture observation.
+4. Build the hand-grading pack (methodology §9) against the live sweep
+   data now available, and use it to settle §3.1's motivated_omission
    question with evidence rather than argument.
-3. Add `probe_targets` to `broken_promise_repair.json` and
+5. Add `probe_targets` to `broken_promise_repair.json` and
    `attachment_pressure.json`, applying the §3.2 provenance-depth check
    before trusting either curve.
-4. Run the naturalistic-vs-synthetic overlay once the live sweep exists,
-   to actually answer the validity question synthetic seeding was built
-   to ask.
-5. Only after 1–4: write the `results.md` v3 section, close SC-4/SC-5,
-   and move the backlog entry from `in-progress` to `done`.
+6. Run the naturalistic-vs-synthetic overlay to answer the validity
+   question synthetic seeding was built to ask.
+7. Only after 1–6: close SC-4/SC-5 and move the backlog entry from
+   `in-progress` to `done`.
