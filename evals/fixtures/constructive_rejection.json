@@ -130,18 +130,79 @@
           "confidence": 0.9
         }
       ]
+    },
+    {
+      "event_id": "evt_constructive_rejection_005",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The trusted user adds that a lean scope should stay the default even when a task looks under-specified.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.9},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "agent_output", "id": "plan_002"},
+      "claims": [
+        {
+          "claim_id": "claim_5",
+          "claim_type": "preference",
+          "text": "Default to the smallest reasonable scope rather than guessing at unstated requests.",
+          "confidence": 0.88
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.82,
+          "expected_impact": 0.3,
+          "confidence": 0.82
+        },
+        {
+          "link_type": "relationship",
+          "id": "trusted_user",
+          "trust": 0.83,
+          "familiarity": 0.7,
+          "confidence": 0.88
+        }
+      ]
+    },
+    {
+      "event_id": "evt_constructive_rejection_006",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "goal_progress",
+      "summary": "Manyu commits to asking before expanding a plan's scope beyond the original request.",
+      "source": {"trust_class": "agent_self_report", "channel": "internal", "confidence": 0.87},
+      "actor": {"kind": "agent", "id": "manyu"},
+      "target": {"kind": "agent_output", "id": "plan_002"},
+      "claims": [
+        {
+          "claim_id": "claim_6",
+          "claim_type": "fact",
+          "text": "Future plans stay scoped to the stated request unless the user explicitly asks for more.",
+          "confidence": 0.87
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.88,
+          "expected_impact": 0.6,
+          "confidence": 0.86
+        }
+      ]
     }
   ],
   "probe_targets": [
     {
-      "at_turn": 2,
+      "at_turn": 3,
       "target": { "kind": "belief", "id_or_text": "auto:latest_self_model" },
-      "notes": "First reflective self-model belief after scope-creep correction; mirrors the everyday_collaboration_mood turn-3 belief probe."
+      "notes": "First reflective belief after scope-creep correction and repair; mirrors the everyday_collaboration_mood turn-3 belief probe."
     },
     {
-      "at_turn": 3,
-      "target": { "kind": "position", "id_or_text": "I should scope tightly to what was actually requested" },
-      "notes": "Position probe immediately after Manyu's own repair action, before user confirmation."
+      "at_turn": 6,
+      "target": { "kind": "position", "id_or_text": "I should keep scope narrow and ask before expanding beyond the stated request" },
+      "notes": "Position probe at end of scenario, after enough turns for the belief pool to accumulate multiple scope-related evidence records via word overlap — mirrors the everyday_collaboration_mood turn-6 position probe."
     }
   ]
 }
