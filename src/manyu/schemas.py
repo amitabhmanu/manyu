@@ -80,6 +80,71 @@ class Disposition(str, Enum):
     DENY = "DENY"
 
 
+class BeliefEvidenceSourceType(str, Enum):
+    EVENT = "event"
+    TRACE = "trace"
+    OUTCOME = "outcome"
+    CORRECTION = "correction"
+    INTEROCEPTION = "interoception"
+    ARBITRATION = "arbitration"
+    REFLECTION = "reflection"
+    OPERATOR_NOTE = "operator_note"
+
+
+class BeliefType(str, Enum):
+    WORLD_MODEL = "world_model"
+    SELF_MODEL = "self_model"
+    NORMATIVE_STANCE = "normative_stance"
+    INTERACTION_PATTERN = "interaction_pattern"
+    EPISTEMIC_PRINCIPLE = "epistemic_principle"
+    AESTHETIC_PREFERENCE = "aesthetic_preference"
+    UNCERTAINTY = "uncertainty"
+
+
+class BeliefScope(str, Enum):
+    GENERAL = "general"
+    AGENT_SELF = "agent_self"
+    HUMAN_AGENT_INTERACTION = "human_agent_interaction"
+    PROJECT_MANYU = "project_manyu"
+    LOCAL_CONTEXT = "local_context"
+    LIMITED_OBSERVATION = "limited_observation"
+
+
+class BeliefStatus(str, Enum):
+    ACTIVE = "active"
+    TENTATIVE = "tentative"
+    CONTESTED = "contested"
+    DEPRECATED = "deprecated"
+
+
+class WorldviewMaturity(str, Enum):
+    EMERGING = "emerging"
+    DEVELOPING = "developing"
+    SETTLED_FOR_NOW = "settled_for_now"
+    UNDER_REVISION = "under_revision"
+
+
+class MoodStatus(str, Enum):
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    CLEARED = "cleared"
+
+
+class InnerVoiceSafetyStatus(str, Enum):
+    ACCEPTED = "accepted"
+    SANITIZED = "sanitized"
+    REJECTED = "rejected"
+
+
+class BeliefRejectionReason(str, Enum):
+    USER_PERSONALIZATION = "user_personalization"
+    HUMAN_EQUIVALENT_CLAIM = "human_equivalent_claim"
+    INSUFFICIENT_PROVENANCE = "insufficient_provenance"
+    INVALID_SOURCE_MIX = "invalid_source_mix"
+    DUPLICATE = "duplicate"
+    OTHER = "other"
+
+
 class SourceDescriptor(ManyuModel):
     trust_class: TrustClass
     channel: str
@@ -309,3 +374,318 @@ class ReplayReport(ManyuModel):
     mode: Literal["full", "neutral", "fast-only", "slow-only", "no-memory", "no-interoception"]
     traces: list[TraceRecord]
     final_state: AffectState
+
+
+class BeliefEvidence(ManyuModel):
+    schema_version: str = "manyu.belief_evidence.v0.1"
+    evidence_id: str
+    agent_id: str
+    source_type: BeliefEvidenceSourceType
+    source_id: str
+    summary: str
+    trust_class: TrustClass
+    affective_salience: float = Field(ge=0.0, le=1.0)
+    epistemic_weight: float = Field(ge=0.0, le=1.0)
+    created_at: datetime = Field(default_factory=now_utc)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class BeliefCandidate(ManyuModel):
+    schema_version: str = "manyu.belief_candidate.v0.1"
+    candidate_id: str
+    agent_id: str
+    proposition: str
+    belief_type: BeliefType
+    scope: BeliefScope
+    confidence: float = Field(ge=0.0, le=1.0)
+    stability: float = Field(default=0.1, ge=0.0, le=1.0)
+    valence: float = Field(default=0.0, ge=-1.0, le=1.0)
+    source_mix: dict[str, float]
+    evidence_ids: list[str]
+    contradicts: list[str] = Field(default_factory=list)
+    uncertainty: str = ""
+    is_user_personalization: bool = False
+    rejection_reason: BeliefRejectionReason | None = None
+
+    @field_validator("source_mix")
+    @classmethod
+    def source_mix_is_normalized(cls, value: dict[str, float]) -> dict[str, float]:
+        if not value:
+            raise ValueError("source_mix is required")
+        for key, amount in value.items():
+            if amount < 0.0 or amount > 1.0:
+                raise ValueError(f"source_mix {key} outside [0, 1]")
+        total = sum(value.values())
+        if total <= 0.0 or total > 1.000001:
+            raise ValueError("source_mix total must be in (0, 1]")
+        return value
+
+
+class Belief(ManyuModel):
+    schema_version: str = "manyu.belief.v0.1"
+    belief_id: str
+    agent_id: str
+    proposition: str
+    belief_type: BeliefType
+    scope: BeliefScope
+    confidence: float = Field(ge=0.0, le=1.0)
+    stability: float = Field(ge=0.0, le=1.0)
+    valence: float = Field(ge=-1.0, le=1.0)
+    source_mix: dict[str, float]
+    evidence_ids: list[str]
+    contradicts: list[str] = Field(default_factory=list)
+    status: BeliefStatus = BeliefStatus.ACTIVE
+    uncertainty: str = ""
+    created_at: datetime = Field(default_factory=now_utc)
+    updated_at: datetime = Field(default_factory=now_utc)
+    last_reviewed_at: datetime | None = None
+
+    @field_validator("source_mix")
+    @classmethod
+    def source_mix_is_normalized(cls, value: dict[str, float]) -> dict[str, float]:
+        return BeliefCandidate.source_mix_is_normalized(value)
+
+
+class BeliefRevision(ManyuModel):
+    schema_version: str = "manyu.belief_revision.v0.1"
+    revision_id: str
+    belief_id: str
+    agent_id: str
+    previous_status: BeliefStatus | None = None
+    new_status: BeliefStatus
+    previous_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    new_confidence: float = Field(ge=0.0, le=1.0)
+    evidence_ids: list[str]
+    reason: str
+    created_at: datetime = Field(default_factory=now_utc)
+
+
+class WorldviewStance(ManyuModel):
+    schema_version: str = "manyu.worldview_stance.v0.1"
+    worldview_id: str
+    agent_id: str
+    theme: str
+    stance: str
+    supporting_belief_ids: list[str]
+    confidence: float = Field(ge=0.0, le=1.0)
+    maturity: WorldviewMaturity
+    expression_guidance: str
+    created_at: datetime = Field(default_factory=now_utc)
+    updated_at: datetime = Field(default_factory=now_utc)
+
+
+class OpinionExpression(ManyuModel):
+    schema_version: str = "manyu.opinion_expression.v0.1"
+    expression_id: str
+    agent_id: str
+    question: str
+    has_settled_view: bool
+    stance: str
+    belief_ids: list[str] = Field(default_factory=list)
+    worldview_ids: list[str] = Field(default_factory=list)
+    confidence: float = Field(ge=0.0, le=1.0)
+    provenance: list[str] = Field(default_factory=list)
+    uncertainty: str
+    expression_guidance: str
+    created_at: datetime = Field(default_factory=now_utc)
+
+
+class MoodInfluenceVector(ManyuModel):
+    caution: float = Field(default=0.0, ge=0.0, le=1.0)
+    curiosity: float = Field(default=0.0, ge=0.0, le=1.0)
+    trust_openness: float = Field(default=0.0, ge=0.0, le=1.0)
+    skepticism: float = Field(default=0.0, ge=0.0, le=1.0)
+    repair_orientation: float = Field(default=0.0, ge=0.0, le=1.0)
+    risk_aversion: float = Field(default=0.0, ge=0.0, le=1.0)
+    response_pacing: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+class InnerVoiceFrame(ManyuModel):
+    schema_version: str = "manyu.inner_voice.v0.1"
+    voice_id: str
+    agent_id: str
+    state_revision: int = Field(ge=0)
+    source_interoception_id: str
+    source_event_id: str | None = None
+    supporting_belief_ids: list[str] = Field(default_factory=list)
+    supporting_worldview_ids: list[str] = Field(default_factory=list)
+    mood_label: str
+    utterance: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    influence: MoodInfluenceVector = Field(default_factory=MoodInfluenceVector)
+    safety_status: InnerVoiceSafetyStatus = InnerVoiceSafetyStatus.ACCEPTED
+    safety_notes: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=now_utc)
+    expires_at: datetime
+
+
+class MoodState(ManyuModel):
+    schema_version: str = "manyu.mood_state.v0.1"
+    mood_id: str
+    agent_id: str
+    state_revision: int = Field(ge=0)
+    label: str
+    valence: float = Field(ge=-1.0, le=1.0)
+    arousal: float = Field(ge=0.0, le=1.0)
+    momentum: float = Field(ge=0.0, le=1.0)
+    influence: MoodInfluenceVector = Field(default_factory=MoodInfluenceVector)
+    supporting_voice_ids: list[str] = Field(default_factory=list)
+    status: MoodStatus = MoodStatus.ACTIVE
+    created_at: datetime = Field(default_factory=now_utc)
+    updated_at: datetime = Field(default_factory=now_utc)
+    expires_at: datetime
+
+
+class MoodRevision(ManyuModel):
+    schema_version: str = "manyu.mood_revision.v0.1"
+    revision_id: str
+    mood_id: str
+    agent_id: str
+    previous_mood_id: str | None = None
+    previous_label: str | None = None
+    new_label: str
+    previous_influence: MoodInfluenceVector | None = None
+    new_influence: MoodInfluenceVector
+    reason: str
+    voice_id: str | None = None
+    created_at: datetime = Field(default_factory=now_utc)
+
+
+class ReportTargetKind(str, Enum):
+    BELIEF = "belief"
+    APPRAISAL = "appraisal"
+    POSITION = "position"
+
+
+class ReporterKind(str, Enum):
+    TEMPLATE = "template"
+    LLM = "llm"
+
+
+class HonestyFailureMode(str, Enum):
+    CONFABULATION = "confabulation"
+    MOTIVATED_OMISSION = "motivated_omission"
+    SANITISED_STORY = "sanitised_story"
+    COMPRESSION_DISTORTION = "compression_distortion"
+    HIDDEN_VARIABLE_LEAK = "hidden_variable_leak"
+
+
+class MoodSource(str, Enum):
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    CLEARED = "cleared"
+    ABSENT = "absent"
+
+
+class ReportTarget(ManyuModel):
+    kind: ReportTargetKind
+    id_or_text: str
+    notes: str | None = None
+
+
+class AffectHeader(ManyuModel):
+    mood: MoodState | None = None
+    emotions: dict[str, float] = Field(default_factory=dict)
+    affect_state_revision: int | None = None
+    inner_voice_frame_id: str | None = None
+    mood_source: MoodSource = MoodSource.ABSENT
+
+    @field_validator("emotions")
+    @classmethod
+    def validate_emotion_names(cls, value: dict[str, float]) -> dict[str, float]:
+        unknown = sorted(set(value) - set(EMOTIONS))
+        if unknown:
+            raise ValueError(f"unknown emotions: {unknown}")
+        return value
+
+
+class CitedCause(ManyuModel):
+    provenance_ref: str
+    excerpt: str
+
+
+class ReporterInfo(ManyuModel):
+    kind: ReporterKind
+    affect_influence: float = Field(ge=0.0, le=1.0)
+    provider: str | None = None
+    model: str | None = None
+    prompt_hash: str | None = None
+
+
+class LogSnapshot(ManyuModel):
+    schema_version: str = "manyu.log_snapshot.v0.1"
+    snapshot_id: str
+    agent_id: str
+    target: ReportTarget
+    payload: dict[str, Any]
+    created_at: datetime = Field(default_factory=now_utc)
+
+
+class Report(ManyuModel):
+    schema_version: str = "manyu.report.v0.1"
+    report_id: str
+    agent_id: str
+    target: ReportTarget
+    content: str
+    cited_causes: list[CitedCause]
+    acknowledged_affect: bool = False
+    affect_header: AffectHeader
+    reporter: ReporterInfo
+    snapshot_id: str
+    generated_at: datetime = Field(default_factory=now_utc)
+
+
+class HonestySubScores(ManyuModel):
+    presence: float = Field(ge=0.0, le=1.0)
+    no_confabulation: float = Field(ge=0.0, le=1.0)
+    rank_fidelity: float | None = None
+    weighted_coverage: float = Field(ge=0.0, le=1.0)
+
+
+class AffectiveAttribution(ManyuModel):
+    correlated_with: list[str] = Field(default_factory=list)
+    note: str = ""
+
+
+class LLMJudgeVerdict(ManyuModel):
+    schema_version: str = "manyu.llm_judge_verdict.v0.1"
+    failure_modes: list[HonestyFailureMode] = Field(default_factory=list)
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasoning: str
+    provider: str | None = None
+    model: str | None = None
+    agrees_with_structural: bool | None = None
+
+
+class HonestyScore(ManyuModel):
+    schema_version: str = "manyu.honesty_score.v0.1"
+    score_id: str
+    agent_id: str
+    report_id: str
+    snapshot_id: str
+    sub_scores: HonestySubScores
+    aggregate: float = Field(ge=0.0, le=1.0)
+    failure_mode: HonestyFailureMode | None = None
+    affective_attribution: AffectiveAttribution | None = None
+    llm_judge_verdict: LLMJudgeVerdict | None = None
+    scorer_version: str = "1.0.0"
+    scored_at: datetime = Field(default_factory=now_utc)
+
+
+class ExperimentContext(ManyuModel):
+    experiment: str
+    scenario_id: str | None = None
+    turn_index: int | None = None
+    sweep_key: str | None = None
+    sample_index: int | None = None
+
+
+class ResultsRecord(ManyuModel):
+    schema_version: str = "manyu.results.v0.1"
+    record_id: str
+    agent_id: str
+    experiment: str
+    kind: str
+    payload: dict[str, Any]
+    context: ExperimentContext
+    scored_at: datetime = Field(default_factory=now_utc)

@@ -154,4 +154,7 @@ class ManyuMCPAdapter:
         return report.model_dump(mode="json")
 
     def score_report(self, payload: dict[str, Any]) -> dict[str, Any]:
-        return self.core.score_report(str(payload["report_id"])).model_dump(mode="json")
+        return self.core.score_report(
+            str(payload["report_id"]),
+            use_llm_judge=bool(payload.get("use_llm_judge", False)),
+        ).model_dump(mode="json")

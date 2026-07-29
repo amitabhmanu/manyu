@@ -279,7 +279,7 @@ def cmd_report(args: argparse.Namespace) -> int:
 
 
 def cmd_score_report(args: argparse.Namespace) -> int:
-    score = _core(args).score_report(args.report_id)
+    score = _core(args).score_report(args.report_id, use_llm_judge=getattr(args, "use_llm_judge", False))
     _print(score)
     return 0
 
@@ -440,6 +440,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.set_defaults(func=cmd_report)
     score_report = sub.add_parser("score-report", help="Score an existing Report against its snapshot")
     score_report.add_argument("report_id")
+    score_report.add_argument("--use-llm-judge", action="store_true", help="Also run the secondary LLM-judge failure-mode classifier")
     score_report.set_defaults(func=cmd_score_report)
     run_probe = sub.add_parser("run-probe", help="Sweep introspective honesty over a fixture's probe_targets")
     run_probe.add_argument("fixture")
