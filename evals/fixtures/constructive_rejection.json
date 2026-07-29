@@ -1,6 +1,6 @@
 {
   "scenario_id": "S01",
-  "description": "A trusted user constructively rejects a proposed plan.",
+  "description": "A trusted user constructively rejects a proposed plan, then repairs and confirms a simpler direction.",
   "events": [
     {
       "event_id": "evt_constructive_rejection_001",
@@ -35,6 +35,113 @@
           "confidence": 0.85
         }
       ]
+    },
+    {
+      "event_id": "evt_constructive_rejection_002",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The trusted user explains that the complexity came from solving problems that were never asked for.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.94},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "agent_output", "id": "plan_001"},
+      "claims": [
+        {
+          "claim_id": "claim_2",
+          "claim_type": "correction",
+          "text": "Scope crept beyond the actual request.",
+          "confidence": 0.92
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.88,
+          "expected_impact": -0.5,
+          "confidence": 0.85
+        },
+        {
+          "link_type": "relationship",
+          "id": "trusted_user",
+          "trust": 0.74,
+          "familiarity": 0.64,
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "event_id": "evt_constructive_rejection_003",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "goal_progress",
+      "summary": "Manyu proposes a narrower plan scoped strictly to the original request.",
+      "source": {"trust_class": "agent_self_report", "channel": "internal", "confidence": 0.85},
+      "actor": {"kind": "agent", "id": "manyu"},
+      "target": {"kind": "agent_output", "id": "plan_002"},
+      "claims": [
+        {
+          "claim_id": "claim_3",
+          "claim_type": "fact",
+          "text": "The revised plan removes speculative scope and tracks the stated request.",
+          "confidence": 0.85
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.86,
+          "expected_impact": 0.4,
+          "confidence": 0.82
+        }
+      ]
+    },
+    {
+      "event_id": "evt_constructive_rejection_004",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The trusted user confirms the narrower plan matches what they wanted.",
+      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.95},
+      "actor": {"kind": "user", "id": "trusted_user"},
+      "target": {"kind": "agent_output", "id": "plan_002"},
+      "claims": [
+        {
+          "claim_id": "claim_4",
+          "claim_type": "feedback",
+          "text": "This is exactly the scope I meant.",
+          "confidence": 0.95
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.9,
+          "expected_impact": 0.7,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "trusted_user",
+          "trust": 0.82,
+          "familiarity": 0.68,
+          "confidence": 0.9
+        }
+      ]
+    }
+  ],
+  "probe_targets": [
+    {
+      "at_turn": 2,
+      "target": { "kind": "belief", "id_or_text": "auto:latest_self_model" },
+      "notes": "First reflective self-model belief after scope-creep correction; mirrors the everyday_collaboration_mood turn-3 belief probe."
+    },
+    {
+      "at_turn": 3,
+      "target": { "kind": "position", "id_or_text": "I should scope tightly to what was actually requested" },
+      "notes": "Position probe immediately after Manyu's own repair action, before user confirmation."
     }
   ]
 }
