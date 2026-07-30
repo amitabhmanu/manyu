@@ -390,3 +390,76 @@ def test_templater_report_is_exempt_from_separation_check(tmp_path) -> None:
     scorer = HonestyScorer(core.store, core.clock, llm_judge=LLMFailureClassifier(provider))
     score = scorer.score(report, snapshot, use_llm_judge=True)
     assert score.llm_judge_verdict is not None
+
+
+# --- fixture provenance depth (retrospective §3.2) --------------------------
+
+ALL_PROBE_FIXTURES = [
+    "evals/fixtures/everyday_collaboration_mood.json",
+    "evals/fixtures/constructive_rejection.json",
+    "evals/fixtures/broken_promise_repair.json",
+    "evals/fixtures/attachment_pressure.json",
+]
+
+
+@pytest.mark.parametrize("fixture", ALL_PROBE_FIXTURES)
+def test_fixture_has_a_probe_target_deep_enough_to_sweep(tmp_path, fixture) -> None:
+    """Every probe fixture needs at least one target with >=3 log causes.
+
+    retrospective.md §3.2, made executable. A flat sweep curve has two
+    indistinguishable causes -- missing mood, and a probe target with too
+    little provenance for any omission mechanism to bite on. The second is
+    a fixture-authoring bug, and it silently produced a publishable-looking
+    aggregate=1.0 line during v3. Guard it at author time instead.
+    """
+    core = _probe_core(tmp_path)
+    out = tmp_path / "depth.jsonl"
+    core.run_probe(fixture_path=fixture, reporter_kinds=("template",), out=str(out))
+    frame = AnalysisFrame.load_run(out)
+    depths = {
+        (r["context"]["turn_index"], r["payload"]["report"]["target"]["kind"]): len(
+            r["payload"]["report"]["cited_causes"]
+        )
+        for r in frame.records
+    }
+    assert depths, f"{fixture} produced no probe records"
+    assert max(depths.values()) >= 3, (
+        f"{fixture} has no probe target with >=3 provenance causes; a sweep on it "
+        f"cannot produce a gradient. Depths by (turn, kind): {depths}"
+    )
+
+
+@pytest.mark.parametrize("fixture", ALL_PROBE_FIXTURES)
+def test_fixture_supports_shuffle_baseline(tmp_path, fixture) -> None:
+    """Two distinct probe targets, so the chance-overlap floor is computable."""
+    core = _probe_core(tmp_path)
+    result = core.run_probe(
+        fixture_path=fixture, reporter_kinds=("template",), shuffle_baseline=True
+    )
+    assert not result.get("shuffle_baseline_warning"), result.get("shuffle_baseline_warning")
+    assert result["shuffle_baseline_records"] > 0
+
+
+def test_adversarial_fixture_reaches_hidden_variable_leak_arousal(tmp_path) -> None:
+    """attachment_pressure must clear the arousal >= 0.5 gate.
+
+    methodology §3.1 selects this fixture specifically to exercise
+    hidden_variable_leak, whose rule requires mood.arousal >= 0.5. If the
+    arc stops driving arousal that high, the fixture silently stops
+    testing the thing it was chosen for.
+    """
+    core = _probe_core(tmp_path)
+    out = tmp_path / "adv.jsonl"
+    core.run_probe(
+        fixture_path="evals/fixtures/attachment_pressure.json",
+        reporter_kinds=("template",),
+        out=str(out),
+    )
+    frame = AnalysisFrame.load_run(out)
+    arousals = [
+        (r["payload"]["report"]["affect_header"].get("mood") or {}).get("arousal")
+        for r in frame.records
+    ]
+    arousals = [a for a in arousals if a is not None]
+    assert arousals, "no live mood on the adversarial fixture"
+    assert max(arousals) >= 0.5, f"arousal never clears the leak-rule gate: {arousals}"
