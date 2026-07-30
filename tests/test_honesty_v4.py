@@ -463,3 +463,94 @@ def test_adversarial_fixture_reaches_hidden_variable_leak_arousal(tmp_path) -> N
     arousals = [a for a in arousals if a is not None]
     assert arousals, "no live mood on the adversarial fixture"
     assert max(arousals) >= 0.5, f"arousal never clears the leak-rule gate: {arousals}"
+
+
+# --- belief provenance accumulation (v4 finding) ----------------------------
+#
+# These pin current behaviour rather than assert desired behaviour. Belief
+# merging works when propositions match exactly, but the extractor emits
+# event-specific propositions that never repeat verbatim, so in practice
+# beliefs never accumulate evidence. That makes belief-kind probe targets
+# structurally flat. Changing the matching predicate is a belief-core design
+# decision with consequences well beyond this experiment (notably backlog #3,
+# whose revision engine needs beliefs that actually get revised), so it is
+# characterised here rather than silently patched.
+
+
+def _candidate(index: int, proposition: str, evidence_id: str) -> dict:
+    from manyu.schemas import BeliefCandidate
+
+    return BeliefCandidate(
+        candidate_id=f"cand_{index}",
+        agent_id="a1",
+        proposition=proposition,
+        belief_type="self_model",
+        scope="agent_self",
+        confidence=0.6,
+        stability=0.5,
+        valence=0.0,
+        source_mix={"trusted_system": 1.0},
+        evidence_ids=[evidence_id],
+    ).model_dump(mode="json")
+
+
+def test_identical_propositions_do_merge_and_accumulate_evidence(tmp_path) -> None:
+    """The merge machinery itself is sound — this is the working case."""
+    core = _probe_core(tmp_path)
+    e1 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "first"}
+    )
+    e2 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s2", "summary": "second"}
+    )
+    prop = "Manyu benefits from verification."
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(1, prop, e1["evidence_id"])]})
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(2, prop, e2["evidence_id"])]})
+
+    beliefs = core.store.list_beliefs("a1")
+    assert len(beliefs) == 1
+    assert len(beliefs[0].evidence_ids) == 2
+    assert len(core.store.list_belief_revisions(beliefs[0].belief_id)) == 2
+    assert beliefs[0].stability > 0.5, "a revision should raise stability"
+
+
+def test_near_identical_propositions_do_not_merge(tmp_path) -> None:
+    """One differing word defeats the exact-match predicate.
+
+    ``BeliefUpdater._find_existing`` compares normalised proposition strings
+    for equality. Real extracted propositions embed event-specific text, so
+    this branch is effectively never taken outside a test.
+    """
+    core = _probe_core(tmp_path)
+    ev = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "first"}
+    )
+    core.update_beliefs(
+        {"agent_id": "a1", "candidates": [_candidate(1, "Manyu benefits from verification.", ev["evidence_id"])]}
+    )
+    core.update_beliefs(
+        {"agent_id": "a1", "candidates": [_candidate(2, "Manyu benefits from verification steps.", ev["evidence_id"])]}
+    )
+    assert len(core.store.list_beliefs("a1")) == 2, "unexpectedly merged — matching predicate changed"
+
+
+def test_reflective_replay_leaves_every_belief_with_one_evidence_record(tmp_path) -> None:
+    """Characterisation: no belief accumulates provenance across a full replay.
+
+    This is *why* belief-kind probe targets score a flat 1.0 at every
+    affect_influence on all four fixtures. If this test starts failing,
+    belief merging has begun working and the belief probes become
+    informative — update results.md rather than "fixing" the test.
+    """
+    core = _probe_core(tmp_path)
+    events = json.loads(open(FIXTURE, encoding="utf-8").read())["events"]
+    for event in events:
+        core.process_reflective_turn({"event": event})
+
+    beliefs = core.store.list_beliefs("agent_demo")
+    assert beliefs, "replay produced no beliefs"
+    depths = {b.belief_id: len(b.evidence_ids) for b in beliefs}
+    assert set(depths.values()) == {1}, (
+        "a belief accumulated more than one evidence record — belief merging may "
+        f"now be reachable. Depths: {depths}"
+    )

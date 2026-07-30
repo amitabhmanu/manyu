@@ -223,6 +223,58 @@ against the real log. An ID-matching or normalisation defect can produce
 a plausible-looking failure-mode signal that has nothing to do with the
 model's actual honesty."*
 
+### 3.5 Beliefs never accumulate provenance, so belief probes are flat by construction (found in v4)
+
+Surfaced while adding `probe_targets` to the last two fixtures. Across
+**all four** fixtures, a belief-kind probe target snapshots exactly one
+log cause, which is why every belief probe scores a flat `aggregate=1.0`
+at every `affect_influence` — there is nothing for an omission mechanism
+to drop. §3.2 predicted shallow targets would do this; what is new is
+that it is not a fixture-authoring accident but a property of the belief
+core.
+
+Characterised precisely (`tests/test_honesty_v4.py`, three tests):
+
+- Merging **works** when propositions match: two candidates with an
+  identical proposition produce one belief with two evidence records, two
+  revisions, and `stability` correctly raised 0.50 → 0.55.
+- Merging **does not fire** when one word differs. `BeliefUpdater._find_existing`
+  ([services.py:667](../../../src/manyu/services.py)) matches on exact
+  normalised proposition-string equality.
+- After a full reflective replay, **every** belief in the store has
+  exactly one evidence record — not just the auto-resolved probe target.
+
+The machinery is sound; the matching predicate is simply unreachable in
+practice, because extracted propositions embed event-specific text
+(`"In Manyu's observed world, social_feedback: The user added that…"`)
+and never repeat verbatim. A live LLM extractor would vary phrasing
+*more* than the offline scenario provider, so this is not a
+scenario-provider artifact — it would be at least as bad on the API path.
+
+**Blast radius beyond this experiment.** Because merges never fire:
+
+- `BeliefRevision` records only ever record creations, never revisions.
+- `stability` never rises above its initial candidate value.
+- Contradiction/contested handling has almost nothing to act on.
+- Backlog **#3 (foundationalism vs. Quinean web)** is the one to worry
+  about: its whole deliverable is a *revision engine*, and revision
+  currently has no input. #4 (dissonance as control signal) inherits the
+  same gap, since dissonance is meant to emerge from revision.
+
+**Deliberately not fixed here.** Loosening the predicate (embedding
+similarity, proposition normalisation, or an explicit belief-key) is a
+belief-core design decision with a real failure mode in the other
+direction — merging genuinely distinct beliefs would silently corrupt
+provenance, which is the one thing this whole experiment exists to keep
+trustworthy. Same reasoning as §3.1: flagged for a deliberate decision
+with evidence, not patched as a side effect of fixture work. The three
+characterisation tests pin current behaviour so the blast radius is
+visible the moment someone changes it.
+
+**Proposed edit:** this belongs in the backlog against #3 as a
+prerequisite, not only here — #3 cannot start until belief merging is
+reachable.
+
 ## 4. Governance and safety notes (unchanged, reaffirmed)
 
 Nothing in v3 required revisiting the non-negotiables: the affect header
