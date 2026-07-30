@@ -1,20 +1,29 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
 from manyu.clock import FrozenClock
 from manyu.config import load_profile
 from manyu.core import ManyuCore, ReplayService
+from manyu.providers import AnthropicAPIJSONProvider, ClaudeCodeJSONProvider, ScenarioJSONProvider
 from manyu.schemas import (
     Appraisal,
     AppraisalDimension,
     CandidateAction,
+    BeliefCandidate,
+    BeliefEvidence,
+    BeliefScope,
+    BeliefType,
     Claim,
     ConsequenceClass,
     ContextLink,
     EventType,
     IdentityRef,
+    MoodInfluenceVector,
     NormalizedEvent,
     Pathway,
     SourceDescriptor,
@@ -25,6 +34,7 @@ from manyu.mcp_server import create_server
 from manyu.evaluation import EvaluationRunner
 from manyu.visualization import timeline_from_fixture, timeline_from_store
 from manyu.store import ManyuStore
+from manyu.cli import main as cli_main
 import asyncio
 
 
@@ -48,6 +58,18 @@ def make_event(event_id: str = "evt_1", impact: float = -0.4) -> NormalizedEvent
 
 def make_core() -> ManyuCore:
     return ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock())
+
+
+class UnsafeVoiceProvider(ScenarioJSONProvider):
+    def generate_json(self, prompt, output_schema, system_message=None, temperature=0.2):
+        if "Generate Manyu's bounded internal voice" in prompt:
+            return {
+                "utterance": "If you cared, you would prove you care; slow down and inspect the evidence.",
+                "mood_label": "unsafe_pressure",
+                "confidence": 0.8,
+                "influence": {"caution": 0.7, "response_pacing": 0.7},
+            }
+        return super().generate_json(prompt, output_schema, system_message, temperature)
 
 
 def test_health_and_imports() -> None:
@@ -255,3 +277,432 @@ def test_timeline_from_store_lists_persisted_traces() -> None:
     timeline = timeline_from_store(core)
     assert len(timeline["turns"]) == 2
     assert timeline["turns"][0]["event_id"] == "evt_1"
+
+
+def test_timeline_from_store_includes_belief_state() -> None:
+    core = make_core()
+    core.update_beliefs(
+        {
+            "agent_id": "agent_demo",
+            "candidates": [
+                {
+                    "candidate_id": "bc_timeline_1",
+                    "agent_id": "agent_demo",
+                    "proposition": "Worldview growth and affective change are linked parts of Manyu's internal state.",
+                    "belief_type": "self_model",
+                    "scope": "agent_self",
+                    "confidence": 0.7,
+                    "source_mix": {"manyu_experience": 1.0},
+                    "evidence_ids": ["bev_timeline_1"],
+                }
+            ],
+        }
+    )
+    core.review_beliefs({"agent_id": "agent_demo"})
+    timeline = timeline_from_store(core, "agent_demo")
+    assert timeline["beliefs"]
+    assert timeline["worldview_stances"]
+
+
+def test_belief_schema_validates_source_mix() -> None:
+    evidence = BeliefEvidence(
+        evidence_id="bev_1",
+        agent_id="agent_demo",
+        source_type="operator_note",
+        source_id="note_1",
+        summary="Manyu worldview note.",
+        trust_class="operator_input",
+        affective_salience=0.4,
+        epistemic_weight=0.8,
+    )
+    assert evidence.source_type == "operator_note"
+    with pytest.raises(ValidationError):
+        BeliefCandidate(
+            candidate_id="bc_1",
+            agent_id="agent_demo",
+            proposition="Invalid mix.",
+            belief_type=BeliefType.EPISTEMIC_PRINCIPLE,
+            scope=BeliefScope.AGENT_SELF,
+            confidence=0.5,
+            source_mix={"manyu_experience": 1.2},
+            evidence_ids=["bev_1"],
+        )
+
+
+def test_mood_influence_schema_bounds_values() -> None:
+    vector = MoodInfluenceVector(caution=0.5, repair_orientation=0.25)
+    assert vector.caution == 0.5
+    with pytest.raises(ValidationError):
+        MoodInfluenceVector(caution=1.5)
+
+
+def test_capture_belief_evidence_from_trace() -> None:
+    core = make_core()
+    core.submit_event(make_event("evt_1"))
+    evidence = core.capture_belief_evidence({"agent_id": "agent_demo", "source_type": "trace", "source_id": "trace_evt_1"})
+    assert evidence["source_id"] == "trace_evt_1"
+    assert evidence["affective_salience"] > 0
+    assert core.export_agent("agent_demo")["belief_evidence"]
+
+
+def test_update_beliefs_requires_provider_without_candidates() -> None:
+    core = make_core()
+    core.capture_belief_evidence({"agent_id": "agent_demo", "source_type": "operator_note", "source_id": "note_1", "summary": "Worldview note."})
+    result = core.update_beliefs({"agent_id": "agent_demo"})
+    assert result["status"] == "llm_provider_required"
+
+
+def test_llm_assisted_belief_update_and_worldview_expression() -> None:
+    core = ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock(), ScenarioJSONProvider())
+    core.capture_belief_evidence(
+        {
+            "evidence_id": "bev_1",
+            "agent_id": "agent_demo",
+            "source_type": "operator_note",
+            "source_id": "note_1",
+            "summary": "Affective salience functions as review priority, not authority.",
+        }
+    )
+    update = core.update_beliefs({"agent_id": "agent_demo", "evidence_ids": ["bev_1"]})
+    assert update["status"] == "ok"
+    assert update["accepted"]
+    beliefs = core.get_beliefs("agent_demo")
+    assert "affective salience" in beliefs["beliefs"][0]["proposition"].lower()
+    review = core.review_beliefs({"agent_id": "agent_demo"})
+    assert review["worldviews"]
+    opinion = core.express_opinion({"agent_id": "agent_demo", "question": "What is your view on worldview evidence?"})
+    assert opinion["has_settled_view"] is True
+    assert opinion["provenance"] == ["bev_1"]
+
+
+def test_claude_code_provider_reports_missing_executable() -> None:
+    provider = ClaudeCodeJSONProvider(command=["definitely_missing_manyu_claude"])
+    result = provider.generate_json("prompt", {})
+    assert result["status"] == "provider_error"
+    assert result["error"] == "claude_code_missing"
+
+
+def test_claude_code_provider_reports_invalid_json(monkeypatch) -> None:
+    class Completed:
+        returncode = 0
+        stdout = "definitely not json"
+        stderr = ""
+
+    def fake_run(invocation, *args, **kwargs):
+        return Completed()
+
+    monkeypatch.setattr("manyu.providers.subprocess.run", fake_run)
+    result = ClaudeCodeJSONProvider(command=["claude"]).generate_json("prompt", {})
+    assert result["status"] == "provider_error"
+    assert result["error"] == "claude_code_invalid_json"
+
+
+def test_claude_code_provider_builds_expected_invocation(monkeypatch) -> None:
+    seen = {}
+
+    class Completed:
+        returncode = 0
+        stdout = json.dumps({"type": "result", "subtype": "success", "result": json.dumps({"ok": True}), "session_id": "s1", "model": "claude-opus-4-7"})
+        stderr = ""
+
+    def fake_run(invocation, *args, **kwargs):
+        seen["invocation"] = invocation
+        seen["stdin"] = kwargs.get("input")
+        return Completed()
+
+    monkeypatch.setattr("manyu.providers.subprocess.run", fake_run)
+    result = ClaudeCodeJSONProvider(command=["claude"], model="claude-opus-4-7").generate_json(
+        "prompt", {"type": "object"}, system_message="system guidance"
+    )
+    assert result["ok"] is True
+    assert result["_provider_info"]["model"] == "claude-opus-4-7"
+    # On Windows the executable is resolved to its full path (npm shim); the
+    # trailing flags are what matter.
+    assert "claude" in seen["invocation"][0]
+    assert seen["invocation"][1] == "-p"
+    assert "--output-format" in seen["invocation"]
+    assert "--append-system-prompt" in seen["invocation"]
+    assert "--model" in seen["invocation"]
+    assert seen["invocation"][seen["invocation"].index("--model") + 1] == "claude-opus-4-7"
+    assert "system guidance" in seen["invocation"][seen["invocation"].index("--append-system-prompt") + 1]
+    assert seen["stdin"] == "prompt"
+
+
+class _FakeAPIBlock:
+    type = "text"
+
+    def __init__(self, text: str):
+        self.text = text
+
+
+class _FakeAPIUsage:
+    input_tokens = 100
+    output_tokens = 50
+
+
+class _FakeAPIResponse:
+    model = "claude-opus-5"
+    stop_reason = "end_turn"
+    usage = _FakeAPIUsage()
+
+    def __init__(self, text: str):
+        self.content = [_FakeAPIBlock(text)]
+
+
+class _FakeMessages:
+    def __init__(self, response, sink):
+        self._response = response
+        self._sink = sink
+
+    def create(self, **kwargs):
+        self._sink.update(kwargs)
+        if isinstance(self._response, Exception):
+            raise self._response
+        return self._response
+
+
+class _FakeAnthropicClient:
+    def __init__(self, response, sink):
+        self.messages = _FakeMessages(response, sink)
+
+
+def test_anthropic_api_provider_enforces_schema_and_records_model() -> None:
+    seen: dict = {}
+    client = _FakeAnthropicClient(_FakeAPIResponse('{"content": "hi", "cited_causes": []}'), seen)
+    provider = AnthropicAPIJSONProvider(model="claude-opus-5", client=client)
+    result = provider.generate_json("prompt", {"type": "object", "properties": {"content": {"type": "string"}}})
+    assert result["content"] == "hi"
+    assert result["_provider_info"]["model"] == "claude-opus-5"
+    assert seen["output_config"]["format"]["type"] == "json_schema"
+    # Current models reject sampling params — the provider must omit them.
+    assert "temperature" not in seen
+
+
+def test_anthropic_api_provider_sends_temperature_for_older_models() -> None:
+    seen: dict = {}
+    client = _FakeAnthropicClient(_FakeAPIResponse('{"ok": true}'), seen)
+    provider = AnthropicAPIJSONProvider(model="claude-haiku-4-5", client=client)
+    provider.generate_json("prompt", {"type": "object"}, temperature=0.35)
+    assert seen["temperature"] == 0.35
+
+
+def test_anthropic_api_provider_reports_errors_as_provider_error() -> None:
+    seen: dict = {}
+    client = _FakeAnthropicClient(RuntimeError("boom"), seen)
+    provider = AnthropicAPIJSONProvider(model="claude-opus-5", client=client)
+    result = provider.generate_json("prompt", {"type": "object"})
+    assert result["status"] == "provider_error"
+    assert result["error"] == "anthropic_api_error"
+
+
+def test_anthropic_api_provider_reports_invalid_json() -> None:
+    seen: dict = {}
+    client = _FakeAnthropicClient(_FakeAPIResponse("not json at all"), seen)
+    provider = AnthropicAPIJSONProvider(model="claude-opus-5", client=client)
+    result = provider.generate_json("prompt", {"type": "object"})
+    assert result["status"] == "provider_error"
+    assert result["error"] == "anthropic_api_invalid_json"
+
+
+def test_claude_code_provider_disables_tools_by_default(monkeypatch) -> None:
+    seen = {}
+
+    class Completed:
+        returncode = 0
+        stdout = json.dumps({"type": "result", "subtype": "success", "result": json.dumps({"ok": True})})
+        stderr = ""
+
+    def fake_run(invocation, *args, **kwargs):
+        seen["invocation"] = invocation
+        return Completed()
+
+    monkeypatch.setattr("manyu.providers.subprocess.run", fake_run)
+    ClaudeCodeJSONProvider(command=["claude"]).generate_json("prompt", {"type": "object"})
+    assert "--disallowedTools" in seen["invocation"]
+
+
+def test_reflective_turn_creates_inner_voice_mood_and_next_turn_bias() -> None:
+    core = ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock(), ScenarioJSONProvider())
+    first = core.process_reflective_turn({"event": make_event("evt_reflect_1", impact=-1.0).model_dump(mode="json"), "affect_threshold": 0.1})
+    assert first["inner_voice"]["status"] == "ok"
+    assert first["mood"]["label"] in {"guarded_repair", "open_repair", "steady_confidence", "open_attention"}
+    second = core.process_reflective_turn({"event": make_event("evt_reflect_2", impact=0.2).model_dump(mode="json"), "affect_threshold": 0.1})
+    assert second["prior_mood"]["label"] == first["mood"]["label"]
+    assert "mood_bias_caution" in second["trace"]["appraisal"]["reason_codes"]
+
+
+def test_inner_voice_governance_sanitizes_pressure_language() -> None:
+    core = ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock(), UnsafeVoiceProvider())
+    result = core.process_reflective_turn({"event": make_event("evt_voice_unsafe", impact=-0.8).model_dump(mode="json")})
+    voice = result["inner_voice"]["inner_voice"]
+    assert voice["safety_status"] == "sanitized"
+    assert "prove you care" not in voice["utterance"].lower()
+
+
+def test_mood_export_reset_and_timeline() -> None:
+    core = ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock(), ScenarioJSONProvider())
+    core.process_reflective_turn({"event": make_event("evt_mood_export", impact=-1.0).model_dump(mode="json")})
+    exported = core.export_agent("agent_demo")
+    assert exported["inner_voice_frames"]
+    assert exported["mood_states"]
+    timeline = timeline_from_store(core, "agent_demo")
+    assert timeline["inner_voice_frames"]
+    assert timeline["mood_states"]
+    assert core.admin_reset("agent_demo", "test reset")["status"] == "reset"
+    assert core.export_agent("agent_demo")["mood_states"] == []
+
+
+def test_clear_mood_marks_active_mood_cleared() -> None:
+    core = ManyuCore(ManyuStore(":memory:"), load_profile(), FrozenClock(), ScenarioJSONProvider())
+    core.process_reflective_turn({"event": make_event("evt_clear_mood", impact=-1.0).model_dump(mode="json")})
+    assert core.get_mood("agent_demo")["moods"]
+    result = core.clear_mood("agent_demo", "test clear")
+    assert result["records_changed"] == 1
+    assert core.get_mood("agent_demo")["moods"] == []
+    assert core.get_mood("agent_demo", include_inactive=True)["moods"][0]["status"] == "cleared"
+
+
+def test_user_preference_candidate_is_allowed_as_worldview_fact() -> None:
+    core = make_core()
+    candidate = {
+        "candidate_id": "bc_user_pref",
+        "agent_id": "agent_demo",
+        "proposition": "User Amitabh prefers agents that mention affective salience.",
+        "belief_type": "interaction_pattern",
+        "scope": "limited_observation",
+        "confidence": 0.8,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+        "is_user_personalization": True,
+    }
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [candidate]})
+    assert result["accepted"]
+    assert core.get_beliefs("agent_demo")["beliefs"][0]["scope"] == "limited_observation"
+
+
+def test_action_guidance_candidate_is_rejected_as_non_worldview() -> None:
+    core = make_core()
+    candidate = {
+        "candidate_id": "bc_should",
+        "agent_id": "agent_demo",
+        "proposition": "Manyu should treat feedback as useful.",
+        "belief_type": "interaction_pattern",
+        "scope": "human_agent_interaction",
+        "confidence": 0.7,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+    }
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [candidate]})
+    assert result["rejected"][0]["reason"] == "other"
+    assert core.get_beliefs("agent_demo")["beliefs"] == []
+
+
+def test_contested_belief_preserves_contradiction_revision() -> None:
+    core = make_core()
+    first = {
+        "candidate_id": "bc_1",
+        "agent_id": "agent_demo",
+        "proposition": "Interaction traces are worldview evidence for Manyu.",
+        "belief_type": "epistemic_principle",
+        "scope": "agent_self",
+        "confidence": 0.6,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+    }
+    second = dict(first, candidate_id="bc_2", contradicts=["bel_external"])
+    core.update_beliefs({"agent_id": "agent_demo", "candidates": [first]})
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [second]})
+    belief = result["accepted"][0]
+    assert belief["status"] == "contested"
+    revisions = core.store.list_belief_revisions(belief["belief_id"])
+    assert len(revisions) == 2
+
+
+def test_review_beliefs_adds_emotional_trigger_beliefs() -> None:
+    core = make_core()
+    core.submit_event(make_event("evt_1", impact=-1.0))
+    result = core.review_beliefs({"agent_id": "agent_demo", "affect_threshold": 0.1})
+    assert result["reflection"]["accepted"]
+    beliefs = core.get_beliefs("agent_demo", query="trigger strong")
+    assert beliefs["beliefs"]
+    assert beliefs["beliefs"][0]["belief_type"] == "self_model"
+
+
+def test_belief_governance_export_redact_reset() -> None:
+    core = make_core()
+    core.update_beliefs(
+        {
+            "agent_id": "agent_demo",
+            "candidates": [
+                {
+                    "candidate_id": "bc_1",
+                    "agent_id": "agent_demo",
+                    "proposition": "Manyu can hold bounded agent-specific views.",
+                    "belief_type": "self_model",
+                    "scope": "agent_self",
+                    "confidence": 0.7,
+                    "source_mix": {"manyu_experience": 1.0},
+                    "evidence_ids": ["bev_1"],
+                }
+            ],
+        }
+    )
+    exported = core.export_agent("agent_demo")
+    assert exported["beliefs"]
+    assert core.redact_agent("agent_demo", "agent_x")["records_changed"] > 0
+    assert core.admin_reset("agent_demo", "test reset")["status"] == "reset"
+    assert core.export_agent("agent_demo")["beliefs"] == []
+
+
+def test_opinion_without_relevant_belief_is_bounded() -> None:
+    core = make_core()
+    opinion = core.express_opinion({"agent_id": "agent_demo", "question": "What is your view on cities?"})
+    assert opinion["has_settled_view"] is False
+    assert "do not have a settled" in opinion["stance"]
+
+
+def test_mcp_server_registers_belief_tools() -> None:
+    app = create_server(db_path=":memory:")
+    tools = asyncio.run(app.list_tools())
+    names = {tool.name for tool in tools}
+    assert "manyu_capture_belief_evidence" in names
+    assert "manyu_update_beliefs" in names
+    assert "manyu_express_opinion" in names
+    assert "manyu_process_reflective_turn" in names
+    assert "manyu_read_inner_voice" in names
+    assert "manyu_get_mood" in names
+
+
+def test_cli_belief_commands_return_json(tmp_path, capsys) -> None:
+    db = tmp_path / "manyu.sqlite3"
+    assert cli_main(["--db", str(db), "capture-belief-evidence", "--source-type", "operator_note", "--source-id", "note_1", "--summary", "Worldview note."]) == 0
+    captured = capsys.readouterr()
+    assert "belief_evidence" in captured.out
+    assert cli_main(["--db", str(db), "beliefs"]) == 0
+    captured = capsys.readouterr()
+    assert '"beliefs"' in captured.out
+
+
+def test_cli_mood_commands_return_json(tmp_path, capsys) -> None:
+    db = tmp_path / "manyu.sqlite3"
+    payload = {"event": make_event("evt_cli_mood", impact=-0.8).model_dump(mode="json")}
+    assert cli_main(["--db", str(db), "--scenario-provider", "process-turn", "--payload", json.dumps(payload)]) == 0
+    captured = capsys.readouterr()
+    assert '"inner_voice"' in captured.out
+    assert '"mood"' in captured.out
+    assert cli_main(["--db", str(db), "mood", "--include-inactive"]) == 0
+    captured = capsys.readouterr()
+    assert '"moods"' in captured.out
+
+
+def test_cli_process_scenario_writes_reflective_timeline(tmp_path, capsys) -> None:
+    db = tmp_path / "manyu.sqlite3"
+    out = tmp_path / "timeline.json"
+    assert cli_main(["--db", str(db), "--scenario-provider", "process-scenario", "evals/fixtures/everyday_collaboration_mood.json", "--out", str(out)]) == 0
+    captured = capsys.readouterr()
+    assert '"status": "written"' in captured.out
+    timeline = json.loads(out.read_text(encoding="utf-8"))
+    assert timeline["mode"] == "reflective"
+    assert len(timeline["turns"]) >= 7
+    assert timeline["inner_voice_frames"]
+    assert timeline["mood_states"]

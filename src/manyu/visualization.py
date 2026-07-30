@@ -74,4 +74,26 @@ def timeline_from_store(core: ManyuCore, agent_id: str | None = None) -> dict[st
         except KeyError:
             continue
     source = f"store:{agent_id}" if agent_id else "store:all"
-    return timeline_from_traces(traces, source=source)
+    timeline = timeline_from_traces(traces, source=source)
+    agents = timeline["agents"] if agent_id is None else [agent_id]
+    evidence = []
+    beliefs = []
+    worldviews = []
+    opinion_expressions = []
+    inner_voices = []
+    mood_states = []
+    for resolved_agent in agents:
+        exported = core.export_agent(resolved_agent)
+        evidence.extend(exported.get("belief_evidence", []))
+        beliefs.extend(exported.get("beliefs", []))
+        worldviews.extend(exported.get("worldview_stances", []))
+        opinion_expressions.extend(exported.get("belief_expression_audit", []))
+        inner_voices.extend(exported.get("inner_voice_frames", []))
+        mood_states.extend(exported.get("mood_states", []))
+    timeline["belief_evidence"] = evidence
+    timeline["beliefs"] = beliefs
+    timeline["worldview_stances"] = worldviews
+    timeline["opinion_expressions"] = opinion_expressions
+    timeline["inner_voice_frames"] = inner_voices
+    timeline["mood_states"] = mood_states
+    return timeline

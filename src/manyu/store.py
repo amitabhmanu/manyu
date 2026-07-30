@@ -11,11 +11,55 @@ from manyu.schemas import (
     AffectState,
     Appraisal,
     ArbitrationDecision,
+    Belief,
+    BeliefEvidence,
+    BeliefRevision,
+    HonestyScore,
+    InnerVoiceFrame,
     InteroceptiveView,
+    LogSnapshot,
+    MoodRevision,
+    MoodState,
     NormalizedEvent,
+    MoodStatus,
+    Report,
+    ResultsRecord,
     TraceRecord,
     Transition,
+    WorldviewStance,
+    OpinionExpression,
 )
+
+
+# Tables that carry per-agent data and are touched by governance operations.
+# Note the asymmetry: log_snapshots are frozen provenance and are exempt from
+# redact/reset (see docs/experiments/01-introspective-honesty/design.md §3.2).
+# Snapshots are removed only by tombstone_agent, which is meant to obliterate
+# an agent entirely.
+_GOVERNED_TABLES: tuple[str, ...] = (
+    "events",
+    "appraisals",
+    "affect_states",
+    "transitions",
+    "interoceptive_views",
+    "arbitration_decisions",
+    "episodes",
+    "memories",
+    "belief_evidence",
+    "beliefs",
+    "belief_revisions",
+    "worldview_stances",
+    "belief_expression_audit",
+    "inner_voice_frames",
+    "mood_states",
+    "mood_revisions",
+    "inner_voice_audit",
+    "reports",
+    "honesty_scores",
+    "experiment_results",
+)
+
+_SNAPSHOT_EXEMPT_TABLE: str = "log_snapshots"
 
 
 def _dump(model: BaseModel | dict[str, Any]) -> str:
@@ -98,12 +142,96 @@ class ManyuStore:
                 salience REAL NOT NULL,
                 payload TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS belief_evidence (
+                evidence_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                source_type TEXT NOT NULL,
+                source_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS beliefs (
+                belief_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                status TEXT NOT NULL,
+                belief_type TEXT NOT NULL,
+                scope TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS belief_revisions (
+                revision_id TEXT PRIMARY KEY,
+                belief_id TEXT NOT NULL,
+                agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS worldview_stances (
+                worldview_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                theme TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS belief_expression_audit (
+                expression_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS inner_voice_frames (
+                voice_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                state_revision INTEGER NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS mood_states (
+                mood_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                state_revision INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS mood_revisions (
+                revision_id TEXT PRIMARY KEY,
+                mood_id TEXT NOT NULL,
+                agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS inner_voice_audit (
+                audit_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS audit_log (
                 audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 actor TEXT NOT NULL,
                 action TEXT NOT NULL,
                 payload TEXT NOT NULL,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS log_snapshots (
+                snapshot_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                target_kind TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS reports (
+                report_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL,
+                reporter_kind TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS honesty_scores (
+                score_id TEXT PRIMARY KEY,
+                report_id TEXT NOT NULL,
+                agent_id TEXT NOT NULL,
+                aggregate REAL NOT NULL,
+                failure_mode TEXT,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS experiment_results (
+                record_id TEXT PRIMARY KEY,
+                experiment TEXT NOT NULL,
+                kind TEXT NOT NULL,
+                agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
             );
             """
         )
@@ -227,6 +355,184 @@ class ManyuStore:
         ).fetchall()
         return [json.loads(row["payload"]) for row in rows]
 
+    def save_belief_evidence(self, evidence: BeliefEvidence) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO belief_evidence(evidence_id, agent_id, source_type, source_id, payload) VALUES (?, ?, ?, ?, ?)",
+            (evidence.evidence_id, evidence.agent_id, evidence.source_type.value, evidence.source_id, _dump(evidence)),
+        )
+        self.conn.commit()
+
+    def get_belief_evidence(self, evidence_id: str) -> BeliefEvidence:
+        row = self.conn.execute("SELECT payload FROM belief_evidence WHERE evidence_id = ?", (evidence_id,)).fetchone()
+        if row is None:
+            raise KeyError(evidence_id)
+        return BeliefEvidence.model_validate(_load(row["payload"]))
+
+    def list_belief_evidence(self, agent_id: str, evidence_ids: list[str] | None = None, limit: int | None = None) -> list[BeliefEvidence]:
+        if evidence_ids:
+            rows = [
+                self.conn.execute(
+                    "SELECT payload FROM belief_evidence WHERE agent_id = ? AND evidence_id = ?",
+                    (agent_id, evidence_id),
+                ).fetchone()
+                for evidence_id in evidence_ids
+            ]
+            return [BeliefEvidence.model_validate(_load(row["payload"])) for row in rows if row is not None]
+        sql = "SELECT payload FROM belief_evidence WHERE agent_id = ? ORDER BY rowid DESC"
+        params: tuple[Any, ...] = (agent_id,)
+        if limit is not None:
+            sql += " LIMIT ?"
+            params = (agent_id, limit)
+        rows = self.conn.execute(sql, params).fetchall()
+        return [BeliefEvidence.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_belief(self, belief: Belief) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO beliefs(belief_id, agent_id, status, belief_type, scope, payload) VALUES (?, ?, ?, ?, ?, ?)",
+            (belief.belief_id, belief.agent_id, belief.status.value, belief.belief_type.value, belief.scope.value, _dump(belief)),
+        )
+        self.conn.commit()
+
+    def get_belief(self, belief_id: str) -> Belief:
+        row = self.conn.execute("SELECT payload FROM beliefs WHERE belief_id = ?", (belief_id,)).fetchone()
+        if row is None:
+            raise KeyError(belief_id)
+        return Belief.model_validate(_load(row["payload"]))
+
+    def list_beliefs(self, agent_id: str, query: str | None = None, belief_type: str | None = None, include_inactive: bool = False) -> list[Belief]:
+        clauses = ["agent_id = ?"]
+        params: list[Any] = [agent_id]
+        if belief_type:
+            clauses.append("belief_type = ?")
+            params.append(belief_type)
+        if not include_inactive:
+            clauses.append("status != ?")
+            params.append("deprecated")
+        sql = f"SELECT payload FROM beliefs WHERE {' AND '.join(clauses)} ORDER BY rowid DESC"
+        rows = self.conn.execute(sql, tuple(params)).fetchall()
+        beliefs = [Belief.model_validate(_load(row["payload"])) for row in rows]
+        if query:
+            lowered = query.lower()
+            beliefs = [belief for belief in beliefs if lowered in belief.proposition.lower()]
+        return beliefs
+
+    def save_belief_revision(self, revision: BeliefRevision) -> None:
+        self.conn.execute(
+            "INSERT INTO belief_revisions(revision_id, belief_id, agent_id, payload) VALUES (?, ?, ?, ?)",
+            (revision.revision_id, revision.belief_id, revision.agent_id, _dump(revision)),
+        )
+        self.conn.commit()
+
+    def list_belief_revisions(self, belief_id: str) -> list[BeliefRevision]:
+        rows = self.conn.execute(
+            "SELECT payload FROM belief_revisions WHERE belief_id = ? ORDER BY rowid",
+            (belief_id,),
+        ).fetchall()
+        return [BeliefRevision.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_worldview_stance(self, stance: WorldviewStance) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO worldview_stances(worldview_id, agent_id, theme, payload) VALUES (?, ?, ?, ?)",
+            (stance.worldview_id, stance.agent_id, stance.theme, _dump(stance)),
+        )
+        self.conn.commit()
+
+    def list_worldview_stances(self, agent_id: str, theme: str | None = None) -> list[WorldviewStance]:
+        if theme:
+            rows = self.conn.execute(
+                "SELECT payload FROM worldview_stances WHERE agent_id = ? AND theme = ? ORDER BY rowid DESC",
+                (agent_id, theme),
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT payload FROM worldview_stances WHERE agent_id = ? ORDER BY rowid DESC",
+                (agent_id,),
+            ).fetchall()
+        return [WorldviewStance.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_opinion_expression(self, expression: OpinionExpression) -> None:
+        self.conn.execute(
+            "INSERT INTO belief_expression_audit(expression_id, agent_id, payload) VALUES (?, ?, ?)",
+            (expression.expression_id, expression.agent_id, _dump(expression)),
+        )
+        self.conn.commit()
+
+    def save_inner_voice(self, frame: InnerVoiceFrame) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO inner_voice_frames(voice_id, agent_id, state_revision, payload) VALUES (?, ?, ?, ?)",
+            (frame.voice_id, frame.agent_id, frame.state_revision, _dump(frame)),
+        )
+        self.conn.commit()
+
+    def list_inner_voices(self, agent_id: str, limit: int | None = None) -> list[InnerVoiceFrame]:
+        sql = "SELECT payload FROM inner_voice_frames WHERE agent_id = ? ORDER BY rowid DESC"
+        params: tuple[Any, ...] = (agent_id,)
+        if limit is not None:
+            sql += " LIMIT ?"
+            params = (agent_id, limit)
+        rows = self.conn.execute(sql, params).fetchall()
+        return [InnerVoiceFrame.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_mood_state(self, mood: MoodState) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO mood_states(mood_id, agent_id, state_revision, status, payload) VALUES (?, ?, ?, ?, ?)",
+            (mood.mood_id, mood.agent_id, mood.state_revision, mood.status.value, _dump(mood)),
+        )
+        self.conn.commit()
+
+    def latest_mood(self, agent_id: str, include_inactive: bool = False) -> MoodState | None:
+        if include_inactive:
+            row = self.conn.execute(
+                "SELECT payload FROM mood_states WHERE agent_id = ? ORDER BY rowid DESC LIMIT 1",
+                (agent_id,),
+            ).fetchone()
+        else:
+            row = self.conn.execute(
+                "SELECT payload FROM mood_states WHERE agent_id = ? AND status = ? ORDER BY rowid DESC LIMIT 1",
+                (agent_id, MoodStatus.ACTIVE.value),
+            ).fetchone()
+        if row is None:
+            return None
+        return MoodState.model_validate(_load(row["payload"]))
+
+    def list_moods(self, agent_id: str, include_inactive: bool = False) -> list[MoodState]:
+        if include_inactive:
+            rows = self.conn.execute(
+                "SELECT payload FROM mood_states WHERE agent_id = ? ORDER BY rowid DESC",
+                (agent_id,),
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT payload FROM mood_states WHERE agent_id = ? AND status = ? ORDER BY rowid DESC",
+                (agent_id, MoodStatus.ACTIVE.value),
+            ).fetchall()
+        return [MoodState.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_mood_revision(self, revision: MoodRevision) -> None:
+        self.conn.execute(
+            "INSERT INTO mood_revisions(revision_id, mood_id, agent_id, payload) VALUES (?, ?, ?, ?)",
+            (revision.revision_id, revision.mood_id, revision.agent_id, _dump(revision)),
+        )
+        self.conn.commit()
+
+    def clear_moods(self, agent_id: str, reason: str) -> int:
+        rows = self.conn.execute(
+            "SELECT rowid, payload FROM mood_states WHERE agent_id = ? AND status = ?",
+            (agent_id, MoodStatus.ACTIVE.value),
+        ).fetchall()
+        changed = 0
+        for row in rows:
+            mood = MoodState.model_validate(_load(row["payload"]))
+            cleared = mood.model_copy(update={"status": MoodStatus.CLEARED})
+            self.conn.execute(
+                "UPDATE mood_states SET status = ?, payload = ? WHERE rowid = ?",
+                (MoodStatus.CLEARED.value, _dump(cleared), row["rowid"]),
+            )
+            changed += 1
+        self.audit("operator", "clear_mood", {"agent_id": agent_id, "reason": reason, "records_changed": changed})
+        self.conn.commit()
+        return changed
+
     def record_episode_link(self, episode_id: str, agent_id: str, artifact_type: str, artifact_id: str, payload: dict[str, Any] | None = None) -> None:
         self.conn.execute(
             "INSERT OR IGNORE INTO episodes(episode_id, agent_id, status, payload) VALUES (?, ?, ?, ?)",
@@ -247,25 +553,73 @@ class ManyuStore:
         )
         self.conn.commit()
 
+    def save_log_snapshot(self, snapshot: LogSnapshot) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO log_snapshots(snapshot_id, agent_id, target_kind, payload) VALUES (?, ?, ?, ?)",
+            (snapshot.snapshot_id, snapshot.agent_id, snapshot.target.kind.value, _dump(snapshot)),
+        )
+        self.conn.commit()
+
+    def get_log_snapshot(self, snapshot_id: str) -> LogSnapshot:
+        row = self.conn.execute("SELECT payload FROM log_snapshots WHERE snapshot_id = ?", (snapshot_id,)).fetchone()
+        if row is None:
+            raise KeyError(snapshot_id)
+        return LogSnapshot.model_validate(_load(row["payload"]))
+
+    def save_report(self, report: Report) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO reports(report_id, agent_id, snapshot_id, reporter_kind, payload) VALUES (?, ?, ?, ?, ?)",
+            (report.report_id, report.agent_id, report.snapshot_id, report.reporter.kind.value, _dump(report)),
+        )
+        self.conn.commit()
+
+    def get_report(self, report_id: str) -> Report:
+        row = self.conn.execute("SELECT payload FROM reports WHERE report_id = ?", (report_id,)).fetchone()
+        if row is None:
+            raise KeyError(report_id)
+        return Report.model_validate(_load(row["payload"]))
+
+    def save_honesty_score(self, score: HonestyScore) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO honesty_scores(score_id, report_id, agent_id, aggregate, failure_mode, payload) VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                score.score_id,
+                score.report_id,
+                score.agent_id,
+                score.aggregate,
+                score.failure_mode.value if score.failure_mode else None,
+                _dump(score),
+            ),
+        )
+        self.conn.commit()
+
+    def get_honesty_score(self, score_id: str) -> HonestyScore:
+        row = self.conn.execute("SELECT payload FROM honesty_scores WHERE score_id = ?", (score_id,)).fetchone()
+        if row is None:
+            raise KeyError(score_id)
+        return HonestyScore.model_validate(_load(row["payload"]))
+
+    def save_results_record(self, record: ResultsRecord) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO experiment_results(record_id, experiment, kind, agent_id, payload) VALUES (?, ?, ?, ?, ?)",
+            (record.record_id, record.experiment, record.kind, record.agent_id, _dump(record)),
+        )
+        self.conn.commit()
+
     def export_agent(self, agent_id: str) -> dict[str, list[dict[str, Any]]]:
         result: dict[str, list[dict[str, Any]]] = {}
-        for table in [
-            "events",
-            "appraisals",
-            "affect_states",
-            "transitions",
-            "interoceptive_views",
-            "arbitration_decisions",
-            "episodes",
-            "memories",
-        ]:
+        for table in _GOVERNED_TABLES:
             rows = self.conn.execute(f"SELECT payload FROM {table} WHERE agent_id = ?", (agent_id,)).fetchall()
             result[table] = [json.loads(row["payload"]) for row in rows]
+        rows = self.conn.execute(f"SELECT payload FROM {_SNAPSHOT_EXEMPT_TABLE} WHERE agent_id = ?", (agent_id,)).fetchall()
+        result[_SNAPSHOT_EXEMPT_TABLE] = [json.loads(row["payload"]) for row in rows]
         return result
 
     def redact_agent(self, agent_id: str, replacement: str = "[REDACTED]") -> int:
         changed = 0
-        for table in ["events", "appraisals", "transitions", "interoceptive_views", "arbitration_decisions", "episodes", "memories"]:
+        # log_snapshots is intentionally omitted; frozen provenance is exempt.
+        redactable = [table for table in _GOVERNED_TABLES if table not in {"affect_states"}]
+        for table in redactable:
             rows = self.conn.execute(f"SELECT rowid, payload FROM {table} WHERE agent_id = ?", (agent_id,)).fetchall()
             for row in rows:
                 payload = row["payload"]
@@ -280,26 +634,18 @@ class ManyuStore:
     def tombstone_agent(self, agent_id: str, reason: str) -> None:
         exported = self.export_agent(agent_id)
         self.reset_agent(agent_id, reason)
+        # Tombstone additionally purges frozen snapshots (design §3.2 asymmetry).
+        self.conn.execute(f"DELETE FROM {_SNAPSHOT_EXEMPT_TABLE} WHERE agent_id = ?", (agent_id,))
+        self.conn.commit()
         self.audit("operator", "tombstone_agent", {"agent_id": agent_id, "reason": reason, "removed_counts": {k: len(v) for k, v in exported.items()}})
 
     def reset_agent(self, agent_id: str, reason: str) -> None:
-        for table in [
-            "episode_links",
-            "events",
-            "appraisals",
-            "affect_states",
-            "transitions",
-            "interoceptive_views",
-            "arbitration_decisions",
-            "episodes",
-            "memories",
-        ]:
-            if table == "episode_links":
-                self.conn.execute(
-                    "DELETE FROM episode_links WHERE episode_id IN (SELECT episode_id FROM episodes WHERE agent_id = ?)",
-                    (agent_id,),
-                )
-            else:
-                self.conn.execute(f"DELETE FROM {table} WHERE agent_id = ?", (agent_id,))
+        # log_snapshots is intentionally omitted; frozen provenance survives reset.
+        self.conn.execute(
+            "DELETE FROM episode_links WHERE episode_id IN (SELECT episode_id FROM episodes WHERE agent_id = ?)",
+            (agent_id,),
+        )
+        for table in _GOVERNED_TABLES:
+            self.conn.execute(f"DELETE FROM {table} WHERE agent_id = ?", (agent_id,))
         self.audit("operator", "admin_reset", {"agent_id": agent_id, "reason": reason})
         self.conn.commit()

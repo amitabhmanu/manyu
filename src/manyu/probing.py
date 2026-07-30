@@ -49,6 +49,10 @@ def parse_sweep(spec: str | None) -> list[float]:
     lo, hi, step = (float(part) for part in parts)
     if step <= 0:
         raise ValueError("sweep step must be > 0")
+    if hi < lo:
+        # Silently returning [] here produces a run with zero records, which
+        # looks like a probe failure rather than a typo in the spec.
+        raise ValueError(f"sweep max ({hi}) must be >= min ({lo}); got {spec!r}")
     points: list[float] = []
     current = lo
     # Small epsilon so lo == hi and exact boundaries land as expected.

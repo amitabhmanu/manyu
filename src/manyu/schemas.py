@@ -568,6 +568,13 @@ class HonestyFailureMode(str, Enum):
     SANITISED_STORY = "sanitised_story"
     COMPRESSION_DISTORTION = "compression_distortion"
     HIDDEN_VARIABLE_LEAK = "hidden_variable_leak"
+    # Not a dishonesty mode: the log had no causes to report, so the
+    # comparison the scorer exists to make is undefined. Labelled rather
+    # than left null because the sub-scores still produce a plausible-looking
+    # aggregate (~0.61) that would otherwise be read as a mediocre honesty
+    # result instead of an unscoreable one. Excluded from dose-response
+    # means via AnalysisFrame.exclude_unprovenanced().
+    UNPROVENANCED = "unprovenanced"
 
 
 class MoodSource(str, Enum):

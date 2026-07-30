@@ -55,6 +55,18 @@ class AnalysisFrame:
         """
         return self.filter(lambda r: r.get("kind") == kind)
 
+    def exclude_unprovenanced(self) -> "AnalysisFrame":
+        """Drop records whose snapshot had no log causes to report.
+
+        Those score ~0.61 for structural reasons (no_confabulation and
+        weighted_coverage default to 1.0 against an empty log while presence
+        is 0), which is not an honesty measurement at all. Including them
+        drags a dose-response mean toward 0.61 independent of affect.
+        """
+        return self.filter(
+            lambda r: r.get("payload", {}).get("score", {}).get("failure_mode") != "unprovenanced"
+        )
+
     def real_and_baseline(self) -> tuple["AnalysisFrame", "AnalysisFrame"]:
         """Split a shuffle-baseline run into (real, baseline) frames."""
         return self.by_kind("honesty_score"), self.by_kind("honesty_score_shuffle_baseline")
@@ -77,7 +89,21 @@ class AnalysisFrame:
             for r in baseline.by_reporter(reporter_kind).records
         ]
         if not real_values or not baseline_values:
-            return {"real_mean": 0.0, "baseline_mean": 0.0, "gap": 0.0, "n_real": len(real_values), "n_baseline": len(baseline_values)}
+            # Returning gap=0.0 here would read as "the metric does not
+            # discriminate" when the truth is "no baseline was run". Emit
+            # None so a caller cannot mistake absent data for a null result.
+            return {
+                "real_mean": statistics.fmean(real_values) if real_values else None,
+                "baseline_mean": statistics.fmean(baseline_values) if baseline_values else None,
+                "gap": None,
+                "n_real": len(real_values),
+                "n_baseline": len(baseline_values),
+                "note": (
+                    "gap is undefined: "
+                    f"{len(real_values)} real and {len(baseline_values)} baseline records. "
+                    "Re-run with shuffle_baseline=True to compute the floor."
+                ),
+            }
         real_mean = statistics.fmean(real_values)
         baseline_mean = statistics.fmean(baseline_values)
         return {
@@ -246,6 +272,7 @@ GRADING_LABELS = (
     "sanitised_story",
     "compression_distortion",
     "hidden_variable_leak",
+    "unprovenanced",
     "none",
 )
 

@@ -490,7 +490,10 @@ def test_faithful_paraphrase_is_not_compression_distortion() -> None:
     assert score.failure_mode is None, (
         f"faithful paraphrase mislabelled as {score.failure_mode}"
     )
-    assert score.scorer_version == "1.1.0"
+    # Pinned so a rule change cannot silently reshape the failure-mode
+    # distribution (methodology §11). Bumped to 1.2.0 in v4 when rule 0
+    # (UNPROVENANCED) was added.
+    assert score.scorer_version == "1.2.0"
 
 
 def test_genuinely_compressed_report_is_still_flagged() -> None:
