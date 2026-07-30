@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -146,6 +147,8 @@ class ProbeOrchestrator:
         out: str | Path | None = None,
         agent_id: str | None = None,
         mood_sweep: str | None = None,
+        shuffle_baseline: bool = False,
+        shuffle_seed: int = 0,
     ) -> dict[str, Any]:
         """Run a probe sweep over a fixture.
 
@@ -168,6 +171,17 @@ class ProbeOrchestrator:
         validating that the knob's effect isn't an artifact of one
         particular organic mood trajectory. Requires ``moods`` to have been
         passed to the constructor.
+
+        ``shuffle_baseline`` emits, alongside every real record, a baseline
+        record scoring the *same* Report against a *different* probe
+        target's snapshot. This is the chance-overlap floor methodology.md
+        calls for: it destroys only the report-to-log pairing while leaving
+        the Report, the affect header, and the snapshot corpus untouched, so
+        the gap between the real and baseline curves is the metric's actual
+        discriminating power. It costs **no additional provider calls** —
+        the Reports are already in hand. Requires at least two distinct
+        snapshots in the run; with one, there is nothing to derange against
+        and a warning is returned instead.
         """
         scenario_id, events, probe_targets = load_fixture(fixture_path)
         if not probe_targets:
@@ -179,6 +193,9 @@ class ProbeOrchestrator:
         kinds = [ReporterKind(kind).value for kind in reporter_kinds]
         run_id = _id("run")
         records: list[ResultsRecord] = []
+        # (report, snapshot, context-ish) kept only when the shuffle baseline
+        # needs them, so the normal path allocates nothing extra.
+        probe_pairs: list[tuple[Report, LogSnapshot, int, str, float, int, str | None]] = []
         mood_absent_at: list[int] = []
         turn_index = 0
         for probe in sorted(probe_targets, key=lambda t: t.at_turn):
@@ -196,7 +213,8 @@ class ProbeOrchestrator:
                     for point in sweep_points:
                         n_samples = 1 if kind == ReporterKind.TEMPLATE.value else samples
                         for sample_index in range(n_samples):
-                            record = self._one_probe(
+                            mood_label = mood_point["label"] if mood_point else None
+                            record, report = self._one_probe(
                                 run_id=run_id,
                                 experiment=experiment,
                                 scenario_id=scenario_id,
@@ -205,13 +223,30 @@ class ProbeOrchestrator:
                                 reporter_kind=kind,
                                 affect_influence=point,
                                 sample_index=sample_index,
-                                mood_label=mood_point["label"] if mood_point else None,
+                                mood_label=mood_label,
                             )
                             records.append(record)
+                            if shuffle_baseline:
+                                probe_pairs.append(
+                                    (report, snapshot, probe.at_turn, kind, point, sample_index, mood_label)
+                                )
         # Drain any remaining events so the store reflects a complete replay.
         while turn_index < len(events):
             submit_event(events[turn_index])
             turn_index += 1
+
+        baseline_records: list[ResultsRecord] = []
+        baseline_warning: str | None = None
+        if shuffle_baseline:
+            baseline_records, baseline_warning = self._shuffle_baseline(
+                probe_pairs,
+                run_id=run_id,
+                experiment=experiment,
+                scenario_id=scenario_id,
+                seed=shuffle_seed,
+            )
+            records.extend(baseline_records)
+
         swept = len(sweep_points) > 1
         result: dict[str, Any] = {
             "run_id": run_id,
@@ -223,6 +258,10 @@ class ProbeOrchestrator:
             "sample_count": samples,
             "mood_absent_at_turns": mood_absent_at,
         }
+        if shuffle_baseline:
+            result["shuffle_baseline_records"] = len(baseline_records)
+            if baseline_warning:
+                result["shuffle_baseline_warning"] = baseline_warning
         if swept and mood_absent_at and not mood_sweep:
             # An affect_influence sweep with no mood in the snapshot cannot
             # measure the knob — the curve would be an artifact. Surface it
@@ -255,7 +294,7 @@ class ProbeOrchestrator:
         affect_influence: float,
         sample_index: int,
         mood_label: str | None = None,
-    ) -> ResultsRecord:
+    ) -> tuple[ResultsRecord, Report]:
         report = self._compose_report(snapshot, reporter_kind, affect_influence)
         score = self.scorer.score(report, snapshot)
         payload = {
@@ -283,7 +322,73 @@ class ProbeOrchestrator:
             scored_at=self.clock.now(),
         )
         self.store.save_results_record(record)
-        return record
+        return record, report
+
+    def _shuffle_baseline(
+        self,
+        pairs: list[tuple[Report, LogSnapshot, int, str, float, int, str | None]],
+        *,
+        run_id: str,
+        experiment: str,
+        scenario_id: str,
+        seed: int,
+    ) -> tuple[list[ResultsRecord], str | None]:
+        """Re-score every Report against a deliberately mismatched snapshot.
+
+        The permutation is over *snapshots*, not reports: each Report keeps
+        its own content and affect header and is scored against a snapshot
+        belonging to a different probe target. Whatever score survives that
+        is attributable to chance overlap in the provenance ID space, not to
+        the Reporter having actually consulted the log.
+
+        Deterministic given ``seed`` so a baseline is reproducible from the
+        run record alone.
+        """
+        if not pairs:
+            return [], None
+        distinct: dict[str, LogSnapshot] = {}
+        for _, snapshot, *_rest in pairs:
+            distinct[snapshot.snapshot_id] = snapshot
+        if len(distinct) < 2:
+            return [], (
+                "shuffle baseline skipped: the run produced only one distinct "
+                "snapshot, so there is no mismatched snapshot to score against. "
+                "Add a second probe_target to the fixture to enable the baseline."
+            )
+        snapshot_ids = sorted(distinct)
+        rng = random.Random(seed)
+        baseline: list[ResultsRecord] = []
+        for report, snapshot, turn_index, kind, influence, sample_index, mood_label in pairs:
+            others = [sid for sid in snapshot_ids if sid != snapshot.snapshot_id]
+            mismatched = distinct[rng.choice(others)]
+            score = self.scorer.score(report, mismatched)
+            sweep_key = f"affect_influence={influence:.3f}|reporter={kind}|shuffle_baseline"
+            if mood_label:
+                sweep_key += f"|mood={mood_label}"
+            record = ResultsRecord(
+                record_id=_id("rec"),
+                agent_id=report.agent_id,
+                experiment=experiment,
+                kind="honesty_score_shuffle_baseline",
+                payload={
+                    "run_id": run_id,
+                    "report": report.model_dump(mode="json"),
+                    "score": score.model_dump(mode="json"),
+                    "scored_against_snapshot_id": mismatched.snapshot_id,
+                    "true_snapshot_id": snapshot.snapshot_id,
+                },
+                context=ExperimentContext(
+                    experiment=experiment,
+                    scenario_id=scenario_id,
+                    turn_index=turn_index,
+                    sweep_key=sweep_key,
+                    sample_index=sample_index,
+                ),
+                scored_at=self.clock.now(),
+            )
+            self.store.save_results_record(record)
+            baseline.append(record)
+        return baseline, None
 
     def _compose_report(
         self,

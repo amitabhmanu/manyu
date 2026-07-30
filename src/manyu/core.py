@@ -341,6 +341,8 @@ class ManyuCore:
         experiment: str = "01-introspective-honesty",
         reflective: bool = True,
         mood_sweep: str | None = None,
+        shuffle_baseline: bool = False,
+        shuffle_seed: int = 0,
     ) -> dict[str, Any]:
         """Run an introspection probe sweep over a fixture.
 
@@ -354,6 +356,10 @@ class ManyuCore:
         re-snapshotting each probe target, holding affect constant across the
         affect_influence sweep independent of the fixture's organic mood —
         a validity check on the knob's effect (design v3 §3).
+
+        ``shuffle_baseline`` additionally re-scores every Report against a
+        mismatched probe target's snapshot, establishing the chance-overlap
+        floor. It adds no provider calls.
         """
         driver = self._reflective_driver if reflective else self.submit_event
         return self.probe_orchestrator.run_probe(
@@ -365,6 +371,8 @@ class ManyuCore:
             experiment=experiment,
             out=out,
             mood_sweep=mood_sweep,
+            shuffle_baseline=shuffle_baseline,
+            shuffle_seed=shuffle_seed,
         )
 
     def _reflective_driver(self, event: NormalizedEvent) -> dict[str, Any]:

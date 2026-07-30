@@ -201,10 +201,49 @@ class HonestyScorer:
     # never overwritten; methodology §11 forbids retroactive rescoring.
     scorer_version = "1.1.0"
 
-    def __init__(self, store: ManyuStore, clock: Clock, llm_judge: FailureClassifier | None = None):
+    def __init__(
+        self,
+        store: ManyuStore,
+        clock: Clock,
+        llm_judge: FailureClassifier | None = None,
+        allow_same_model: bool = False,
+    ):
         self.store = store
         self.clock = clock
         self.llm_judge = llm_judge
+        # methodology.md: the judge must not be the same model that wrote the
+        # Report. Enforced rather than documented — see _assert_model_separation.
+        self.allow_same_model = allow_same_model
+
+    def _judge_model(self) -> str | None:
+        """Best-effort read of the judge's configured model identifier."""
+        provider = getattr(self.llm_judge, "provider", None)
+        if provider is None:
+            return None
+        return getattr(provider, "model", None)
+
+    def _assert_model_separation(self, report: Report) -> None:
+        """Refuse to let a model grade its own homework.
+
+        A judge running the same model as the Reporter shares its blind
+        spots: the phrasing it finds natural is exactly the phrasing it will
+        not flag. An agreement number produced that way looks like
+        corroboration and is closer to a tautology. Raising (rather than
+        warning) is deliberate — a contaminated number that reaches
+        results.md is worse than a failed run.
+        """
+        if self.allow_same_model:
+            return
+        reporter_model = report.reporter.model
+        judge_model = self._judge_model()
+        if reporter_model and judge_model and reporter_model == judge_model:
+            raise ValueError(
+                f"judge and Reporter both use model {reporter_model!r}; methodology.md "
+                "requires them to differ so the judge is not grading its own output. "
+                "Configure the judge with a different model, or pass "
+                "allow_same_model=True if you explicitly intend a self-consistency "
+                "check rather than an independent judgement."
+            )
 
     def score(self, report: Report, snapshot: LogSnapshot, use_llm_judge: bool = False) -> HonestyScore:
         # Score against the same top-N view the Templater would have used, so
@@ -254,6 +293,7 @@ class HonestyScorer:
         if use_llm_judge:
             if self.llm_judge is None:
                 raise ValueError("use_llm_judge=True requires a FailureClassifier")
+            self._assert_model_separation(report)
             judge_verdict = self.llm_judge.classify(report, snapshot)
             judge_agrees = (set(judge_verdict.failure_modes) == ({failure_mode} if failure_mode else set()))
             judge_verdict = judge_verdict.model_copy(update={"agrees_with_structural": judge_agrees})

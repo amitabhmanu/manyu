@@ -295,6 +295,8 @@ def cmd_run_probe(args: argparse.Namespace) -> int:
         experiment=args.experiment,
         reflective=getattr(args, "reflective", True),
         mood_sweep=getattr(args, "seed_mood", None),
+        shuffle_baseline=getattr(args, "shuffle_baseline", False),
+        shuffle_seed=getattr(args, "shuffle_seed", 0),
     )
     summary = {
         "status": "ok",
@@ -304,9 +306,45 @@ def cmd_run_probe(args: argparse.Namespace) -> int:
         "records_emitted": len(result["records"]),
         "out_path": result.get("out_path"),
     }
-    if result.get("warning"):
-        summary["warning"] = result["warning"]
+    if result.get("shuffle_baseline_records") is not None:
+        summary["shuffle_baseline_records"] = result["shuffle_baseline_records"]
+    for key in ("warning", "shuffle_baseline_warning"):
+        if result.get(key):
+            summary[key] = result[key]
     _print(summary)
+    return 0
+
+
+def cmd_grading_pack(args: argparse.Namespace) -> int:
+    from manyu.analysis import AnalysisFrame, render_grading_pack
+
+    core = _core(args)
+
+    def lookup(snapshot_id: str):
+        try:
+            return core.store.get_log_snapshot(snapshot_id).payload
+        except Exception:
+            return None
+
+    frame = AnalysisFrame.load_run(args.records)
+    result = render_grading_pack(
+        frame,
+        args.out,
+        snapshot_lookup=lookup,
+        per_label=args.per_label,
+        min_cases=args.min_cases,
+        seed=args.seed,
+        reporter_kind=args.reporter or None,
+    )
+    _print(result)
+    return 0
+
+
+def cmd_score_grading_pack(args: argparse.Namespace) -> int:
+    from manyu.analysis import score_grading_pack
+
+    result = score_grading_pack(args.answer_key, args.labels, target_agreement=args.target)
+    _print(result)
     return 0
 
 
@@ -458,7 +496,35 @@ def build_parser() -> argparse.ArgumentParser:
         "seed before each probe, holding affect constant across the affect_influence sweep "
         "independent of the fixture's organic mood.",
     )
+    run_probe.add_argument(
+        "--shuffle-baseline",
+        action="store_true",
+        help="Also score every Report against a mismatched probe target's snapshot, "
+        "establishing the chance-overlap floor. Adds no provider calls. Requires "
+        "the fixture to have at least two probe_targets.",
+    )
+    run_probe.add_argument(
+        "--shuffle-seed", type=int, default=0, help="Seed for the shuffle-baseline permutation (reproducibility)"
+    )
     run_probe.set_defaults(func=cmd_run_probe)
+    pack = sub.add_parser(
+        "grading-pack",
+        help="Render a blinded hand-grading pack from a probe run's JSONL (methodology §9)",
+    )
+    pack.add_argument("records", help="Path to a run's .jsonl (or a directory containing one)")
+    pack.add_argument("--out", default=".manyu/grading/pack", help="Output path stem")
+    pack.add_argument("--per-label", type=int, default=4)
+    pack.add_argument("--min-cases", type=int, default=20)
+    pack.add_argument("--seed", type=int, default=0)
+    pack.add_argument("--reporter", default="llm", help="Reporter kind to grade; empty string for all")
+    pack.set_defaults(func=cmd_grading_pack)
+    score_pack = sub.add_parser(
+        "score-grading-pack", help="Compare filled-in grader labels against scorer labels (SC-5)"
+    )
+    score_pack.add_argument("answer_key", help="The pack's .answer_key.json")
+    score_pack.add_argument("labels", help="The grader's filled-in labels JSON")
+    score_pack.add_argument("--target", type=float, default=0.8)
+    score_pack.set_defaults(func=cmd_score_grading_pack)
     return parser
 
 
