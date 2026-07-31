@@ -223,7 +223,15 @@ against the real log. An ID-matching or normalisation defect can produce
 a plausible-looking failure-mode signal that has nothing to do with the
 model's actual honesty."*
 
-### 3.5 Beliefs never accumulate provenance, so belief probes are flat by construction (found in v4)
+### 3.5 Belief probes are flat on varied scenarios — *corrected*, see §3.6
+
+> **This section's original conclusion was wrong and is retained only for
+> the record.** It claimed belief merging was unreachable and that backlog
+> #3 was therefore blocked. §3.6 below shows merging works whenever the
+> stimulus pattern repeats; the shallow depth was a fixture-design property,
+> not a belief-core defect. Read §3.6 first.
+
+### 3.5a Original (superseded) finding
 
 Surfaced while adding `probe_targets` to the last two fixtures. Across
 **all four** fixtures, a belief-kind probe target snapshots exactly one
@@ -274,6 +282,61 @@ visible the moment someone changes it.
 **Proposed edit:** this belongs in the backlog against #3 as a
 prerequisite, not only here — #3 cannot start until belief merging is
 reachable.
+
+### 3.6 Correction: belief merging works; the fixtures never exercised it
+
+§3.5 concluded that beliefs "never accumulate provenance" and, on that
+basis, marked backlog #3 blocked. That was an overclaim drawn from
+evidence that only covered varied-stimulus fixtures.
+
+What is actually true: the trigger-belief proposition is templated on
+**(event_type, actor kind, dominant emotion pair)**. It repeats — and
+therefore merges, accumulating evidence and raising `stability` — whenever
+that tuple repeats. Demonstrated directly: five same-pattern events
+produce one belief holding four evidence records with stability 0.50 →
+0.70 across ten revisions.
+
+The four fixtures simply never repeated the tuple. They changed event
+type, actor, or emotional direction on nearly every turn, so every
+reflective turn minted a fresh single-evidence belief. §3.5's evidence
+(“every belief has exactly one evidence record”) was real but
+fixture-specific, and I generalised it into a claim about the belief core.
+
+**Consequences of the correction:**
+
+- **Backlog #3 is not blocked.** Revision works and is exercisable today.
+  Its status is restored, with the fixture-design requirement noted.
+- **No change to `BeliefUpdater._find_existing` is needed.** The risky
+  loosening §3.5 contemplated — fuzzy proposition matching, with its
+  inverse failure mode of silently merging distinct beliefs and corrupting
+  provenance — is unnecessary.
+- **Belief probe depth is a fixture-authoring responsibility.** A scenario
+  that repeats a stimulus pattern produces measurable belief targets; a
+  realistically varied one does not. That is a genuine methodological
+  constraint on what belief probes can measure, and it is now enforced by
+  `test_fixture_probe_targets_have_enough_log_depth`.
+
+Two real defects *were* found while chasing this, both of which had been
+quietly distorting every probe:
+
+1. **`auto:latest_self_model` never worked.** `_resolve_belief_id` stripped
+   only the `auto:` prefix and compared the remainder against
+   `belief_type.value`, so the documented marker matched nothing and fell
+   through to "the first belief of any type, any depth". Every belief probe
+   target in every fixture was effectively arbitrary. Fixed, with
+   `auto:richest_<type>` added — the right selector for a probe target,
+   since a single-evidence belief cannot register omission or misranking —
+   and an explicit error replacing the silent fallback.
+2. **Position snapshots were pre-truncated to five matched beliefs**,
+   which shadowed the documented top-N rule (smallest set covering 80% of
+   weight, capped at 8). With matched beliefs holding one evidence record
+   each, no position target could ever offer more than five causes, so
+   `select_top_n` had nothing to select and every position probe sat at a
+   ceiling. Raised to 12 so the documented rule does the work.
+
+**Proposed edit:** design.md §12 should state that a belief probe target
+requires a repeated stimulus pattern to be scoreable, and recommend
+`auto:richest_<type>` over `auto:latest_<type>` for probe targets.
 
 ## 4. Governance and safety notes (unchanged, reaffirmed)
 

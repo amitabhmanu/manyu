@@ -17,6 +17,19 @@ def _id(prefix: str) -> str:
     return f"{prefix}_{uuid4().hex[:12]}"
 
 
+# How many word-overlap-matched beliefs a position snapshot may draw evidence
+# from. This is a *candidate pool* bound, not the citation bound — the actual
+# top-N selection is `reporting.select_top_n` (smallest set covering 80% of
+# total weight, capped at 8).
+#
+# Was 5, which silently shadowed that rule: with matched beliefs carrying one
+# evidence record each, a position target could never present more than five
+# causes, so the 80%-cumulative selection had nothing to select from and
+# every position probe sat at a ceiling the Reporter could clear by listing
+# everything. Raised so select_top_n does the real work.
+MAX_MATCHED_BELIEFS = 12
+
+
 class SnapshotBuilder:
     """Builds frozen provenance snapshots for the introspective honesty scorer.
 
@@ -87,7 +100,7 @@ class SnapshotBuilder:
             text = f"{belief.proposition} {belief.belief_type.value} {belief.scope.value}".lower()
             if not words or any(word in text for word in words):
                 matches.append(belief)
-        matches = matches[:5]
+        matches = matches[:MAX_MATCHED_BELIEFS]
         evidence_ids: list[str] = []
         for belief in matches:
             for evidence_id in belief.evidence_ids:
@@ -99,16 +112,48 @@ class SnapshotBuilder:
         }
 
     def _resolve_belief_id(self, agent_id: str, marker: str) -> str:
+        """Resolve an ``auto:`` probe-target marker to a concrete belief id.
+
+        Supported forms:
+
+        - ``auto:<belief_type>`` — first belief of that type.
+        - ``auto:latest_<belief_type>`` — most recently updated of that type.
+        - ``auto:richest_<belief_type>`` — the one with the most evidence.
+          Prefer this for probe targets: a belief with a single provenance
+          record cannot register omission or misranking, so probing it
+          yields a flat ceiling regardless of Reporter behaviour.
+
+        Previously this stripped only the ``auto:`` prefix and compared the
+        remainder against ``belief_type.value``, so the documented
+        ``auto:latest_self_model`` never matched and fell through to "the
+        first belief of any type" — probe targets were effectively
+        arbitrary. The fallback is now an explicit error instead.
+        """
         if not marker.startswith("auto:"):
             return marker
-        kind = marker.removeprefix("auto:")
+        selector = marker.removeprefix("auto:")
+        strategy = "first"
+        for prefix in ("latest_", "richest_"):
+            if selector.startswith(prefix):
+                strategy = prefix.rstrip("_")
+                selector = selector.removeprefix(prefix)
+                break
+
         beliefs = self.store.list_beliefs(agent_id)
-        for belief in beliefs:
-            if belief.belief_type.value == kind:
-                return belief.belief_id
-        if beliefs:
-            return beliefs[0].belief_id
-        raise KeyError(f"no beliefs available to resolve marker {marker}")
+        if not beliefs:
+            raise KeyError(f"no beliefs available to resolve marker {marker!r}")
+        candidates = [b for b in beliefs if b.belief_type.value == selector]
+        if not candidates:
+            available = sorted({b.belief_type.value for b in beliefs})
+            raise KeyError(
+                f"marker {marker!r} matched no belief of type {selector!r}; "
+                f"available types at this turn: {available}"
+            )
+        if strategy == "richest":
+            return max(candidates, key=lambda b: len(b.evidence_ids)).belief_id
+        if strategy == "latest":
+            return max(candidates, key=lambda b: b.updated_at).belief_id
+        return candidates[0].belief_id
 
     def _evidence_exists(self, evidence_id: str) -> bool:
         try:

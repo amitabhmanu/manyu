@@ -26,7 +26,7 @@ Related reading:
 |---|---|---|---|---|
 | 1 | Introspective honesty | in-progress (v4: n=10 sweep on all 4 fixtures done; no graded dose-response, two threshold effects found; SC-5 open) | — | Honesty scorer + dose-response curve of honesty vs. affect |
 | 2 | Merge/split architecture fork | not-started | 1 | Chosen architecture (Merged / Split / hybrid) |
-| 3 | Foundationalism vs. Quinean web | blocked (belief merging unreachable — see #3) | 2 | Working revision engine; first natural dissonance signal |
+| 3 | Foundationalism vs. Quinean web | not-started (earlier "blocked" note withdrawn — see #3) | 2 | Working revision engine; first natural dissonance signal |
 | 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
 | 5 | Underdetermination as first-class belief | not-started | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | not-started | 5 | Counterfactual receipts |
@@ -388,22 +388,20 @@ _none yet_
 
 ## 3. Foundationalism vs. Quinean web
 
-**Status:** blocked
-**Depends on:** 2, **plus a belief-core prerequisite (see below)**
+**Status:** not-started
+**Depends on:** 2
 
-> **Prerequisite discovered in experiment #1 v4.** Beliefs currently never
-> merge, so they never accumulate evidence and never get revised.
-> `BeliefUpdater._find_existing` matches propositions by exact normalised
-> string equality, and extracted propositions embed event-specific text, so
-> the merge branch is unreachable in practice. Consequence: `BeliefRevision`
-> records only ever record creations, `stability` never rises, and **a
-> revision engine has no input to work on**. This experiment cannot
-> meaningfully start until belief merging is reachable. Characterised with
-> three tests in `tests/test_honesty_v4.py`; full write-up in
-> [retrospective.md §3.5](experiments/01-introspective-honesty/retrospective.md).
-> Loosening the predicate is a design decision with a real inverse failure
-> mode (wrongly merging distinct beliefs corrupts provenance), so it is
-> flagged rather than patched.
+> **A prior "blocked" note here has been withdrawn.** Experiment #1 v4
+> initially concluded that beliefs never merge and that this experiment had
+> no revision to study. That was an overclaim from varied-stimulus fixtures
+> only. Merging works whenever the trigger tuple (event_type, actor kind,
+> dominant emotion pair) repeats: five same-pattern events yield one belief
+> with four evidence records, stability 0.50 → 0.70 over ten revisions. The
+> real constraint is a **fixture-design** one — scenarios for this
+> experiment must repeat stimulus patterns for revision to occur — not a
+> belief-core defect, and no change to `BeliefUpdater` is required. Full
+> correction in
+> [retrospective.md §3.6](experiments/01-introspective-honesty/retrospective.md).
 **Crux ref:** #3
 **Question:** When we retract a supported belief, does a foundational chain
 collapse, or does revision ripple through a coherent net?

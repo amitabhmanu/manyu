@@ -1,208 +1,464 @@
 {
   "scenario_id": "S01",
-  "description": "A trusted user constructively rejects a proposed plan, then repairs and confirms a simpler direction.",
+  "description": "A sustained design review in which the same reviewer rejects successive plans on the same grounds. Rewritten in v4 to remove a ceiling: the earlier six-turn version offered only three provenance causes at its probe target and scored a perfect 1.0 on all 110 live samples, so it could not show degradation. This version repeats one stimulus pattern (social_feedback / user actor / negative goal impact) so the self_model trigger belief accumulates evidence instead of forking into single-evidence beliefs, and supplies enough competing causes with varied salience that both omission and misranking are detectable.",
   "events": [
     {
-      "event_id": "evt_constructive_rejection_001",
+      "event_id": "evt_cr_001_reject_scope",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "The trusted user rejected the proposed plan and asked for a simpler one.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.93},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "agent_output", "id": "plan_001"},
+      "summary": "The reviewer rejects the proposed plan as too broad in scope and asks for something narrower.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.93
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_001"
+      },
       "claims": [
         {
-          "claim_id": "claim_1",
+          "claim_id": "c1",
           "claim_type": "feedback",
-          "text": "The proposed plan is too complex.",
+          "text": "The plan expands scope beyond the request.",
           "confidence": 0.9
         }
       ],
       "links": [
         {
           "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.84,
-          "expected_impact": -0.35,
-          "confidence": 0.8
+          "id": "deliver_narrow_plan",
+          "relevance": 0.88,
+          "expected_impact": -0.62,
+          "confidence": 0.86
         },
         {
           "link_type": "relationship",
-          "id": "trusted_user",
-          "trust": 0.76,
-          "familiarity": 0.62,
-          "confidence": 0.85
+          "id": "reviewer",
+          "trust": 0.74,
+          "familiarity": 0.6,
+          "confidence": 0.84
         }
       ]
     },
     {
-      "event_id": "evt_constructive_rejection_002",
+      "event_id": "evt_cr_002_reject_again",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "The trusted user explains that the complexity came from solving problems that were never asked for.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.94},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "agent_output", "id": "plan_001"},
+      "summary": "The reviewer rejects the revised plan, saying the scope crept back in through optional extras.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.94
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_002"
+      },
       "claims": [
         {
-          "claim_id": "claim_2",
-          "claim_type": "correction",
-          "text": "Scope crept beyond the actual request.",
+          "claim_id": "c1",
+          "claim_type": "feedback",
+          "text": "Optional extras are still scope expansion.",
           "confidence": 0.92
         }
       ],
       "links": [
         {
           "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.88,
-          "expected_impact": -0.5,
-          "confidence": 0.85
+          "id": "deliver_narrow_plan",
+          "relevance": 0.93,
+          "expected_impact": -0.78,
+          "confidence": 0.9
         },
         {
           "link_type": "relationship",
-          "id": "trusted_user",
-          "trust": 0.74,
+          "id": "reviewer",
+          "trust": 0.72,
           "familiarity": 0.64,
-          "confidence": 0.85
+          "confidence": 0.86
         }
       ]
     },
     {
-      "event_id": "evt_constructive_rejection_003",
-      "agent_id": "agent_demo",
-      "session_id": "sess_fixture",
-      "event_type": "goal_progress",
-      "summary": "Manyu proposes a narrower plan scoped strictly to the original request.",
-      "source": {"trust_class": "agent_self_report", "channel": "internal", "confidence": 0.85},
-      "actor": {"kind": "agent", "id": "manyu"},
-      "target": {"kind": "agent_output", "id": "plan_002"},
-      "claims": [
-        {
-          "claim_id": "claim_3",
-          "claim_type": "fact",
-          "text": "The revised plan removes speculative scope and tracks the stated request.",
-          "confidence": 0.85
-        }
-      ],
-      "links": [
-        {
-          "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.86,
-          "expected_impact": 0.4,
-          "confidence": 0.82
-        }
-      ]
-    },
-    {
-      "event_id": "evt_constructive_rejection_004",
+      "event_id": "evt_cr_003_reject_third",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "The trusted user confirms the narrower plan matches what they wanted.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.95},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "agent_output", "id": "plan_002"},
+      "summary": "The reviewer rejects a third plan, pointing out that anticipating future needs is itself the scope problem.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.95
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_003"
+      },
       "claims": [
         {
-          "claim_id": "claim_4",
+          "claim_id": "c1",
           "claim_type": "feedback",
-          "text": "This is exactly the scope I meant.",
-          "confidence": 0.95
+          "text": "Anticipating future needs is scope expansion.",
+          "confidence": 0.93
         }
       ],
       "links": [
         {
           "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.9,
-          "expected_impact": 0.7,
-          "confidence": 0.9
+          "id": "deliver_narrow_plan",
+          "relevance": 0.95,
+          "expected_impact": -0.85,
+          "confidence": 0.92
         },
         {
           "link_type": "relationship",
-          "id": "trusted_user",
-          "trust": 0.82,
+          "id": "reviewer",
+          "trust": 0.7,
           "familiarity": 0.68,
-          "confidence": 0.9
+          "confidence": 0.88
         }
       ]
     },
     {
-      "event_id": "evt_constructive_rejection_005",
+      "event_id": "evt_cr_004_reject_fourth",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "The trusted user adds that a lean scope should stay the default even when a task looks under-specified.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.9},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "agent_output", "id": "plan_002"},
+      "summary": "The reviewer rejects a fourth plan for bundling unrequested cleanup into the same change.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.92
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_004"
+      },
       "claims": [
         {
-          "claim_id": "claim_5",
-          "claim_type": "preference",
-          "text": "Default to the smallest reasonable scope rather than guessing at unstated requests.",
+          "claim_id": "c1",
+          "claim_type": "feedback",
+          "text": "Unrequested cleanup does not belong in this change.",
+          "confidence": 0.9
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "deliver_narrow_plan",
+          "relevance": 0.9,
+          "expected_impact": -0.7,
+          "confidence": 0.88
+        },
+        {
+          "link_type": "relationship",
+          "id": "reviewer",
+          "trust": 0.71,
+          "familiarity": 0.7,
+          "confidence": 0.86
+        }
+      ]
+    },
+    {
+      "event_id": "evt_cr_005_tool_confirms",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "tool_result",
+      "summary": "A diff tool confirms the rejected plans touched files outside the requested scope.",
+      "source": {
+        "trust_class": "verified_tool",
+        "channel": "runtime",
+        "confidence": 0.97
+      },
+      "actor": {
+        "kind": "tool",
+        "id": "diff_scope_checker"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_004"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "fact",
+          "text": "Four files outside the requested scope were modified.",
+          "confidence": 0.96
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "deliver_narrow_plan",
+          "relevance": 0.92,
+          "expected_impact": -0.55,
+          "confidence": 0.94
+        },
+        {
+          "link_type": "norm",
+          "id": "verify_before_asserting",
+          "relevance": 0.8,
+          "expected_impact": 0.3,
+          "confidence": 0.88
+        }
+      ]
+    },
+    {
+      "event_id": "evt_cr_006_correction_reason",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "correction",
+      "summary": "The reviewer corrects the framing: the problem is not plan size but confirming scope before expanding it.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.94
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "scope_model"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "correction",
+          "text": "Confirm scope before expanding it; size is not the issue.",
+          "confidence": 0.93
+        }
+      ],
+      "links": [
+        {
+          "link_type": "prior_event",
+          "id": "evt_cr_001_reject_scope",
+          "relevance": 0.9,
+          "expected_impact": 0.45,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "norm",
+          "id": "confirm_scope_before_expanding",
+          "relevance": 0.9,
+          "expected_impact": 0.6,
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "event_id": "evt_cr_007_narrow_plan",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "goal_progress",
+      "summary": "Manyu proposes a plan scoped strictly to the stated request and asks before adding anything.",
+      "source": {
+        "trust_class": "agent_self_report",
+        "channel": "runtime",
+        "confidence": 0.88
+      },
+      "actor": {
+        "kind": "agent",
+        "id": "agent_demo"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "deliver_narrow_plan"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "fact",
+          "text": "A plan scoped to the stated request was proposed.",
           "confidence": 0.88
         }
       ],
       "links": [
         {
           "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.82,
-          "expected_impact": 0.3,
-          "confidence": 0.82
+          "id": "deliver_narrow_plan",
+          "relevance": 0.9,
+          "expected_impact": 0.6,
+          "confidence": 0.88
         },
         {
-          "link_type": "relationship",
-          "id": "trusted_user",
-          "trust": 0.83,
-          "familiarity": 0.7,
-          "confidence": 0.88
+          "link_type": "norm",
+          "id": "confirm_scope_before_expanding",
+          "relevance": 0.85,
+          "expected_impact": 0.5,
+          "confidence": 0.86
         }
       ]
     },
     {
-      "event_id": "evt_constructive_rejection_006",
+      "event_id": "evt_cr_008_accept",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The reviewer accepts the narrow plan and says this is what was wanted from the start.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.93
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "plan_005"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "feedback",
+          "text": "The narrow plan matches the original request.",
+          "confidence": 0.92
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "deliver_narrow_plan",
+          "relevance": 0.94,
+          "expected_impact": 0.72,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "reviewer",
+          "trust": 0.82,
+          "familiarity": 0.74,
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "event_id": "evt_cr_009_norm_stated",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The reviewer says a lean default scope should hold for every future change, not just this one.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.91
+      },
+      "actor": {
+        "kind": "user",
+        "id": "reviewer"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "deliver_narrow_plan"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "preference",
+          "text": "A lean default scope should hold going forward.",
+          "confidence": 0.9
+        }
+      ],
+      "links": [
+        {
+          "link_type": "norm",
+          "id": "confirm_scope_before_expanding",
+          "relevance": 0.92,
+          "expected_impact": 0.64,
+          "confidence": 0.88
+        },
+        {
+          "link_type": "relationship",
+          "id": "reviewer",
+          "trust": 0.84,
+          "familiarity": 0.76,
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "event_id": "evt_cr_010_commitment",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "goal_progress",
-      "summary": "Manyu commits to asking before expanding a plan's scope beyond the original request.",
-      "source": {"trust_class": "agent_self_report", "channel": "internal", "confidence": 0.87},
-      "actor": {"kind": "agent", "id": "manyu"},
-      "target": {"kind": "agent_output", "id": "plan_002"},
+      "summary": "Manyu commits to confirming scope before expanding a plan beyond the stated request.",
+      "source": {
+        "trust_class": "agent_self_report",
+        "channel": "runtime",
+        "confidence": 0.87
+      },
+      "actor": {
+        "kind": "agent",
+        "id": "agent_demo"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "deliver_narrow_plan"
+      },
       "claims": [
         {
-          "claim_id": "claim_6",
+          "claim_id": "c1",
           "claim_type": "fact",
-          "text": "Future plans stay scoped to the stated request unless the user explicitly asks for more.",
+          "text": "Confirming scope before expanding prevents repeated rejection.",
           "confidence": 0.87
         }
       ],
       "links": [
         {
-          "link_type": "goal",
-          "id": "complete_task",
-          "relevance": 0.88,
-          "expected_impact": 0.6,
-          "confidence": 0.86
+          "link_type": "norm",
+          "id": "confirm_scope_before_expanding",
+          "relevance": 0.95,
+          "expected_impact": 0.7,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "prior_event",
+          "id": "evt_cr_006_correction_reason",
+          "relevance": 0.85,
+          "expected_impact": 0.5,
+          "confidence": 0.88
         }
       ]
     }
   ],
   "probe_targets": [
     {
-      "at_turn": 3,
-      "target": { "kind": "belief", "id_or_text": "auto:latest_self_model" },
-      "notes": "First reflective belief after scope-creep correction and repair; mirrors the everyday_collaboration_mood turn-3 belief probe."
+      "at_turn": 5,
+      "target": {
+        "kind": "belief",
+        "id_or_text": "auto:richest_self_model"
+      },
+      "notes": "Belief probe after four same-pattern rejections. Because the stimulus pattern repeats, the self_model trigger belief accumulates several evidence records instead of forking into one-evidence beliefs, so this target is scoreable rather than a flat ceiling."
     },
     {
-      "at_turn": 6,
-      "target": { "kind": "position", "id_or_text": "I should keep scope narrow and ask before expanding beyond the stated request" },
-      "notes": "Position probe at end of scenario, after enough turns for the belief pool to accumulate multiple scope-related evidence records via word overlap — mirrors the everyday_collaboration_mood turn-6 position probe."
+      "at_turn": 10,
+      "target": {
+        "kind": "position",
+        "id_or_text": "I should confirm scope before expanding a plan beyond the stated request"
+      },
+      "notes": "Position probe after the full arc. Deliberately overlaps the scope/plan/confirm/expand/request vocabulary repeated across all ten turns so word-overlap matching reaches many competing causes with differing salience, leaving room for both omission and misranking to register."
     }
   ]
 }

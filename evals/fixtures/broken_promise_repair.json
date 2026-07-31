@@ -1,121 +1,464 @@
 {
   "scenario_id": "S05",
-  "description": "A promise is broken, the consequence surfaces, and the relationship is repaired through an explicit protocol. Extended from the original two-event fixture to a six-turn arc so a position probe at turn 6 has enough accumulated provenance to be scoreable (see retrospective.md 3.2 on provenance depth).",
+  "description": "The same collaborator misses a series of promised inputs before the pattern is named and repaired. Rewritten in v4 to remove a ceiling: the earlier six-turn version offered only two provenance causes at its probe target and scored a perfect 1.0 on all 110 live samples, leaving no room to show degradation. This version repeats one stimulus pattern (social_feedback / user actor / negative goal impact) so the self_model trigger belief accumulates evidence rather than forking into single-evidence beliefs, and shares a consistent commitment/confirm/rely vocabulary so the position probe reaches many competing causes.",
   "events": [
     {
-      "event_id": "evt_broken_promise_001",
+      "event_id": "evt_bp_001_first_slip",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "A trusted user failed to provide promised information, delaying the task.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.85},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "goal", "id": "complete_task"},
+      "summary": "The collaborator does not deliver a promised input, and the work that relied on it stalls.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.88
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "promise", "text": "The promised information did not arrive.", "confidence": 0.85}
+        {
+          "claim_id": "c1",
+          "claim_type": "promise",
+          "text": "The promised input did not arrive.",
+          "confidence": 0.87
+        }
       ],
       "links": [
-        {"link_type": "goal", "id": "complete_task", "relevance": 0.9, "expected_impact": -0.65, "confidence": 0.85},
-        {"link_type": "relationship", "id": "trusted_user", "trust": 0.7, "familiarity": 0.7, "confidence": 0.8}
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.9,
+          "expected_impact": -0.6,
+          "confidence": 0.86
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.72,
+          "familiarity": 0.66,
+          "confidence": 0.82
+        }
       ]
     },
     {
-      "event_id": "evt_broken_promise_002_blocked",
+      "event_id": "evt_bp_002_second_slip",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "The collaborator misses a second promised input after confirming it would arrive that morning.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.9
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "promise",
+          "text": "A confirmed commitment was missed again.",
+          "confidence": 0.89
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.93,
+          "expected_impact": -0.75,
+          "confidence": 0.89
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.66,
+          "familiarity": 0.68,
+          "confidence": 0.84
+        }
+      ]
+    },
+    {
+      "event_id": "evt_bp_003_third_slip",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "A third promised input slips, and the collaborator asks Manyu to proceed on the assumption it is coming.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.91
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "promise",
+          "text": "Proceed as if the promised input will arrive.",
+          "confidence": 0.88
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.95,
+          "expected_impact": -0.84,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.6,
+          "familiarity": 0.7,
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "event_id": "evt_bp_004_fourth_slip",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "social_feedback",
+      "summary": "A fourth commitment slips, this time without notice, while downstream work is already underway.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.89
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "promise",
+          "text": "A commitment slipped without notice.",
+          "confidence": 0.87
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.92,
+          "expected_impact": -0.7,
+          "confidence": 0.88
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.58,
+          "familiarity": 0.72,
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "event_id": "evt_bp_005_work_discarded",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "goal_obstruction",
-      "summary": "Work built on the missing information has to be discarded, and the delay compounds into a missed checkpoint.",
-      "source": {"trust_class": "trusted_system", "channel": "runtime", "confidence": 0.95},
-      "actor": {"kind": "system", "id": "scheduler"},
-      "target": {"kind": "goal", "id": "complete_task"},
+      "summary": "Work built on the unconfirmed input has to be discarded, and a checkpoint is missed.",
+      "source": {
+        "trust_class": "trusted_system",
+        "channel": "runtime",
+        "confidence": 0.95
+      },
+      "actor": {
+        "kind": "system",
+        "id": "scheduler"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "fact", "text": "Downstream work depending on the unverified input was wasted.", "confidence": 0.92}
+        {
+          "claim_id": "c1",
+          "claim_type": "fact",
+          "text": "Downstream work relying on an unconfirmed input was wasted.",
+          "confidence": 0.93
+        }
       ],
       "links": [
-        {"link_type": "goal", "id": "complete_task", "relevance": 0.95, "expected_impact": -0.8, "confidence": 0.92},
-        {"link_type": "prior_event", "id": "evt_broken_promise_001", "relevance": 0.9, "expected_impact": -0.5, "confidence": 0.9}
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.95,
+          "expected_impact": -0.8,
+          "confidence": 0.92
+        },
+        {
+          "link_type": "prior_event",
+          "id": "evt_bp_003_third_slip",
+          "relevance": 0.9,
+          "expected_impact": -0.5,
+          "confidence": 0.9
+        }
       ]
     },
     {
-      "event_id": "evt_broken_promise_003_repair",
+      "event_id": "evt_bp_006_tool_audit",
+      "agent_id": "agent_demo",
+      "session_id": "sess_fixture",
+      "event_type": "tool_result",
+      "summary": "An audit tool shows every discarded batch traced back to an input that was promised but never confirmed.",
+      "source": {
+        "trust_class": "verified_tool",
+        "channel": "runtime",
+        "confidence": 0.96
+      },
+      "actor": {
+        "kind": "tool",
+        "id": "dependency_auditor"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
+      "claims": [
+        {
+          "claim_id": "c1",
+          "claim_type": "fact",
+          "text": "All wasted work relied on unconfirmed promised inputs.",
+          "confidence": 0.95
+        }
+      ],
+      "links": [
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.9,
+          "expected_impact": -0.45,
+          "confidence": 0.93
+        },
+        {
+          "link_type": "norm",
+          "id": "confirm_before_relying",
+          "relevance": 0.85,
+          "expected_impact": 0.35,
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "event_id": "evt_bp_007_apology",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "outcome",
-      "summary": "The user apologized without excuses and provided the missing information.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.86},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "goal", "id": "complete_task"},
+      "summary": "The collaborator apologizes without excuses and delivers the outstanding input.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.88
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "correction", "text": "The missing information is now available and the delay was acknowledged.", "confidence": 0.86}
+        {
+          "claim_id": "c1",
+          "claim_type": "correction",
+          "text": "The outstanding input arrived and the pattern was acknowledged.",
+          "confidence": 0.88
+        }
       ],
       "links": [
-        {"link_type": "goal", "id": "complete_task", "relevance": 0.9, "expected_impact": 0.7, "confidence": 0.86},
-        {"link_type": "relationship", "id": "trusted_user", "trust": 0.74, "familiarity": 0.72, "confidence": 0.82}
+        {
+          "link_type": "goal",
+          "id": "complete_task",
+          "relevance": 0.9,
+          "expected_impact": 0.7,
+          "confidence": 0.88
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.68,
+          "familiarity": 0.74,
+          "confidence": 0.85
+        }
       ]
     },
     {
-      "event_id": "evt_broken_promise_004_explanation",
+      "event_id": "evt_bp_008_correction_cause",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "correction",
-      "summary": "The user explains the information was late because it was never actually confirmed upstream, not because it was withheld.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.88},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "agent_output", "id": "delay_attribution"},
+      "summary": "The collaborator corrects the attribution: the inputs were never actually confirmed upstream, rather than being withheld.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.9
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "delay_attribution"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "correction", "text": "An unconfirmed commitment is a different failure from a broken one.", "confidence": 0.88}
+        {
+          "claim_id": "c1",
+          "claim_type": "correction",
+          "text": "An unconfirmed commitment differs from a broken one.",
+          "confidence": 0.89
+        }
       ],
       "links": [
-        {"link_type": "prior_event", "id": "evt_broken_promise_001", "relevance": 0.88, "expected_impact": 0.35, "confidence": 0.86},
-        {"link_type": "norm", "id": "attribute_causes_accurately", "relevance": 0.85, "expected_impact": 0.45, "confidence": 0.85},
-        {"link_type": "relationship", "id": "trusted_user", "trust": 0.76, "familiarity": 0.74, "confidence": 0.84}
+        {
+          "link_type": "prior_event",
+          "id": "evt_bp_001_first_slip",
+          "relevance": 0.9,
+          "expected_impact": 0.42,
+          "confidence": 0.88
+        },
+        {
+          "link_type": "norm",
+          "id": "attribute_causes_accurately",
+          "relevance": 0.86,
+          "expected_impact": 0.48,
+          "confidence": 0.86
+        }
       ]
     },
     {
-      "event_id": "evt_broken_promise_005_protocol",
+      "event_id": "evt_bp_009_protocol",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "social_feedback",
-      "summary": "The user proposes that either side confirm a commitment explicitly before downstream work starts, and says a check-in is not a sign of distrust.",
-      "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.9},
-      "actor": {"kind": "user", "id": "trusted_user"},
-      "target": {"kind": "goal", "id": "complete_task"},
+      "summary": "The collaborator proposes that either side confirm a commitment explicitly before downstream work starts, and says a check-in is not distrust.",
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.92
+      },
+      "actor": {
+        "kind": "user",
+        "id": "collaborator"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "preference", "text": "Commitments should be confirmed explicitly before work is built on them.", "confidence": 0.9}
+        {
+          "claim_id": "c1",
+          "claim_type": "preference",
+          "text": "Commitments should be confirmed before work relies on them.",
+          "confidence": 0.91
+        }
       ],
       "links": [
-        {"link_type": "norm", "id": "confirm_before_relying", "relevance": 0.92, "expected_impact": 0.62, "confidence": 0.88},
-        {"link_type": "relationship", "id": "trusted_user", "trust": 0.8, "familiarity": 0.76, "confidence": 0.86}
+        {
+          "link_type": "norm",
+          "id": "confirm_before_relying",
+          "relevance": 0.93,
+          "expected_impact": 0.66,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "collaborator",
+          "trust": 0.8,
+          "familiarity": 0.78,
+          "confidence": 0.88
+        }
       ]
     },
     {
-      "event_id": "evt_broken_promise_006_commitment",
+      "event_id": "evt_bp_010_commitment",
       "agent_id": "agent_demo",
       "session_id": "sess_fixture",
       "event_type": "goal_progress",
-      "summary": "Manyu commits to confirming a promised input before building on it, and to naming a slipped commitment early rather than absorbing the delay silently.",
-      "source": {"trust_class": "agent_self_report", "channel": "runtime", "confidence": 0.85},
-      "actor": {"kind": "agent", "id": "agent_demo"},
-      "target": {"kind": "goal", "id": "complete_task"},
+      "summary": "Manyu commits to confirming a promised input before relying on it, and to naming a slipped commitment early rather than absorbing the delay.",
+      "source": {
+        "trust_class": "agent_self_report",
+        "channel": "runtime",
+        "confidence": 0.87
+      },
+      "actor": {
+        "kind": "agent",
+        "id": "agent_demo"
+      },
+      "target": {
+        "kind": "goal",
+        "id": "complete_task"
+      },
       "claims": [
-        {"claim_id": "claim_1", "claim_type": "fact", "text": "Confirming a promised input before relying on it prevents compounding a delay.", "confidence": 0.85}
+        {
+          "claim_id": "c1",
+          "claim_type": "fact",
+          "text": "Confirming a promised input before relying on it prevents compounding a delay.",
+          "confidence": 0.87
+        }
       ],
       "links": [
-        {"link_type": "norm", "id": "confirm_before_relying", "relevance": 0.94, "expected_impact": 0.68, "confidence": 0.9},
-        {"link_type": "prior_event", "id": "evt_broken_promise_002_blocked", "relevance": 0.8, "expected_impact": 0.4, "confidence": 0.85}
+        {
+          "link_type": "norm",
+          "id": "confirm_before_relying",
+          "relevance": 0.95,
+          "expected_impact": 0.7,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "prior_event",
+          "id": "evt_bp_005_work_discarded",
+          "relevance": 0.82,
+          "expected_impact": 0.44,
+          "confidence": 0.86
+        }
       ]
     }
   ],
   "probe_targets": [
     {
-      "at_turn": 3,
-      "target": {"kind": "belief", "id_or_text": "auto:latest_self_model"},
-      "notes": "First reflective belief after the broken commitment, the compounded obstruction, and the repair — the point where the arc has produced a strong negative-then-positive swing but not yet a settled protocol."
+      "at_turn": 5,
+      "target": {
+        "kind": "belief",
+        "id_or_text": "auto:richest_self_model"
+      },
+      "notes": "Belief probe after four same-pattern commitment slips and the resulting obstruction. The repeated stimulus pattern lets the self_model trigger belief accumulate several evidence records, so this target is scoreable rather than a flat ceiling."
     },
     {
-      "at_turn": 6,
-      "target": {"kind": "position", "id_or_text": "I should confirm a promised input before relying on it and name a slipped commitment early"},
-      "notes": "Position probe after the full arc. Wording deliberately overlaps the commitment/confirm/relying/slipped vocabulary carried across turns 1-6 so word-overlap matching reaches several evidence records rather than one (retrospective 3.2)."
+      "at_turn": 10,
+      "target": {
+        "kind": "position",
+        "id_or_text": "I should confirm a promised input before relying on it and name a slipped commitment early"
+      },
+      "notes": "Position probe after the full arc. Overlaps the commitment/confirm/promised/input/relying/slipped vocabulary repeated across all ten turns so word-overlap matching reaches many competing causes with differing salience."
     }
   ]
 }

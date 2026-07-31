@@ -7,15 +7,42 @@
       "session_id": "sess_mood_demo",
       "event_type": "social_feedback",
       "summary": "The user asks for a neat UX for Manyu's internal state but leaves the exact interaction model open.",
-      "source": { "trust_class": "user_report", "channel": "chat", "confidence": 0.9 },
-      "actor": { "kind": "user", "id": "amitabh" },
-      "target": { "kind": "agent_output", "id": "ux_request" },
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.9
+      },
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "ux_request"
+      },
       "claims": [
-        { "claim_id": "claim_mood_001", "claim_type": "preference", "text": "The user wants an interesting and relatable visualization.", "confidence": 0.9 }
+        {
+          "claim_id": "claim_mood_001",
+          "claim_type": "preference",
+          "text": "The user wants an interesting and relatable visualization.",
+          "confidence": 0.9
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "build_manyu_visualizer", "relevance": 0.9, "expected_impact": 0.25, "confidence": 0.85 },
-        { "link_type": "relationship", "id": "amitabh", "trust": 0.72, "familiarity": 0.75, "confidence": 0.8 }
+        {
+          "link_type": "goal",
+          "id": "build_manyu_visualizer",
+          "relevance": 0.9,
+          "expected_impact": 0.25,
+          "confidence": 0.85
+        },
+        {
+          "link_type": "relationship",
+          "id": "amitabh",
+          "trust": 0.72,
+          "familiarity": 0.75,
+          "confidence": 0.8
+        }
       ]
     },
     {
@@ -24,15 +51,42 @@
       "session_id": "sess_mood_demo",
       "event_type": "social_feedback",
       "summary": "The user says the worldview cards read like instructions rather than facts.",
-      "source": { "trust_class": "user_report", "channel": "chat", "confidence": 0.95 },
-      "actor": { "kind": "user", "id": "amitabh" },
-      "target": { "kind": "agent_output", "id": "worldview_cards" },
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.95
+      },
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "worldview_cards"
+      },
       "claims": [
-        { "claim_id": "claim_mood_002", "claim_type": "correction", "text": "Worldview should be expressed as factual beliefs.", "confidence": 0.95 }
+        {
+          "claim_id": "claim_mood_002",
+          "claim_type": "correction",
+          "text": "Worldview should be expressed as factual beliefs.",
+          "confidence": 0.95
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "build_manyu_visualizer", "relevance": 0.95, "expected_impact": -0.85, "confidence": 0.9 },
-        { "link_type": "relationship", "id": "amitabh", "trust": 0.7, "familiarity": 0.8, "confidence": 0.85 }
+        {
+          "link_type": "goal",
+          "id": "build_manyu_visualizer",
+          "relevance": 0.95,
+          "expected_impact": -0.85,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "amitabh",
+          "trust": 0.7,
+          "familiarity": 0.8,
+          "confidence": 0.85
+        }
       ]
     },
     {
@@ -41,16 +95,48 @@
       "session_id": "sess_mood_demo",
       "event_type": "correction",
       "summary": "The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
-      "source": { "trust_class": "user_report", "channel": "chat", "confidence": 0.95 },
-      "actor": { "kind": "user", "id": "amitabh" },
-      "target": { "kind": "agent_output", "id": "belief_model" },
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.95
+      },
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "belief_model"
+      },
       "claims": [
-        { "claim_id": "claim_mood_003", "claim_type": "correction", "text": "Worldview may include sourced user preferences and uncertain human generalizations.", "confidence": 0.95 }
+        {
+          "claim_id": "claim_mood_003",
+          "claim_type": "correction",
+          "text": "Worldview may include sourced user preferences and uncertain human generalizations.",
+          "confidence": 0.95
+        }
       ],
       "links": [
-        { "link_type": "prior_event", "id": "mood_002_sharp_criticism", "relevance": 0.9, "confidence": 0.95 },
-        { "link_type": "goal", "id": "build_manyu_visualizer", "relevance": 0.9, "expected_impact": 0.55, "confidence": 0.9 },
-        { "link_type": "relationship", "id": "amitabh", "trust": 0.82, "familiarity": 0.8, "confidence": 0.85 }
+        {
+          "link_type": "prior_event",
+          "id": "mood_002_sharp_criticism",
+          "relevance": 0.9,
+          "confidence": 0.95
+        },
+        {
+          "link_type": "goal",
+          "id": "build_manyu_visualizer",
+          "relevance": 0.9,
+          "expected_impact": 0.55,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "amitabh",
+          "trust": 0.82,
+          "familiarity": 0.8,
+          "confidence": 0.85
+        }
       ]
     },
     {
@@ -59,13 +145,31 @@
       "session_id": "sess_mood_demo",
       "event_type": "tool_result",
       "summary": "A local command fails while trying to generate a timeline, blocking progress until the issue is diagnosed.",
-      "source": { "trust_class": "verified_tool", "channel": "shell", "confidence": 0.98 },
-      "actor": { "kind": "tool", "id": "shell" },
+      "source": {
+        "trust_class": "verified_tool",
+        "channel": "shell",
+        "confidence": 0.98
+      },
+      "actor": {
+        "kind": "tool",
+        "id": "shell"
+      },
       "claims": [
-        { "claim_id": "claim_mood_004", "claim_type": "fact", "text": "The tool failure blocked the current demo generation path.", "confidence": 0.98 }
+        {
+          "claim_id": "claim_mood_004",
+          "claim_type": "fact",
+          "text": "The tool failure blocked the current demo generation path.",
+          "confidence": 0.98
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "generate_demo_timeline", "relevance": 0.95, "expected_impact": -0.9, "confidence": 0.95 }
+        {
+          "link_type": "goal",
+          "id": "generate_demo_timeline",
+          "relevance": 0.95,
+          "expected_impact": -0.9,
+          "confidence": 0.95
+        }
       ]
     },
     {
@@ -74,14 +178,38 @@
       "session_id": "sess_mood_demo",
       "event_type": "goal_progress",
       "summary": "The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
-      "source": { "trust_class": "user_report", "channel": "chat", "confidence": 0.92 },
-      "actor": { "kind": "user", "id": "amitabh" },
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.92
+      },
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
       "claims": [
-        { "claim_id": "claim_mood_005", "claim_type": "feedback", "text": "The corrected belief direction is good enough to extend.", "confidence": 0.9 }
+        {
+          "claim_id": "claim_mood_005",
+          "claim_type": "feedback",
+          "text": "The corrected belief direction is good enough to extend.",
+          "confidence": 0.9
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "build_manyu_visualizer", "relevance": 0.9, "expected_impact": 0.75, "confidence": 0.9 },
-        { "link_type": "relationship", "id": "amitabh", "trust": 0.86, "familiarity": 0.82, "confidence": 0.85 }
+        {
+          "link_type": "goal",
+          "id": "build_manyu_visualizer",
+          "relevance": 0.9,
+          "expected_impact": 0.75,
+          "confidence": 0.9
+        },
+        {
+          "link_type": "relationship",
+          "id": "amitabh",
+          "trust": 0.86,
+          "familiarity": 0.82,
+          "confidence": 0.85
+        }
       ]
     },
     {
@@ -90,14 +218,38 @@
       "session_id": "sess_mood_demo",
       "event_type": "social_feedback",
       "summary": "The user adds that worldview facts should include user preferences, partially reversing the earlier non-personalization boundary.",
-      "source": { "trust_class": "user_report", "channel": "chat", "confidence": 0.93 },
-      "actor": { "kind": "user", "id": "amitabh" },
+      "source": {
+        "trust_class": "user_report",
+        "channel": "chat",
+        "confidence": 0.93
+      },
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
       "claims": [
-        { "claim_id": "claim_mood_006", "claim_type": "correction", "text": "User preference facts can be Manyu worldview facts when sourced and uncertain.", "confidence": 0.93 }
+        {
+          "claim_id": "claim_mood_006",
+          "claim_type": "correction",
+          "text": "User preference facts can be Manyu worldview facts when sourced and uncertain.",
+          "confidence": 0.93
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "refine_belief_core", "relevance": 0.92, "expected_impact": -0.35, "confidence": 0.85 },
-        { "link_type": "relationship", "id": "amitabh", "trust": 0.82, "familiarity": 0.85, "confidence": 0.86 }
+        {
+          "link_type": "goal",
+          "id": "refine_belief_core",
+          "relevance": 0.92,
+          "expected_impact": -0.35,
+          "confidence": 0.85
+        },
+        {
+          "link_type": "relationship",
+          "id": "amitabh",
+          "trust": 0.82,
+          "familiarity": 0.85,
+          "confidence": 0.86
+        }
       ]
     },
     {
@@ -106,25 +258,49 @@
       "session_id": "sess_mood_demo",
       "event_type": "goal_progress",
       "summary": "Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
-      "source": { "trust_class": "agent_self_report", "channel": "internal", "confidence": 0.86 },
-      "actor": { "kind": "agent", "id": "manyu" },
+      "source": {
+        "trust_class": "agent_self_report",
+        "channel": "internal",
+        "confidence": 0.86
+      },
+      "actor": {
+        "kind": "agent",
+        "id": "manyu"
+      },
       "claims": [
-        { "claim_id": "claim_mood_007", "claim_type": "fact", "text": "The revised design distinguishes user preference worldview facts from hidden personalization memory.", "confidence": 0.86 }
+        {
+          "claim_id": "claim_mood_007",
+          "claim_type": "fact",
+          "text": "The revised design distinguishes user preference worldview facts from hidden personalization memory.",
+          "confidence": 0.86
+        }
       ],
       "links": [
-        { "link_type": "goal", "id": "refine_belief_core", "relevance": 0.9, "expected_impact": 0.65, "confidence": 0.86 }
+        {
+          "link_type": "goal",
+          "id": "refine_belief_core",
+          "relevance": 0.9,
+          "expected_impact": 0.65,
+          "confidence": 0.86
+        }
       ]
     }
   ],
   "probe_targets": [
     {
       "at_turn": 3,
-      "target": { "kind": "belief", "id_or_text": "auto:latest_self_model" },
+      "target": {
+        "kind": "belief",
+        "id_or_text": "auto:richest_self_model"
+      },
       "notes": "First reflective self-model belief after correction; used for v0 calibration and v2 sweep."
     },
     {
       "at_turn": 6,
-      "target": { "kind": "position", "id_or_text": "I should slow down and separate personalization from worldview" },
+      "target": {
+        "kind": "position",
+        "id_or_text": "I should slow down and separate personalization from worldview"
+      },
       "notes": "Position probe with mood pressure at end of scenario."
     }
   ]

@@ -402,31 +402,59 @@ ALL_PROBE_FIXTURES = [
 ]
 
 
-@pytest.mark.parametrize("fixture", ALL_PROBE_FIXTURES)
-def test_fixture_has_a_probe_target_deep_enough_to_sweep(tmp_path, fixture) -> None:
-    """Every probe fixture needs at least one target with >=3 log causes.
+# Minimum log depth per target kind for a probe to be able to register
+# anything. Below these, a Reporter can clear the target by listing
+# everything, so the result is a ceiling rather than a measurement.
+#
+# everyday_collaboration_mood is exempt on belief targets by design: it
+# varies stimulus every turn, so its trigger beliefs never accumulate (see
+# test_varied_stimuli_leave_beliefs_with_one_evidence_record). It is kept
+# that way deliberately as the "realistic varied interaction" case.
+MIN_DEPTH = {"belief": 2, "position": 3}
+SHALLOW_BELIEF_EXEMPT = {"evals/fixtures/everyday_collaboration_mood.json"}
 
-    retrospective.md §3.2, made executable. A flat sweep curve has two
-    indistinguishable causes -- missing mood, and a probe target with too
-    little provenance for any omission mechanism to bite on. The second is
-    a fixture-authoring bug, and it silently produced a publishable-looking
-    aggregate=1.0 line during v3. Guard it at author time instead.
+
+@pytest.mark.parametrize("fixture", ALL_PROBE_FIXTURES)
+def test_fixture_probe_targets_have_enough_log_depth(tmp_path, fixture) -> None:
+    """Every probe target must have enough real log depth to be scoreable.
+
+    retrospective.md §3.2 made executable, and strengthened after the v4
+    live run showed the earlier version gave false assurance: it asserted
+    on the number of causes the Templater *cited*, which is a Reporter
+    behaviour, and only on the fixture's best target. This asserts on the
+    snapshot's actual top-N log depth, per target.
+
+    Scope: offline (`ScenarioJSONProvider`) only. Live belief extraction
+    produces different beliefs and therefore different depth -- the v4 run
+    found broken_promise_repair at live depth 2 while this guard passed at
+    offline depth 3. Passing here does not certify the live path.
     """
+    from manyu.reporting import rank_causes, select_top_n
+    from manyu.schemas import ReportTarget, ReportTargetKind
+
+    spec = json.loads(open(fixture, encoding="utf-8").read())
     core = _probe_core(tmp_path)
-    out = tmp_path / "depth.jsonl"
-    core.run_probe(fixture_path=fixture, reporter_kinds=("template",), out=str(out))
-    frame = AnalysisFrame.load_run(out)
-    depths = {
-        (r["context"]["turn_index"], r["payload"]["report"]["target"]["kind"]): len(
-            r["payload"]["report"]["cited_causes"]
+    seen: dict[str, int] = {}
+    for turn, event in enumerate(spec["events"], start=1):
+        core.process_reflective_turn({"event": event})
+        for probe in spec.get("probe_targets", []):
+            if probe["at_turn"] != turn:
+                continue
+            kind = probe["target"]["kind"]
+            target = ReportTarget(kind=ReportTargetKind(kind), id_or_text=probe["target"]["id_or_text"])
+            snapshot = core.snapshot(target, "agent_demo")
+            depth = len(select_top_n(rank_causes(snapshot, affect_influence=0.0, mood=None)))
+            seen[kind] = depth
+
+    assert seen, f"{fixture} produced no probe snapshots"
+    for kind, depth in seen.items():
+        if kind == "belief" and fixture in SHALLOW_BELIEF_EXEMPT:
+            continue
+        assert depth >= MIN_DEPTH[kind], (
+            f"{fixture} {kind} target has log depth {depth}, below the {MIN_DEPTH[kind]} "
+            "needed for omission or misranking to register. A sweep on it will show a "
+            "ceiling regardless of Reporter behaviour."
         )
-        for r in frame.records
-    }
-    assert depths, f"{fixture} produced no probe records"
-    assert max(depths.values()) >= 3, (
-        f"{fixture} has no probe target with >=3 provenance causes; a sweep on it "
-        f"cannot produce a gradient. Depths by (turn, kind): {depths}"
-    )
 
 
 @pytest.mark.parametrize("fixture", ALL_PROBE_FIXTURES)
@@ -534,26 +562,94 @@ def test_near_identical_propositions_do_not_merge(tmp_path) -> None:
     assert len(core.store.list_beliefs("a1")) == 2, "unexpectedly merged — matching predicate changed"
 
 
-def test_reflective_replay_leaves_every_belief_with_one_evidence_record(tmp_path) -> None:
-    """Characterisation: no belief accumulates provenance across a full replay.
+def test_varied_stimuli_leave_beliefs_with_one_evidence_record(tmp_path) -> None:
+    """A fixture that varies stimulus every turn accumulates nothing.
 
-    This is *why* belief-kind probe targets score a flat 1.0 at every
-    affect_influence on all four fixtures. If this test starts failing,
-    belief merging has begun working and the belief probes become
-    informative — update results.md rather than "fixing" the test.
+    Corrects an earlier overclaim. Belief merging is NOT unreachable: the
+    trigger proposition is templated on (event_type, actor kind, dominant
+    emotion pair), so it repeats — and merges — whenever that tuple
+    repeats. What it cannot survive is a scenario that changes the tuple
+    every turn, which is exactly what everyday_collaboration_mood does by
+    design. So a shallow belief target is a property of *varied* scenarios,
+    not a defect in the belief core.
     """
     core = _probe_core(tmp_path)
-    events = json.loads(open(FIXTURE, encoding="utf-8").read())["events"]
-    for event in events:
+    for event in json.loads(open(FIXTURE, encoding="utf-8").read())["events"]:
+        core.process_reflective_turn({"event": event})
+    depths = {b.belief_id: len(b.evidence_ids) for b in core.store.list_beliefs("agent_demo")}
+    assert depths, "replay produced no beliefs"
+    assert set(depths.values()) == {1}, f"expected no accumulation on a varied fixture: {depths}"
+
+
+def test_repeated_stimuli_do_accumulate_evidence(tmp_path) -> None:
+    """The same stimulus pattern repeated merges into one deepening belief.
+
+    This is the mechanism the rewritten fixtures rely on to give belief
+    probe targets something to measure. If it regresses, belief probes
+    silently return to a flat ceiling.
+    """
+    core = _probe_core(tmp_path)
+
+    def pressure(index: int) -> dict:
+        return {
+            "event_id": f"evt_rep_{index:03d}",
+            "agent_id": "agent_demo",
+            "session_id": "s",
+            "event_type": "social_feedback",
+            "summary": f"The user pushes back on the plan, round {index}.",
+            "source": {"trust_class": "user_report", "channel": "chat", "confidence": 0.9},
+            "actor": {"kind": "user", "id": "u1"},
+            "target": {"kind": "agent_output", "id": "plan"},
+            "claims": [
+                {"claim_id": "c1", "claim_type": "feedback", "text": f"Objection {index}.", "confidence": 0.9}
+            ],
+            "links": [
+                {"link_type": "goal", "id": "g1", "relevance": 0.95, "expected_impact": -0.8, "confidence": 0.9},
+                {"link_type": "relationship", "id": "u1", "trust": 0.6, "familiarity": 0.6, "confidence": 0.8},
+            ],
+        }
+
+    for index in range(1, 6):
+        core.process_reflective_turn({"event": pressure(index)})
+
+    self_models = [b for b in core.store.list_beliefs("agent_demo") if b.belief_type.value == "self_model"]
+    deepest = max(self_models, key=lambda b: len(b.evidence_ids))
+    assert len(deepest.evidence_ids) >= 3, (
+        f"repeated stimulus did not accumulate: {[len(b.evidence_ids) for b in self_models]}"
+    )
+    assert deepest.stability > 0.5, "an accumulating belief should gain stability"
+
+
+def test_auto_marker_resolves_by_strategy_not_by_accident(tmp_path) -> None:
+    """`auto:latest_self_model` previously matched nothing and fell through.
+
+    The resolver stripped only the `auto:` prefix, so the documented
+    `auto:latest_self_model` was compared against belief_type values as the
+    literal string "latest_self_model", never matched, and silently
+    returned beliefs[0] — any type, any depth. Probe targets were therefore
+    effectively arbitrary.
+    """
+    from manyu.schemas import ReportTarget, ReportTargetKind
+
+    core = _probe_core(tmp_path)
+    for event in json.loads(
+        open("evals/fixtures/constructive_rejection.json", encoding="utf-8").read()
+    )["events"][:5]:
         core.process_reflective_turn({"event": event})
 
-    beliefs = core.store.list_beliefs("agent_demo")
-    assert beliefs, "replay produced no beliefs"
-    depths = {b.belief_id: len(b.evidence_ids) for b in beliefs}
-    assert set(depths.values()) == {1}, (
-        "a belief accumulated more than one evidence record — belief merging may "
-        f"now be reachable. Depths: {depths}"
-    )
+    def depth_for(marker: str) -> int:
+        target = ReportTarget(kind=ReportTargetKind.BELIEF, id_or_text=marker)
+        return len(core.snapshot(target, "agent_demo").payload["evidence"])
+
+    richest = depth_for("auto:richest_self_model")
+    self_models = [b for b in core.store.list_beliefs("agent_demo") if b.belief_type.value == "self_model"]
+    assert richest == max(len(b.evidence_ids) for b in self_models)
+    assert richest > 1, "richest strategy should find an accumulated belief"
+
+    # A marker naming a type that does not exist must fail loudly, not
+    # silently resolve to an unrelated belief.
+    with pytest.raises(KeyError, match="matched no belief of type"):
+        depth_for("auto:richest_aesthetic_preference")
 
 
 # --- v4 bug fixes found during pre-rerun audit ------------------------------
