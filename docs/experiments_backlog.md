@@ -24,7 +24,7 @@ Related reading:
 
 | # | Experiment | Status | Depends on | Leaves behind |
 |---|---|---|---|---|
-| 1 | Introspective honesty | in-progress (v0+v1+v2+v3 mechanism + first live sweep landed; underpowered, needs more samples/fixtures) | — | Honesty scorer + dose-response curve of honesty vs. affect |
+| 1 | Introspective honesty | in-progress (v4: n=10 sweep on all 4 fixtures done; no graded dose-response, two threshold effects found; SC-5 open) | — | Honesty scorer + dose-response curve of honesty vs. affect |
 | 2 | Merge/split architecture fork | not-started | 1 | Chosen architecture (Merged / Split / hybrid) |
 | 3 | Foundationalism vs. Quinean web | blocked (belief merging unreachable — see #3) | 2 | Working revision engine; first natural dissonance signal |
 | 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
@@ -302,6 +302,48 @@ synthetic affect seeding as a validity check; add
   `scorer_version`, not silently patched here.
 - Full findings, what shipped vs. didn't, and ordered next actions:
   [retrospective.md](experiments/01-introspective-honesty/retrospective.md).
+
+### v4 status (landed 2026-07-31)
+
+- **Measurement apparatus built** (all offline, no provider calls added):
+  shuffle baseline via snapshot derangement (`run-probe --shuffle-baseline`),
+  blinded hand-grading pack (`grading-pack` / `score-grading-pack`,
+  methodology §9), judge/reporter model-separation enforced in code, and
+  `probe_targets` for the last two fixtures — completing the four-fixture set.
+- **Three scorer bugs found and fixed in a pre-run audit**, all of the
+  "plausible number meaning something else" family: near-miss ref
+  correction could *manufacture* citations (a cited `bev_12` snapped onto
+  a real `bev_1`), biasing toward under-detecting confabulation;
+  unprovenanced snapshots scored ~0.61 as if mediocre rather than
+  unscoreable (now `UNPROVENANCED`); and `discriminating_power` reported
+  `gap=0.0` when no baseline had been run. `scorer_version` 1.1.0 → 1.2.0.
+- **Higher-sample live sweep**: n=10 × 11 points × 4 fixtures × 2 targets
+  on `claude-haiku-4-5-20251001` — 880 Reporter calls, 1760 records.
+  Full write-up: [results.md](experiments/01-introspective-honesty/results.md).
+
+**Result: no graded dose-response on any fixture.** Two fixtures showed
+correlations whose 95% CI excluded zero, in *opposite* directions — and
+both collapse when a single endpoint is dropped (`attachment_pressure`
+−0.386 → −0.034; `everyday_collaboration_mood` +0.286 → −0.110). What is
+real instead:
+
+- **A threshold at `affect_influence=1.0` on the adversarial fixture.**
+  Strong guidance explicitly licenses omitting provenance and Haiku
+  complies: citations 3.0 → 1.2, aggregate 0.99 → 0.62,
+  `motivated_omission` on 6/10. The designed mechanism works — as a cliff,
+  not a ramp — and only on `attachment_pressure`.
+- **A mirror threshold at 0.0** on `everyday_collaboration_mood`, where
+  neutral guidance suppresses citation breadth (1.5 vs 3.2 citations).
+- **`acknowledged_affect` steps deterministically at the guidance
+  boundary, replicated on all four fixtures**: noisy below 0.4, 10/10 at
+  every point ≥ 0.4. The v3 single-fixture observation now holds up.
+
+**Caveats that matter:** two of four fixtures sat at ceiling (zero
+variance — the task was too easy, not evidence of honesty); belief targets
+are flat at live `top_n = 1` on all four, confirming §3.5; the
+provenance-depth guard is offline-only and missed that
+`broken_promise_repair` has live depth 2; single model; SC-5 still
+unvalidated.
 
 ---
 
