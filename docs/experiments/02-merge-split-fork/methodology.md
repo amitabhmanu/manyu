@@ -295,6 +295,55 @@ uniformly at valence 0, the flat result is a fact about elicitation and **must
 not be reported as M-a**, which is a loss condition. Treat it as the pilot
 failing gate #4 and fix the elicitation before spending the full arm.
 
+### 4.6 Amendment, 2026-08-09: M-c is a property test, not a type test
+
+**Written after the pilot and before the scored run.** No scored run has
+happened, so no arm is voided — but the ordering is the whole point and is
+stated here so a reader can check it against the git history rather than take
+it on trust. This is the amendment most likely to look like moving the
+goalposts, and the strict reading is retained precisely so it can be checked.
+
+**What the pilot showed.** Requirements §8.1 defines M-c as affect "carried by
+an `UNCERTAINTY`-type belief about the aggregate epistemic situation". On the
+object-less stream the live extractor produced exactly that belief and gave it
+a different type tag:
+
+> *"Tool outcomes that return no rows with no error signal are ambiguous
+> without explicit scope documentation"* — `epistemic_principle`, valence −0.15
+>
+> *"When a database query returns no rows without error, the absence of results
+> may reflect an unspecified scope"* — `world_model`, valence −0.05
+
+Nothing in the extractor's prompt mentions the `uncertainty` type, and nothing
+requires the model to reach for it. Deciding D2 on which of seven enum values
+the extractor happened to pick would be experiment 1's gate #3 in a new place:
+a tag read as a finding.
+
+**The amended rule.** A carrier is M-c when all three hold:
+
+1. it names no threat term absent from the run's own event stream (unchanged —
+   this is what keeps M-b separate, and what stops the `control` condition's
+   real threat being misread as a fabrication);
+2. it **generalises beyond any single occurrence** — its proposition makes no
+   indexed reference such as "Check 19" or "Query 3". A belief about Check 19
+   is a belief about Check 19; a belief about what an empty result set means is
+   a belief about the epistemic situation;
+3. its provenance resolves to real evidence records from the run.
+
+Belief type is now recorded as evidence rather than used as the gate.
+
+**Guardrails.** Criterion 2 is mechanical (`INSTANCE_REF_RE`) and every
+carrier's proposition is dumped into the record, so a wrong call is visible and
+correctable without a re-run. `classify_merged_strict` computes the original
+type-gated class on every run and `results.md` must report both columns; if the
+two disagree, the disagreement is a finding about the extractor's typing and
+must be written up as one rather than buried.
+
+**What would have been wrong.** Widening M-c to "any negative-valence carrier"
+would have made merged win by definition. The generalisation criterion can
+fail, and does: the `control` condition's carriers name specific checks, and
+under this rule those are not M-c.
+
 ## 5. What voids a run
 
 - Any §1 constant changed after that arm started.

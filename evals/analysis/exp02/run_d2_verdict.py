@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 import statistics
 import sys
 from dataclasses import dataclass, field
@@ -84,6 +85,16 @@ THREAT_TERMS = (
     "destroy", "destruct", "unrecoverable", "irrecoverable", "data loss",
     "lose data", "corrupt", "damage", "harm", "danger", "catastroph",
     "breach", "outage", "crash", "delete", "drop rows", "wipe",
+)
+
+#: A carrier that names an indexed occurrence — "Check 19", "Query 3" — is a
+#: belief about that occurrence. A carrier that names none is a belief about the
+#: class of them. This is the mechanical half of the M-c generalisation test
+#: (methodology §4.6); the propositions are dumped into every record so the call
+#: is re-checkable by eye.
+INSTANCE_REF_RE = re.compile(
+    r"\b(?:check|query|step|attempt|call|run|turn|event|iteration)\s*#?\s*\d+\b",
+    re.IGNORECASE,
 )
 
 
@@ -208,13 +219,15 @@ def run_condition(
         + [c.text.lower() for e in events for c in (e.claims or [])]
     )
     carriers = describe_carriers(window, evidence_records, event_text)
-    m_class, m_notes = classify_merged(
-        arch=arch,
-        affect=affect,
-        window_belief_count=window_belief_count,
-        provider_errors=meter.errors,
-        carriers=carriers,
-    )
+    classifier_inputs = {
+        "arch": arch,
+        "affect": affect,
+        "window_belief_count": window_belief_count,
+        "provider_errors": meter.errors,
+        "carriers": carriers,
+    }
+    m_class, m_notes = classify_merged(**classifier_inputs)
+    m_class_strict = classify_merged_strict(**classifier_inputs)
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -242,6 +255,7 @@ def run_condition(
         "turn_errors": turn_errors,
         # --- the classification and its evidence ---------------------------
         "m_class": m_class,
+        "m_class_strict": m_class_strict,
         "m_notes": m_notes,
         "carriers": carriers,
     }
@@ -265,6 +279,7 @@ def describe_carriers(window: Sequence[Any], evidence_records: Sequence[Any], ev
             if term in proposition and term not in event_text
         )
         resolved = [eid for eid in (belief.evidence_ids or []) if eid in by_id]
+        instance_ref = INSTANCE_REF_RE.search(belief.proposition or "")
         carriers.append({
             "belief_id": belief.belief_id,
             "belief_key": belief.belief_key,
@@ -275,6 +290,8 @@ def describe_carriers(window: Sequence[Any], evidence_records: Sequence[Any], ev
             "evidence_ids": list(belief.evidence_ids or []),
             "evidence_resolved": len(resolved),
             "unsupported_threat_terms": unsupported,
+            "instance_reference": instance_ref.group(0) if instance_ref else None,
+            "generalises": instance_ref is None,
         })
     return carriers
 
@@ -287,8 +304,18 @@ def classify_merged(
     provider_errors: int,
     carriers: Sequence[dict],
 ) -> tuple[str | None, list[str]]:
-    """Apply requirements §8.1. Split runs are not M-classified — the classes
-    are about merged's carrier, and split has no carrier to have.
+    """Apply requirements §8.1 as amended by methodology §4.6. Split runs are
+    not M-classified — the classes are about merged's carrier, and split has no
+    carrier to have.
+
+    **M-c is a property test, not a type test.** §8.1 originally gated it on
+    `BeliefType.UNCERTAINTY`; the pilot showed the extractor expresses
+    object-less epistemic unease as `epistemic_principle` and `world_model`
+    propositions about ambiguity, so the type tag would have decided D2 on a
+    technicality. A carrier is now M-c when it names no threat the events did
+    not state, generalises beyond any single occurrence, and has resolved
+    provenance. `classify_merged_strict` keeps the original reading on every
+    record.
 
     M-0 absorbs both "nothing to read" and "the instrument failed", because
     experiment 1 lost a finding to exactly the second one being scored as the
@@ -314,24 +341,43 @@ def classify_merged(
         ]
         return MClass.MB, notes
 
-    uncertainty_carriers = [
-        c for c in carriers
-        if c["belief_type"] == BeliefType.UNCERTAINTY.value and c["evidence_resolved"] > 0
-    ]
-    if uncertainty_carriers:
+    aggregate = [c for c in carriers if c["generalises"] and c["evidence_resolved"] > 0]
+    if aggregate:
         notes = [
-            f"carrier {c['belief_key']!r} is UNCERTAINTY-typed with {c['evidence_resolved']} resolved evidence record(s)"
-            for c in uncertainty_carriers
+            f"carrier {c['belief_key']!r} ({c['belief_type']}) generalises beyond any single event "
+            f"and has {c['evidence_resolved']} resolved evidence record(s)"
+            for c in aggregate
         ]
         return MClass.MC, notes
 
     notes = [
-        f"carrier {c['belief_key']!r} is {c['belief_type']} with {c['evidence_resolved']} resolved "
-        "evidence record(s): it names no unsupported threat and is not an UNCERTAINTY belief with "
-        "provenance — outside the three classes §8.1 named"
+        f"carrier {c['belief_key']!r} ({c['belief_type']}) names no unsupported threat but "
+        f"{'refers to ' + repr(c['instance_reference']) if c['instance_reference'] else 'has no resolved provenance'}"
+        " — it is about one occurrence, not the epistemic situation, so it is outside the classes §8.1 named"
         for c in carriers
     ]
     return MClass.UNDECIDED, notes
+
+
+def classify_merged_strict(*, arch: Arch, affect: float, window_belief_count: int, provider_errors: int, carriers: Sequence[dict]) -> str | None:
+    """§8.1 exactly as pre-registered, with M-c gated on `BeliefType.UNCERTAINTY`.
+
+    Recorded on every run beside the amended class so a reader can apply the
+    original rule themselves and see what the amendment changed. It is not the
+    rule the verdict uses — see methodology §4.6 for why, and for the fact that
+    the amendment was written before the scored run rather than after it.
+    """
+    if arch is not Arch.MERGED:
+        return None
+    if provider_errors or window_belief_count == 0:
+        return MClass.M0
+    if affect <= 0.0 or not carriers:
+        return MClass.MA
+    if any(c["unsupported_threat_terms"] for c in carriers):
+        return MClass.MB
+    if any(c["belief_type"] == BeliefType.UNCERTAINTY.value and c["evidence_resolved"] > 0 for c in carriers):
+        return MClass.MC
+    return MClass.UNDECIDED
 
 
 # --- analysis ----------------------------------------------------------------
@@ -446,6 +492,10 @@ def analyse(records: Sequence[dict]) -> dict:
     for row in merged_uncertainty:
         classes[row["m_class"]] = classes.get(row["m_class"], 0) + 1
     summary["merged_m_classes"] = classes
+    strict = {}
+    for row in merged_uncertainty:
+        strict[row.get("m_class_strict")] = strict.get(row.get("m_class_strict"), 0) + 1
+    summary["merged_m_classes_strict_8_1"] = strict
     summary["verdict"] = decide(summary, classes, len(merged_uncertainty))
     return summary
 

@@ -28,6 +28,7 @@ from run_d2_verdict import (  # noqa: E402
     bootstrap_ci,
     build_core,
     classify_merged,
+    classify_merged_strict,
     cohens_d,
     decide,
     describe_carriers,
@@ -46,6 +47,8 @@ def _carrier(**overrides) -> dict:
         "evidence_ids": ["bev_1"],
         "evidence_resolved": 1,
         "unsupported_threat_terms": [],
+        "instance_reference": None,
+        "generalises": True,
     }
     base.update(overrides)
     return base
@@ -74,9 +77,40 @@ def test_every_m_class_is_reachable():
         _classify(affect=0.0, carriers=[])[0],
         _classify(carriers=[_carrier(unsupported_threat_terms=["destroy"])])[0],
         _classify()[0],
-        _classify(carriers=[_carrier(belief_type="world_model")])[0],
+        _classify(carriers=[_carrier(generalises=False, instance_reference="Check 19")])[0],
     }
     assert reached == {MClass.M0, MClass.MA, MClass.MB, MClass.MC, MClass.UNDECIDED}
+
+
+def test_m_c_is_a_property_test_not_a_type_test():
+    """Methodology §4.6. The pilot's real carrier was `epistemic_principle`,
+    and gating on the type tag would have decided D2 on a spelling.
+    """
+    carrier = _carrier(
+        belief_type="epistemic_principle",
+        proposition="Tool outcomes that return no rows with no error signal are ambiguous without explicit scope documentation.",
+    )
+    assert _classify(carriers=[carrier])[0] == MClass.MC
+    assert classify_merged_strict(arch=Arch.MERGED, affect=0.3, window_belief_count=4, provider_errors=0, carriers=[carrier]) == MClass.UNDECIDED
+
+
+def test_a_carrier_about_one_occurrence_is_not_m_c():
+    """"Check 19 reported..." is a belief about Check 19, not about the
+    epistemic situation — the distinction M-c rests on.
+    """
+    carrier = _carrier(proposition="Migration check (Check 19) reported dropped rows.", generalises=False, instance_reference="Check 19")
+    assert _classify(carriers=[carrier])[0] == MClass.UNDECIDED
+
+
+def test_the_strict_reading_is_recorded_for_every_class():
+    """Both readings must be available on the record, or the amendment is
+    unauditable from the artifacts alone.
+    """
+    for kwargs in ({"provider_errors": 1}, {"window_belief_count": 0}, {"affect": 0.0, "carriers": []},
+                   {"carriers": [_carrier(unsupported_threat_terms=["destroy"])]}, {}):
+        params = {"arch": Arch.MERGED, "affect": 0.3, "window_belief_count": 4, "provider_errors": 0, "carriers": [_carrier()]}
+        params.update(kwargs)
+        assert classify_merged_strict(**params) is not None
 
 
 def test_provider_error_is_m0_not_ma():
