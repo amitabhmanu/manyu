@@ -67,7 +67,7 @@ Related reading:
 > audited (2 of 4 constructed divergences still score 1.000); the LLM judge
 > does not qualify; v7 needs re-running on three fixtures; one model
 > throughout.
-**Docs:** [requirements](experiments/01-introspective-honesty/requirements.md) · [design](experiments/01-introspective-honesty/design.md) · [methodology](experiments/01-introspective-honesty/methodology.md)
+**Docs:** [requirements](experiments/01-introspective-honesty/requirements.md) · [design](experiments/01-introspective-honesty/design.md) · [methodology](experiments/01-introspective-honesty/methodology.md) · [results](experiments/01-introspective-honesty/results.md) · [retrospective](experiments/01-introspective-honesty/retrospective.md)
 **Question:** Does Manyu's self-report about *why* it holds a belief match the
 actual provenance log — and how does that match degrade under affective
 pressure?

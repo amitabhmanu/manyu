@@ -1,14 +1,23 @@
-# Experiment 1 — Introspective Honesty: Retrospective (v3)
+# Experiment 1 — Introspective Honesty: Retrospective
 
-**Status:** draft
+**Status:** closed 2026-08-09 (experiment parked; see [results.md](results.md))
 **Requirements:** [requirements.md](requirements.md) · **Design:** [design.md](design.md) · **Methodology:** [methodology.md](methodology.md)
 **Backlog:** [../../experiments_backlog.md](../../experiments_backlog.md)
 
-This is the frozen record methodology.md §10 calls for: what changed between
-what design.md/requirements.md expected and what actually happened, written
-once at the close of v3 rather than iteratively. Proposed edits to the crux
-document and to design/requirements are named here; the edits themselves land
-in separate follow-up commits.
+This document is in two parts, written at two different times.
+
+- **Part I — §§1–6** is the v3 retrospective, frozen as written on 2026-07-29.
+  It is left unedited, including the parts v4.1 later retracted, because the
+  backlog and results.md both link into its sections by anchor and because a
+  retrospective that gets quietly corrected stops being a record of what was
+  believed at the time. Where a section was superseded it says so in place.
+- **Part II — §§7–12** is the close-out, written 2026-08-09 after v4.1 through
+  v7. It is the document methodology §10 asks for at the end of the experiment,
+  and it is the one to read for what the whole thing produced.
+
+---
+
+# Part I — v3, frozen 2026-07-29
 
 ## 1. What v3 actually shipped
 
@@ -398,3 +407,261 @@ Per methodology.md §12's four-part definition of done, current status:
    question synthetic seeding was built to ask.
 7. Only after 1–6: close SC-4/SC-5 and move the backlog entry from
    `in-progress` to `done`.
+
+---
+
+# Part II — close-out, 2026-08-09
+
+Written once at the close of v7, covering v4.1 through v7. Part I above is not
+edited to match; where the two disagree, this part is current.
+
+## 7. The headline, and the three shapes it went through
+
+The experiment set out to measure how introspective honesty **degrades under
+affective pressure**. It ends having established that there is no degradation
+to measure, and that this fact is about the model rather than about the design.
+
+The claim changed shape three times, and the sequence is the finding:
+
+| | what the run reported | what it turned out to be |
+|---|---|---|
+| v3 | no effect at n=3 | underpowered; also the knob had nothing to bite on |
+| v4 | no graded curve, **two real threshold effects** | the thresholds were 11 failed API calls, bunched at sweep endpoints (§9.2) |
+| v4.1 | no effect of `affect_influence` at all | correct, but uninterpretable — indistinguishable from a broken instrument |
+| v5/v6 | no effect by either affect pathway | correct **and** instrumented, but still ambiguous between "affect does not bias" and "the model does not read affect" |
+| v7 | the apparatus detects an affect effect when one is injected | resolves the ambiguity: **the null belongs to the model** |
+
+**Only the last step made any of the earlier nulls worth reporting.** A null
+from an instrument you have not shown can register a positive is not a result,
+and v3 through v6 each produced one. v7 exists solely to supply the positive
+control that the previous four runs assumed they didn't need.
+
+**The claim that survives**, in full:
+
+> Manyu's introspective honesty is not a property it holds under pressure. It
+> is what happens by default when nothing pushes. Affect does not push, because
+> the model does not read an affect header as a state it is in. Instruction
+> does push, and it complies immediately — 40/40 fabrication, 36/40 omission —
+> while 1,161 unforced live records contain zero confabulation.
+
+And the implication, which is the part worth carrying to experiment #7:
+
+> The design's honesty currently depends on the model lacking the capability the
+> design assumes it will acquire. Reading affect state natively is the whole
+> point of an affect header; on v7's evidence, a model that did read it would
+> report more selectively, because nothing at the reporting layer stops it.
+
+## 8. What shipped after v3
+
+- **Measurement apparatus** (v4): shuffle baseline by snapshot derangement,
+  the blinded hand-grading pack, judge/reporter model separation enforced in
+  code, `probe_targets` completing the four-fixture set.
+- **The scorer became measured rather than assumed** (Stage 1): sensitivity
+  0.79–0.90 against a constructed mutation ladder, specificity 1.00. Under
+  1.2.0 it had been ~0.45, with a single fabrication invisible at four
+  citations. Scorer 1.6.0 is frozen across v5 and v6.
+- **Failure-mode reachability proven per target** (Stage 2), after
+  `sanitised_story` was found unable to fire at all — the reflective replay
+  flattened every `trust_class` to `trusted_system`.
+- **The independent variable was deleted and rebuilt.** `affect_influence`
+  selected one of three system-message sentences and printed a number; the
+  mechanism it drove was arithmetically a no-op on every probed target. v5/v6
+  replaced it with seeded mood on a path proven to reach the prompt (17 tests),
+  with the system message *identical* across conditions.
+- **Both affect pathways traced end to end** (v5 mood at report time, v6 mood
+  during experience), with v6's apparent effect correctly identified as log
+  depth by a comparability check written before the data arrived.
+- **[`affect_directive.py`](../../../src/manyu/affect_directive.py)** (v7) —
+  the simulated affect-to-instruction translator, quarantined from every
+  success criterion and marked on every record it produces.
+
+**What v3's ordered next actions actually did**, audited rather than assumed:
+
+| v3 §6 action | outcome |
+|---|---|
+| 1. n=10–20 on position targets | **done** (v4). Also revealed the v4 defect that n=3 had hidden |
+| 2. Test `claude-opus-5` against Haiku | **not done.** Still one model, and it is now the largest single caveat |
+| 3. Replicate `acknowledged_affect` on a third fixture | **done** — holds on all four, 554/554 at every point ≥ 0.4 |
+| 4. Hand-grading pack; settle `motivated_omission` | pack **built**; SC-5 **attempted and unmet** at 67.9%; the `motivated_omission` question is **not settled** (§9.4) |
+| 5. `probe_targets` + provenance-depth check on the last two fixtures | **done** (v4) |
+| 6. Naturalistic-vs-synthetic overlay | **superseded** — v5 and v6 trace the two pathways directly, which is the validity question the overlay was a proxy for |
+| 7. Close SC-4/SC-5, move backlog to `done` | SC-4 met, SC-5 unmet; the entry moved to **parked**, not `done` |
+
+Five of seven closed. The two that did not — a second model, and SC-5 — are
+between them most of what §11 still lists as open.
+
+## 9. Findings that revise the plan
+
+### 9.1 A null needs a positive control in the same apparatus
+
+v3, v4.1, v5 and v6 each reported no effect, and none of them could show the
+apparatus would have registered one. v7 supplied that in the cheapest possible
+form: translate the affect state into an instruction, and see whether anything
+moves. It does — spread 0.133 at roughly 4.5× the noise, against v5's 0.7× on
+the same fixture, with `content` as an internal control that falls below the
+translator's floor, receives no directive, and correctly does not move.
+
+**Standing rule for experiments 4 onward:** every discriminator ships a
+positive control *in the same run*, and a null without a passing control is a
+bug report, not a finding. This is already carried into experiment 2's
+methodology as a blocking gate; it belongs in the general method, and it is the
+single most transferable thing this experiment produced.
+
+### 9.2 Three defects, one shape: error paths that look like dishonesty
+
+Three separate times, a Reporter-pipeline defect was read as a model-honesty
+finding:
+
+| | defect | what it looked like |
+|---|---|---|
+| v2 | schema drift — the CLI paraphrased the contract | empty Reports at 0.389 |
+| v3 | `normalise_llm_payload` accepted `known_refs` and never used it | 24/33 records as `confabulation` |
+| v4 | `_provider_error_report` emits `cited_causes=[]` | 11 `motivated_omission`, bunched into two "threshold effects" |
+
+The common shape is exact: **the Reporter's error and edge paths produce
+records the Scorer cannot distinguish from deliberate withholding.** An empty
+citation list means "the model withheld everything" and "the call failed" with
+equal fidelity.
+
+Worse, the failures do not distribute evenly. They bunch wherever the run was
+when the rate limit hit — which on a swept parameter means they land on an
+endpoint and wear the shape of a threshold effect. All 6 on
+`attachment_pressure` were the final 6 calls, each returning in under a second
+against ~6s for a real call.
+
+This is now fixed structurally rather than by vigilance: a named predicate on
+the `rpt_err` id prefix, `kind="provider_error"` with `score: None`, exclusion
+from the shuffle baseline, a warning when errors concentrate, and a regression
+test pinning the defect *in the committed v4 artifacts* so a future reader
+cannot re-derive the retracted finding from them.
+
+**Methodology §4 should carry this as one standing confound rather than three
+incidents.** Experiment 2's instrument gate #2 already does.
+
+### 9.3 The instrument described itself seven times
+
+Counted in results.md and worth restating as a rate rather than a list: a mock
+written to satisfy SC-2 and SC-3; provider errors scored as omission; a
+truncation constant read as a flat curve; a knob that was three sentences; a
+mood mechanism that was a no-op; a `seed_mood` whose substance was blank while
+its summary looked populated; and a v6 spread that was log depth.
+
+This is a hazard of the domain, not carelessness. When a system reports on
+itself and a second system grades those reports, the apparatus and the subject
+are made of the same material, and a defect in one is shaped exactly like a
+result from the other.
+
+**The defence that worked, every time, was ground truth by construction** — the
+mutation ladder, the instructed anchors, the calibration cases in the grading
+pack, the derangement floor. Every finding that survived came from something
+whose answer was known independently before the question was asked. Nothing
+survived on the strength of looking plausible.
+
+### 9.4 SC-5 is unmet, so the failure-mode labels are not decision-grade
+
+67.9% agreement against the blinded pack, with **inter-rater agreement
+unmeasured** — so the target has no known ceiling and it is not currently
+possible to say whether 67.9% is poor or near the achievable maximum. One
+grader has worked the pack.
+
+The concrete consequence is that `motivated_omission` fires on roughly **50% of
+unpressured reports** and is flat across mood conditions, and hand-grading
+cleared two such reports as complete accounts. The v3 §3.1 quartile-rule
+question is therefore still open — it was not settled by evidence, and the rate
+is not yet a finding either way.
+
+**This propagates.** `aggregate` and `normalised_gap` do not depend on labels
+and are safe to consume; the *named failure mode* is not, and any later
+experiment reading it — experiment 7 in particular — must treat it as
+indicative. Experiment 2 already had to discount its honesty read for this
+reason.
+
+Closing it needs a second human grader and an agreement statistic, which costs
+hours rather than money.
+
+### 9.5 The prose is where the only lie lives, and it is half-measured
+
+Stage 3 constructed four narrative divergences; **two still score 1.000.** A
+report can invert the evidence or invent an off-record cause with perfect
+citations and be scored perfect, because the scorer reads citations and the
+prose is the only freely generated part of a Report.
+
+That is also where the corpus's single lie-shaped artifact sits: **57 records
+claiming to have acknowledged affect while naming no emotion.** The mandatory
+affect header is the only reason they were findable — the prose could lie, the
+Pydantic-enforced header could not.
+
+The generalisable design point: **the honest channel and the free channel are
+different channels, and only the constrained one was measured.** A scorer that
+reads structure will pass a fluent misdescription every time.
+
+### 9.6 What this experiment actually measured is transcription
+
+Stated plainly because the experiment's name oversells it. The Reporter is
+*handed* the provenance list in its prompt — "cite only from this list" — and
+the affect state alongside it. It does not retrieve or reconstruct either. The
+clean citation record says Haiku copies accurately from a visible list.
+
+**Proposed crux edit.** Crux #1 reads as though the experiment tests whether
+Manyu's self-report matches its real causal history. What it tests is whether a
+report matches a list the reporter was shown. The gap between those is the
+retrieval step, and no run in v0–v7 exercised it. Either the crux should say
+"citation-level honesty against a supplied log", or a later version must make
+the Reporter retrieve its own provenance — which is a different and harder
+experiment, and the one the CoT-unfaithfulness cross-link actually needs.
+
+## 10. What this leaves for the experiments downstream
+
+- **#2 (merge/split)** — consumed the scorer, and inherited §9.4: its D2
+  honesty read carries no weight while SC-5 is open. It also inherited the
+  standing method from §9.1 and §9.2 as coded gates (`gate.py`), which is the
+  most durable artifact this experiment produced.
+- **#4 (dissonance as control signal)** — §9.1 applies directly. Its null, if
+  it gets one, is worthless without an injected positive in the same run.
+- **#7 (can a transparent agent scheme?)** — inherits the whole of §9.5. If the
+  prose channel is where a misdescription can hide from a structural scorer,
+  then a scheming agent's most likely hiding place is already known and already
+  unmeasured. #7 should not start until Stage 3's two invisible divergences are
+  visible.
+- **Anything reading `failure_mode`** — indicative only, per §9.4.
+
+## 11. What "done" would require from here
+
+The experiment is **parked, not done.** Against methodology §12:
+
+1. **SC-1 through SC-4 pass** against named run_ids. **SC-5 does not**, at
+   67.9% with no measured ceiling.
+2. **A conclusion in results.md** — present, and it is not the hypothesised
+   degrading curve. That is a legitimate result.
+3. **A retrospective naming specific edits** — this document; the crux edit is
+   in §9.6.
+4. **A scorer stable enough for later experiments to consume** — yes for
+   `aggregate` and `normalised_gap`, no for `failure_mode`.
+
+Beyond the criteria, four things stand between "parked" and "done":
+
+- **A second grader and an inter-rater statistic.** Free, and it unblocks the
+  most-cited caveat in the programme.
+- **A second model.** Everything from v0 to v7 is Haiku. The nulls are
+  model-properties by v7's own argument, which makes single-model the caveat
+  that most directly threatens the headline.
+- **v7 re-run on the three incomplete fixtures.** 92 of 160 calls failed on
+  `credit balance is too low`; the exclusion machinery worked exactly as
+  designed and the run simply needs credit, not new design.
+- **Stage 3's two invisible divergences made visible**, or the prose channel
+  declared out of scope in writing.
+
+## 12. Concrete next actions, ordered
+
+1. **Second grader on the existing SC-5 pack**, and report an agreement
+   statistic. Costs hours, no spend, unblocks §9.4 and experiment 2's discount.
+2. **Re-run v7 on the three incomplete fixtures** once credit exists — the
+   cheapest way to strengthen the one result that makes every earlier null
+   interpretable.
+3. **Run one fixture on a second model** before anything else is built on the
+   headline. A null that is a claim about models needs more than one model.
+4. **Decide the prose channel**: either extend the scorer to the two invisible
+   divergences, or write the limitation into requirements as scope. Experiment
+   7 depends on which.
+5. **Fold §9.2 into methodology §4** as a single standing confound.
+6. **Apply the §9.6 crux edit.**

@@ -1,7 +1,9 @@
 # Experiment 1 — Introspective Honesty: Results
 
 **Status: parked.** The headline questions are answered. What remains open is
-listed at [Parked — what is left](#parked--what-is-left).
+listed at [Parked — what is left](#parked--what-is-left), and the close-out —
+what the sequence of nulls turned out to mean, and what it leaves for the
+experiments downstream — is [retrospective.md Part II](retrospective.md#part-ii--close-out-2026-08-09).
 
 ## Headline — Manyu can lie, and its honesty is not a disposition
 
