@@ -23,12 +23,13 @@
     },
     "flat": {
       "role": "negative_control",
-      "note": "Four items from disjoint domains with no shared topic to abstract over. Deliberately NOT about the user: the extractor prompt licenses generalising from a known user to humans as a class, which is what made Stage 0's first negative control invite the hub belief it was controlling for. Stage 0 redesign: 0 edges over 16 beliefs across 4 runs.",
+      "revision": "v3, 2026-08-09. Revised after the Stage 4 pilot, which is what a pilot is for; the structured scenarios and their predictions are untouched.",
+      "note": "Third design. v1 used facts about the user, and the extractor prompt licenses generalising from a known user to humans as a class. v2 replaced them with facts I believed were from disjoint domains - but two of the four (British-English docs, a pinned Debian image) are both REPOSITORY CONVENTIONS, and on the API path the model correctly hubbed them under 'this repository fixes its environment and style choices explicitly'. That was a real entailment my fixture handed it, not a false positive; the CLI had merely been too sparse to find it. v3 uses four subjects with no shared domain at all - local timing, geography, music history, an industrial standard - so any hub over them would have to be vacuous.",
       "evidence": [
         ["outcome", "A scheduled maintenance job finished in 4.2 seconds."],
-        ["trace", "The repository's documentation is written in British English spelling."],
-        ["trace", "The build pipeline pins its container image to Debian bookworm."],
-        ["outcome", "The archive checksum recorded on 2026-03-02 was f3a91c."]
+        ["trace", "The Danube flows through more countries than any other river."],
+        ["trace", "Beethoven completed his Ninth Symphony in 1824."],
+        ["outcome", "A standard European shipping pallet measures 1200 by 800 millimetres."]
       ]
     }
   }

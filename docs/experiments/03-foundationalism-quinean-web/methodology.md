@@ -108,10 +108,54 @@ rather than points.
 |---|---|---|
 | P1 | `verification` produces ≥1 edge in **≥ 7 of 10** runs | ≤ 6 — the positive control is not reliable and nothing else is readable |
 | P2 | `incident_review` produces ≥1 edge in **≥ 5 of 10** runs | Structure is scenario-specific, not general |
-| P3 | `flat` produces **0 edges in ≥ 9 of 10** runs | The specificity result from Stage 0 does not hold at n=10 |
+| ~~P3~~ | ~~`flat` produces **0 edges in ≥ 9 of 10** runs~~ | **Withdrawn — see §6.1** |
+| **P3′** | `flat` produces **0 multi-supporter nodes in ≥ 8 of 10** runs | Shared structure appears without shared subject matter; specificity fails on the property that matters |
 | P4 | Retraction reaches **depth ≥ 2 in ≥ 2 of 10** runs on at least one structured scenario | Live webs are uniformly shallow; the propagation apparatus characterises a regime that does not occur |
 | P5 | **≥ 1 node with multiple supporters** appears in ≥ 3 of 20 structured runs | `share` never varies live; SC-3's net-vs-chain distinction has no naturalistic instance |
+| **P5′** | Each structured scenario produces ≥1 multi-supporter node in **≥ 4 of 10** runs | Shared structure is incidental rather than scenario-driven |
 | P6 | Structural-null rate (`no_structure`) is **≤ 3 of 10** per structured scenario | Over-merging dominates; Stage 0's 1-in-4 was optimistic |
+
+### 6.1 P3 withdrawn and replaced after the pilot (2026-08-09)
+
+**This is a post-hoc revision and is marked as one. P1, P2, P4, P5 and P6 are
+untouched and remain blind.**
+
+P3 demanded the negative control produce *zero edges*. The pilot showed no
+fixture can satisfy that: a generative extractor abstracts from anything.
+
+| control | edges/belief | multi-supporter runs |
+|---|---|---|
+| flat v2 (repo facts) | 0.40 | 3 of 3 |
+| flat v3 (unrelated subjects) | 0.43 | **0 of 3** |
+| `verification` | 0.74 | 2 of 3 |
+| `incident_review` | 0.55 | 2 of 3 |
+
+Two findings, and only one is a fixture defect:
+
+1. **v2 was genuinely flawed.** Two of its four "disjoint" facts — British
+   English documentation and a pinned Debian image — are both repository
+   conventions, and the model correctly hubbed them under "this repository
+   fixes its environment and style choices explicitly." That was a real
+   entailment the fixture handed it. The CLI had missed it only by being less
+   generative (4 beliefs, no abstraction, against the API's 7).
+2. **Edge presence is not a specific signal at all.** v3 uses four subjects
+   with no shared domain — local timing, geography, music history, an
+   industrial standard — and still produces 0.43 edges/belief, statistically
+   indistinguishable from v2. Every fact admits *some* generalisation.
+
+What v3 *did* remove is **shared** structure: no multi-supporter node in any
+run, against 4 of 6 structured runs. That is also the property the propagation
+claim depends on — shared supporters are what make `share` vary, and `share`
+varying is the entire basis of SC-3.
+
+So the discriminator moves from "does it build edges" to "does it build
+structure that is *shared*". P3 was a badly chosen prediction rather than a
+failed one, and the substitution is recorded here rather than quietly applied.
+
+**What this costs:** P3′ and P5′ were chosen with the pilot numbers visible, so
+they carry less evidential weight than the blind predictions. They are
+confirmatory, not exploratory, and results.md must say so. The thresholds were
+set before the live run and are not revisited afterwards.
 
 **P4 is the load-bearing one.** P1–P3 mostly re-confirm Stage 0 at larger *n*.
 P4 and P5 are what decide whether the offline characterisation describes
