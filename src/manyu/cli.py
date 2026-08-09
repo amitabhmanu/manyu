@@ -185,8 +185,19 @@ def cmd_update_beliefs(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_status(result: dict[str, Any]) -> int:
+    """Print a result and exit non-zero if it reports an error.
+
+    These commands are driven in bulk by experiment harnesses, where a
+    mistyped belief id or a rejected argument must stop the script rather than
+    read as a completed manipulation.
+    """
+    _print(result)
+    return 1 if result.get("status") == "error" else 0
+
+
 def cmd_retract_belief(args: argparse.Namespace) -> int:
-    _print(
+    return _print_status(
         _core(args).retract_belief(
             {
                 "agent_id": args.agent_id,
@@ -196,11 +207,10 @@ def cmd_retract_belief(args: argparse.Namespace) -> int:
             }
         )
     )
-    return 0
 
 
 def cmd_assert_contradiction(args: argparse.Namespace) -> int:
-    _print(
+    return _print_status(
         _core(args).assert_contradiction(
             {
                 "agent_id": args.agent_id,
@@ -210,7 +220,6 @@ def cmd_assert_contradiction(args: argparse.Namespace) -> int:
             }
         )
     )
-    return 0
 
 
 def cmd_beliefs(args: argparse.Namespace) -> int:

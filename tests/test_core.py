@@ -843,6 +843,18 @@ def test_cli_revision_commands_drive_the_engine(tmp_path, capsys) -> None:
     )
 
 
+def test_cli_revision_commands_exit_nonzero_on_error(tmp_path) -> None:
+    """Review finding 4.
+
+    Both commands printed the error payload and returned 0, so a harness
+    driving retractions in bulk would treat a stale belief id or a rejected
+    argument as a completed manipulation and carry on.
+    """
+    db = tmp_path / "manyu.sqlite3"
+    assert cli_main(["--db", str(db), "retract-belief", "--belief-id", "bel_typo", "--arm", "direct"]) == 1
+    assert cli_main(["--db", str(db), "assert-contradiction", "--contradictor-id", "bel_a", "--target-id", "bel_b", "--arm", "direct"]) == 1
+
+
 def test_revision_surface_reports_errors_rather_than_raising() -> None:
     core = make_core()
     beliefs = core.update_beliefs({"agent_id": "agent_demo", "candidates": [{

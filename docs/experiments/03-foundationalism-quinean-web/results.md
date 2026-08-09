@@ -327,6 +327,29 @@ target, a depth-2 chain propagates end to end, both arms are drivable through
 live ingest, the foreclosure ablation is off by default, repeated retraction
 keeps confidence in range, and an empty batch is a clean no-op.
 
+## 3.4 Code review (2026-08-06)
+
+A diff review of the stage found **four more**, none caught by the 498 tests
+then passing. Three were in `assert_contradiction` and its ledger — the same
+function that produced four of the earlier ten.
+
+| Finding | Observed | Fix |
+|---|---|---|
+| Self-contradiction charged a belief **unrecoverably** | `assert_contradiction(X, X)` dropped X 0.8 → 0.4 and marked it CONTESTED, but `X.contradicts` ended `[]`: the edge was written, then clobbered by a `target` snapshot read before that write. Relief walks `origin.contradicts`, so with the edge gone the charge could never be refunded | Self-reference refused (matching `_resolve_edges` on the ingest path); `target` re-read after the contradictor write |
+| Idempotency guard keyed on the **amount**, not the event | A contradictor at confidence 0 priced at exactly 0, so `charged > 0.0` never engaged: repeats piled up duplicate markers, and a later recovery let the same contradiction charge for real | Guard keyed on the presence of an assertion marker |
+| `contradictions_priced` reported `charged: 0` for an already-priced pair | Indistinguishable from a contradiction never priced; any analysis summing the field under-counts on a re-run | `PropagationResult.outcome` (`applied` / `already_priced` / `recorded_without_charge` / `self_reference_refused`) surfaced through the payload |
+| CLI commands exited **0 on error** | `manyu retract-belief --belief-id bel_typo` printed `{"status":"error"}` and exited 0; a batch harness would record manipulations that never happened | Non-zero exit when `status == "error"` |
+
+The first is the one that mattered: it produced a permanently suppressed
+belief with no path to recovery, reachable from the CLI and MCP surfaces
+Stage 4 will drive.
+
+**Running total: fourteen defects, none found by the test suite.** Four came
+from writing a standard down before reading a verdict, four from adversarial
+probing, four from reading the diff, two from the Stage 4 pre-flight. The
+consistent signal is that tests written alongside a mechanism agree with it
+exactly where it is wrong.
+
 ## 4. What is not established
 
 - **No blinding.** The engine predated the Stage 2 fixtures (§2.4). Only

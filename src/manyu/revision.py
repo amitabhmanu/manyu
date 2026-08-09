@@ -216,6 +216,13 @@ class PropagationResult:
     arm: ContradictionArm
     steps: list[PropagationStep] = field(default_factory=list)
 
+    #: Why this call did what it did. An empty `steps` list is ambiguous on its
+    #: own — a contradiction that was already priced, one the `evidential` arm
+    #: only records, and one refused for self-reference all produce no steps,
+    #: and all three would otherwise report as "charged 0.0", indistinguishable
+    #: from a contradiction that genuinely cost nothing.
+    outcome: str = "applied"
+
     @property
     def moved(self) -> list[PropagationStep]:
         return [s for s in self.steps if abs(s.delta) > 0.0]
@@ -337,26 +344,47 @@ class RevisionEngine:
         until evidence moves.
         """
         contradictor = self.store.get_belief(contradictor_id)
-        target = self.store.get_belief(target_id)
         result = PropagationResult(origin_id=contradictor_id, arm=self.arm)
+
+        if contradictor_id == target_id:
+            # A belief contradicting itself is a degenerate cycle, exactly as
+            # for `supports`, and it used to be actively harmful: the charge
+            # landed while the edge did not survive (see below), so nothing
+            # could ever refund it. `BeliefUpdater._resolve_edges` already
+            # drops self-edges on the ingest path; this surface now matches.
+            self.store.audit("system", "self_contradiction_refused", {"agent_id": agent_id, "belief_id": target_id})
+            result.outcome = "self_reference_refused"
+            return result
 
         if target_id not in contradictor.contradicts:
             self.store.save_belief(
                 contradictor.model_copy(update={"contradicts": sorted(set([*contradictor.contradicts, target_id]))})
             )
 
+        # Read *after* the contradictor write. Reading both up front meant a
+        # later `save_belief(target)` could persist a snapshot taken before an
+        # intervening write and silently roll it back.
+        target = self.store.get_belief(target_id)
+
         if self.arm is not ContradictionArm.DIRECT:
             if target.status is not BeliefStatus.CONTESTED:
                 self.store.save_belief(target.model_copy(update={"status": BeliefStatus.CONTESTED}))
+            result.outcome = "recorded_without_charge"
             return result
 
-        charged, _ = self._suppression_ledger(target_id, contradictor_id)
-        if charged > 0.0:
+        if self._was_asserted(target_id, contradictor_id):
             # Idempotent. Asserting the same contradiction twice previously
             # charged twice (0.8 -> 0.56 -> 0.32), so any harness that
             # re-applied a fixture's declared edges — or any re-processing of
             # the same web — compounded the penalty without bound.
+            #
+            # Keyed on the *presence* of an assertion, not on the amount
+            # charged: a contradictor sitting at confidence 0 prices at
+            # exactly 0, so an amount-based guard never engaged and the pair
+            # could be re-asserted indefinitely — then charged for real if the
+            # contradictor later recovered.
             self.store.audit("system", "contradiction_already_priced", {"agent_id": agent_id, "contradictor": contradictor_id, "target": target_id})
+            result.outcome = "already_priced"
             return result
 
         share = self._contradiction_share(agent_id, target)
@@ -573,6 +601,16 @@ class RevisionEngine:
             elif seen_assert and rev.reason == "retraction":
                 return True
         return False
+
+    def _was_asserted(self, target_id: str, contradictor_id: str) -> bool:
+        """Has this contradiction ever been priced, whatever it cost?
+
+        Distinct from `_suppression_ledger`'s `charged`, which is an *amount*
+        and is legitimately 0 when the contradictor had no confidence to lend.
+        Idempotency has to key on the event, not the amount.
+        """
+        marker = _asserted_by(contradictor_id)
+        return any(rev.reason == marker for rev in self.store.list_belief_revisions(target_id))
 
     def _suppression_ledger(self, target_id: str, contradictor_id: str) -> tuple[float, float]:
         """`(charged, refunded)` for one contradiction, read from the revision trail.

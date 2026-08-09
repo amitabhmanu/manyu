@@ -405,6 +405,77 @@ def test_a_refund_never_undoes_an_explicit_retraction() -> None:
         assert all(v == pytest.approx(0.0) for v in final.values()), f"order {order}: {final}"
 
 
+# --- code-review findings ----------------------------------------------------
+
+
+def test_a_belief_cannot_contradict_itself() -> None:
+    """Review finding 1, and it was unrecoverable.
+
+    The charge landed (0.8 -> 0.4, CONTESTED) while the edge did not survive:
+    it was written onto a fresh copy, then clobbered by a `target` snapshot
+    read before that write. Relief walks `origin.contradicts` to find refund
+    targets, so with the edge gone the penalty could never be undone.
+    """
+    core = ManyuCore.from_paths(db_path=":memory:", frozen=True)
+    ids = seed_beliefs(core, [BeliefSpec(key="p", proposition="P.", confidence=0.8)])
+    result = core.assert_contradiction({"contradictor_id": ids["p"], "target_id": ids["p"], "arm": "direct"})
+
+    belief = core.store.get_belief(ids["p"])
+    assert belief.confidence == pytest.approx(0.8), "a self-contradiction must not charge"
+    assert belief.status.value == "active"
+    assert belief.contradicts == []
+    assert result["outcome"] == "self_reference_refused"
+
+
+def test_idempotency_holds_when_the_contradictor_has_no_confidence() -> None:
+    """Review finding 2.
+
+    The guard tested the amount charged, not whether an assertion had
+    happened. A contradictor at confidence 0 prices at exactly 0, so the guard
+    never engaged: repeats piled up duplicate markers, and a later recovery
+    let the same contradiction charge for real.
+    """
+    core = ManyuCore.from_paths(db_path=":memory:", frozen=True)
+    ids = seed_beliefs(core, [
+        BeliefSpec(key="p", proposition="P.", confidence=0.8),
+        BeliefSpec(key="q", proposition="Q.", confidence=0.8),
+    ])
+    core.retract_belief({"belief_id": ids["q"], "arm": "direct"})
+    for _ in range(3):
+        core.assert_contradiction({"contradictor_id": ids["q"], "target_id": ids["p"], "arm": "direct"})
+
+    markers = [r.reason for r in core.store.list_belief_revisions(ids["p"]) if r.reason.startswith("contradiction_asserted")]
+    assert len(markers) == 1, f"one assertion, one marker: {markers}"
+
+    # A contradictor that later regains confidence must not charge again.
+    recovered = core.store.get_belief(ids["q"])
+    core.store.save_belief(recovered.model_copy(update={"confidence": 0.9}))
+    core.assert_contradiction({"contradictor_id": ids["q"], "target_id": ids["p"], "arm": "direct"})
+    assert core.store.get_belief(ids["p"]).confidence == pytest.approx(0.8)
+
+
+def test_an_already_priced_contradiction_is_distinguishable_from_a_free_one() -> None:
+    """Review finding 3.
+
+    Both report `charged: 0`, so an analysis summing that field to count
+    priced contradictions under-counts on any re-run.
+    """
+    core = ManyuCore.from_paths(db_path=":memory:", frozen=True)
+    first = _extracted(core, ("world_model/general/deploy-ok",))
+    second = _extracted(core, ("world_model/general/deploy-ok",))
+
+    assert first["contradictions_priced"][0]["outcome"] == "applied"
+    assert first["contradictions_priced"][0]["charged"] > 0
+    assert second["contradictions_priced"][0]["outcome"] == "already_priced"
+    assert second["contradictions_priced"][0]["charged"] == 0
+
+
+def test_the_evidential_arm_reports_why_it_charged_nothing() -> None:
+    core = ManyuCore.from_paths(db_path=":memory:", frozen=True, contradiction_arm=ContradictionArm.EVIDENTIAL)
+    priced = _extracted(core, ("world_model/general/deploy-ok",))["contradictions_priced"]
+    assert priced[0]["outcome"] == "recorded_without_charge"
+
+
 def test_gate_the_deciding_fixture_actually_separates_the_arms() -> None:
     """A fixture on which both arms agree cannot decide anything. Checked
     before the verdict is read, per experiment 2's gate #1."""

@@ -67,6 +67,10 @@ def _propagation_payload(result: PropagationResult) -> dict[str, Any]:
     return {
         "origin_id": result.origin_id,
         "arm": result.arm.value,
+        # An empty `steps` list is ambiguous on its own; `outcome` says whether
+        # nothing happened because nothing was owed, because it was already
+        # priced, or because the call was refused.
+        "outcome": result.outcome,
         "max_depth_reached": result.max_depth_reached,
         "total_movement": round(result.total_movement(), 6),
         "steps": [
@@ -344,6 +348,11 @@ class ManyuCore:
                     "contradictor_id": contradictor_id,
                     "target_id": target_id,
                     "charged": round(-sum(step.delta for step in result.steps), 6),
+                    # Without this, a re-run of the same batch reports
+                    # `charged: 0` — indistinguishable from a contradiction
+                    # that was never priced at all, so any analysis summing
+                    # this field silently under-counts on repeat runs.
+                    "outcome": result.outcome,
                 }
             )
         return priced
