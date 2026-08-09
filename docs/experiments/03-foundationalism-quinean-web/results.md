@@ -1,9 +1,10 @@
 # Experiment 3 — Results
 
 **Stages complete:** 0 (feasibility), 1 (engine), 2 (discrimination),
-3 (dissonance coupling, re-run under both arms)
-**All offline.** No provider is constructed in any Stage 1–3 test; `n=1` under
-`FrozenClock`, per requirements §4.
+3 (dissonance coupling, re-run under both arms), **4 (live confirmation)**
+Stages 1–3 are offline and deterministic under `FrozenClock` at `n=1`. Stage 4
+is live: `claude-opus-5`, n=10 × 3 scenarios, 30 clean records, 0 provider
+errors (§3.5). One earlier live run was voided (§3.6).
 
 ## 1. Headline
 
@@ -350,6 +351,98 @@ probing, four from reading the diff, two from the Stage 4 pre-flight. The
 consistent signal is that tests written alongside a mechanism agree with it
 exactly where it is wrong.
 
+## 3.5 Stage 4 — live confirmation (2026-08-09)
+
+`claude-opus-5` via `AnthropicAPIJSONProvider`, n=10 × 3 scenarios, 30 clean
+records, **0 provider errors**. Raw: `evals/analysis/exp03/stage4.jsonl`.
+
+**One live run was voided first.** See §3.6 — the numbers below are from the
+corrected re-run.
+
+### All seven predictions pass
+
+| | Prediction | Result | |
+|---|---|---|---|
+| P1 | `verification` ≥1 edge in ≥7/10 | **10/10** | PASS |
+| P2 | `incident_review` ≥1 edge in ≥5/10 | **10/10** | PASS |
+| P3′ | `flat` 0 multi-supporter in ≥8/10 | **9/10** | PASS *(post-hoc, §6.1)* |
+| **P4** | depth ≥2 reached in ≥2/10 on one structured scenario | **verification 5/10, incident 2/10** | **PASS** |
+| P5 | multi-supporter in ≥3/20 structured | **17/20** | PASS |
+| P5′ | ≥1 multi-supporter in ≥4/10 each | **10/10 and 7/10** | PASS *(post-hoc, §6.1)* |
+| P6 | `no_structure` ≤3/10 per structured scenario | **0/10 and 0/10** | PASS |
+
+P1, P2, P4, P5 and P6 were pre-registered blind. P3′ and P5′ were set with
+pilot numbers visible and are confirmatory only.
+
+**P4 is the one that mattered**, and it holds: naturalistic webs carry
+structure a retraction actually traverses. The apparatus is not describing a
+regime that fails to occur.
+
+### What the webs look like
+
+| scenario | beliefs/run | edges/run | web depths | moved/run |
+|---|---|---|---|---|
+| `verification` | 6.4 | 5.3 | 1,1,1,2,2,2,2,2,2,3 | 1.8 |
+| `incident_review` | 7.8 | 4.2 | 1,1,1,1,1,1,1,2,2,2 | 1.5 |
+| `flat` | 6.5 | 2.3 | 1×9, 2 | 1.5 |
+
+**Attenuation holds live**: mean |Δ| is 0.185 at depth 1 and 0.051 at depth 2.
+
+**`share` genuinely varies**: seven distinct values on `verification`
+(0.125–0.5), five on `incident_review`. SC-3's net-vs-chain distinction has a
+naturalistic instance rather than only a constructed one.
+
+**Edge integrity: 118 emitted, 0 unresolved.** The batch-wide resolution fix
+holds at scale — against Stage 0's pre-fix 46% loss.
+
+### The foreclosure, measured rather than argued
+
+Across all 33 structured share values, the **maximum is exactly 0.5** and none
+exceeds it. §11.1 derived that cap analytically from mandatory provenance —
+`share ≤ 1/(1+1)` because every belief carries at least one evidence record.
+It is now an observation on live, model-built webs.
+
+This is also what makes the voided run diagnosable: it reported `share = 1.0`,
+a value the substrate cannot produce.
+
+### Honest reading
+
+Depth-2 propagation **occurs but is not typical** — 7 of 20 structured runs.
+Most live webs are one hop deep. The claim supported is that the mechanism
+fires on real input, not that deep webs are the common case. Two of the three
+web-depth distributions are dominated by depth 1.
+
+## 3.6 The voided run
+
+The first live run was discarded before its numbers were read.
+
+`run_stage4.py` omitted `agent_id` from its `retract_belief` call, so it took
+the profile default `agent_demo` while its beliefs lived under `probe_agent`.
+Grounding counts are scoped by agent — `list_beliefs(agent_id, ...)` — so
+`supporters` returned **zero for every belief**, and share collapsed from
+`1/(supporters + evidence)` to `1/evidence`:
+
+| | depth 0 | depth 1 | depth 2 |
+|---|---|---|---|
+| voided run | −0.8 | **−0.8** | **−0.8** |
+| corrected | −0.8 | −0.4 | −0.2 |
+
+The runner had accidentally reproduced the `ignore_own_evidence` ablation: it
+measured the **foundationalist** regime and would have been reported as a
+Quinean result. Every propagation-dependent number was inflated.
+
+Caught by an impossible value, not by a test: `share = 1.0` cannot occur under
+mandatory provenance, and checking that anomaly rather than reporting the
+passes is the only reason the run was not published.
+
+**What survived:** P1, P2, P3′, P5, P5′ and P6 are computed from the extracted
+web before any propagation, so they were unaffected and agreed with the
+re-run. **P4 was invalid** and was re-measured.
+
+`RevisionEngine` now refuses to operate on a belief owned by another agent
+rather than silently counting grounding against an empty set. Raw voided data
+retained as `stage4-VOIDED-agent-mismatch.jsonl` (methodology §9).
+
 ## 4. What is not established
 
 - **No blinding.** The engine predated the Stage 2 fixtures (§2.4). Only
@@ -363,9 +456,11 @@ exactly where it is wrong.
 - **One entailed run in four produced no structure at all**, collapsing three
   observations into a single belief. Stage 4's *n* must be large enough that a
   null run reads as a null run.
-- **The API provider path is still unverified.** Stage 0 confirmed the
-  extractor on the CLI only; `supports` was added to the schema and the API
-  has never been asked to honour it.
+- ~~The API provider path is unverified.~~ **Closed** — gate 1 passed and 60
+  live extractions ran clean (§3.5).
+- **Depth-2 propagation is not typical**, only demonstrated: 7 of 20
+  structured runs. Most live webs are one hop deep.
+- **One model, one provider.** As in experiments 1 and 2.
 - **The foundationalist limb is unreachable** (§1). Until an arm runs with the
   provenance requirement lifted, the comparison has one available outcome.
 - **No live web has been revised.** Stage 4 is untouched, and the Stage 0

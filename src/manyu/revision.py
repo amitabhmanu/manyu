@@ -279,6 +279,7 @@ class RevisionEngine:
         its provenance survive so the revision remains auditable afterwards.
         """
         origin = self.store.get_belief(belief_id)
+        self._require_matching_agent(agent_id, origin)
         result = PropagationResult(origin_id=belief_id, arm=self.arm)
 
         after = _clamp(to_confidence)
@@ -344,6 +345,7 @@ class RevisionEngine:
         until evidence moves.
         """
         contradictor = self.store.get_belief(contradictor_id)
+        self._require_matching_agent(agent_id, contradictor)
         result = PropagationResult(origin_id=contradictor_id, arm=self.arm)
 
         if contradictor_id == target_id:
@@ -601,6 +603,29 @@ class RevisionEngine:
             elif seen_assert and rev.reason == "retraction":
                 return True
         return False
+
+    @staticmethod
+    def _require_matching_agent(agent_id: str, belief: Belief) -> None:
+        """Refuse to operate on a belief belonging to a different agent.
+
+        Every grounding count is scoped by `agent_id`
+        (`list_beliefs(agent_id, ...)`), so an `agent_id` that does not own the
+        belief silently returns **zero supporters** for everything. Share then
+        collapses to `1/own_evidence` instead of `1/(supporters + evidence)`,
+        and the shock propagates undiminished — the foundationalist regime the
+        substrate is supposed to forbid, produced by a caller typo.
+
+        This is not hypothetical: the Stage 4 runner omitted `agent_id`, took
+        the default `agent_demo` while its beliefs lived under `probe_agent`,
+        and measured 0.8 / 0.8 / 0.8 down a chain that should have decayed
+        0.8 / 0.4 / 0.2. The whole run had to be discarded. Failing loudly
+        costs one comparison.
+        """
+        if belief.agent_id != agent_id:
+            raise ValueError(
+                f"belief {belief.belief_id} belongs to agent {belief.agent_id!r}, not {agent_id!r}; "
+                "grounding would be counted against the wrong agent"
+            )
 
     def _was_asserted(self, target_id: str, contradictor_id: str) -> bool:
         """Has this contradiction ever been priced, whatever it cost?

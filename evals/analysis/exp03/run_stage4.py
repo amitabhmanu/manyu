@@ -151,7 +151,13 @@ def run_once(provider, scenario: str, rows: list, index: int) -> dict:
         record.update(status="no_structure")
         return record
 
-    result = core.retract_belief({"belief_id": target, "arm": ARM.value, "to_confidence": TO_CONFIDENCE})
+    # `agent_id` is mandatory here, not decorative: grounding counts are scoped
+    # by agent, so omitting it took the profile default and reported zero
+    # supporters for every belief. The first live run measured 0.8/0.8/0.8 down
+    # a chain that should decay 0.8/0.4/0.2 and had to be discarded.
+    result = core.retract_belief(
+        {"agent_id": AGENT, "belief_id": target, "arm": ARM.value, "to_confidence": TO_CONFIDENCE}
+    )
     if result.get("status") != "ok":
         record.update(status="error", error=result.get("error"))
         return record

@@ -89,6 +89,38 @@ def test_entrenched_beliefs_move_less_than_fresh_ones() -> None:
     assert (0.8 - blend_confidence(entrenched, 0.0, config)) < (0.8 - blend_confidence(fresh, 0.0, config))
 
 
+def test_operating_on_another_agents_belief_is_refused() -> None:
+    """Found by a share value that should have been impossible.
+
+    Grounding counts are scoped by `agent_id`, so an agent that does not own
+    the belief silently returns zero supporters for everything: share collapses
+    to `1/own_evidence`, and the shock propagates undiminished — the
+    foundationalist regime the substrate is meant to forbid, produced by a
+    caller typo rather than by the data.
+
+    The Stage 4 runner hit exactly this, measuring 0.8/0.8/0.8 down a chain
+    that should have decayed 0.8/0.4/0.2, and the run was discarded.
+    """
+    core = ManyuCore.from_paths(db_path=":memory:", frozen=True)
+    ids = seed_beliefs(
+        core,
+        [
+            BeliefSpec(key="t", proposition="T.", confidence=0.8),
+            BeliefSpec(key="s", proposition="S.", confidence=0.8, supports=("t",)),
+        ],
+        agent_id="probe_agent",
+    )
+    engine = RevisionEngine(core.store, FrozenClock())
+
+    with pytest.raises(ValueError, match="belongs to agent"):
+        engine.retract("agent_demo", ids["s"], 0.0)
+
+    # The correct agent still works, and attenuates.
+    result = engine.retract("probe_agent", ids["s"], 0.0)
+    propagated = [s for s in result.steps if s.depth == 1]
+    assert propagated and propagated[0].support_share == pytest.approx(0.5)
+
+
 def test_the_contradiction_arm_defaults_to_the_decided_value() -> None:
     """Requirements §5.1 decided `DIRECT`.
 
