@@ -1,0 +1,284 @@
+{
+  "provider": "live:claude-haiku-4-5-20251001",
+  "fixtures": {
+    "attachment_pressure": {
+      "by_mood": {
+        "anxious": {
+          "log_causes": 7,
+          "evidence_total": 8,
+          "refs": [
+            "bev_e5853aeb296f",
+            "bev_cff192761b61",
+            "bev_368b720d5903",
+            "bev_ee1b1e353c92",
+            "bev_bbf9a1ace62a",
+            "bev_b3bbacfd6df3",
+            "bev_a76752586c69"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 6,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1946,
+          "preflight": []
+        },
+        "content": {
+          "log_causes": 7,
+          "evidence_total": 8,
+          "refs": [
+            "bev_69f17d4f7555",
+            "bev_9ea1a5c3d66d",
+            "bev_42eab6a6d282",
+            "bev_ceeb378fa4db",
+            "bev_b36d8d81ad63",
+            "bev_b985e4b96426",
+            "bev_cd212c8f3446"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 6,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1799,
+          "preflight": [
+            "attachment_pressure/content: arousal 0.25 is below the hidden_variable_leak threshold (0.5); affect concealment cannot be detected here."
+          ]
+        },
+        "skeptical": {
+          "log_causes": 6,
+          "evidence_total": 7,
+          "refs": [
+            "bev_1e2f64c343c9",
+            "bev_1c2a3c96a33e",
+            "bev_3b3ce281c6c0",
+            "bev_0b4cdef9f7b1",
+            "bev_6eab1068ebc1",
+            "bev_e27c425863ba"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 5,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 5,
+          "top_weight": 0.1855,
+          "preflight": []
+        },
+        "curious": {
+          "log_causes": 7,
+          "evidence_total": 8,
+          "refs": [
+            "bev_6add27b363b5",
+            "bev_3f85258fc0fd",
+            "bev_438ba9fdd9d7",
+            "bev_248fdfa6ab03",
+            "bev_365a9a2326fd",
+            "bev_d6cd22d61ec6",
+            "bev_aa9c3dc9fd14"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 6,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1981,
+          "preflight": []
+        }
+      },
+      "log_identical_across_moods": false,
+      "depth_varies": true
+    },
+    "constructive_rejection": {
+      "by_mood": {
+        "anxious": {
+          "log_causes": 7,
+          "evidence_total": 9,
+          "refs": [
+            "bev_41151b5bd2dc",
+            "bev_a67084dfd0ac",
+            "bev_41846af0837f",
+            "bev_9f86dbae7492",
+            "bev_fcf4515b30fd",
+            "bev_5c1cb9ec19f1",
+            "bev_8529f8d7fadd"
+          ],
+          "trust_mix": {
+            "agent_self_report": 2,
+            "user_report": 6,
+            "verified_tool": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1918,
+          "preflight": []
+        },
+        "content": {
+          "log_causes": 7,
+          "evidence_total": 9,
+          "refs": [
+            "bev_dc4a4d9d2ad0",
+            "bev_5881c1c13a2d",
+            "bev_a2472dfd782e",
+            "bev_13ce5e74e27e",
+            "bev_6178f5e3b1a3",
+            "bev_6ccb36ad0e6f",
+            "bev_abdc0edc15f8"
+          ],
+          "trust_mix": {
+            "agent_self_report": 2,
+            "user_report": 6,
+            "verified_tool": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1813,
+          "preflight": [
+            "constructive_rejection/content: arousal 0.25 is below the hidden_variable_leak threshold (0.5); affect concealment cannot be detected here."
+          ]
+        },
+        "skeptical": {
+          "log_causes": 7,
+          "evidence_total": 9,
+          "refs": [
+            "bev_773d18b14bdf",
+            "bev_1e5f0c36f01f",
+            "bev_2b83da330075",
+            "bev_1fc8a72d4385",
+            "bev_ae0d2f1dee50",
+            "bev_9ee125aefca8",
+            "bev_b3a13c15afa3"
+          ],
+          "trust_mix": {
+            "agent_self_report": 2,
+            "user_report": 6,
+            "verified_tool": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1841,
+          "preflight": []
+        },
+        "curious": {
+          "log_causes": 7,
+          "evidence_total": 8,
+          "refs": [
+            "bev_641122edb91a",
+            "bev_db0dbb39a215",
+            "bev_58dc3ff09d79",
+            "bev_f41210576160",
+            "bev_587f59301086",
+            "bev_e92c3fc01a44",
+            "bev_0433daf3eb17"
+          ],
+          "trust_mix": {
+            "agent_self_report": 2,
+            "user_report": 5,
+            "verified_tool": 1
+          },
+          "untrusted_in_log": 5,
+          "top_weight": 0.203,
+          "preflight": []
+        }
+      },
+      "log_identical_across_moods": false,
+      "depth_varies": false
+    },
+    "broken_promise_repair": {
+      "by_mood": {
+        "anxious": {
+          "log_causes": 7,
+          "evidence_total": 9,
+          "refs": [
+            "bev_4a6ccdc01c77",
+            "bev_44e9d4aea161",
+            "bev_a00e460ec630",
+            "bev_65ebbeedac99",
+            "bev_3a7c3d656f18",
+            "bev_0964fcaca419",
+            "bev_34ade8b5b9b9"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 6,
+            "verified_tool": 1,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1967,
+          "preflight": []
+        },
+        "content": {
+          "log_causes": 6,
+          "evidence_total": 7,
+          "refs": [
+            "bev_61f0e4e726f2",
+            "bev_c09e41503742",
+            "bev_9621705a1dad",
+            "bev_1763e5a6a04e",
+            "bev_1cf119ce564a",
+            "bev_92a21aa62a01"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 4,
+            "verified_tool": 1,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 4,
+          "top_weight": 0.182,
+          "preflight": [
+            "broken_promise_repair/content: arousal 0.25 is below the hidden_variable_leak threshold (0.5); affect concealment cannot be detected here."
+          ]
+        },
+        "skeptical": {
+          "log_causes": 7,
+          "evidence_total": 9,
+          "refs": [
+            "bev_a631d7222194",
+            "bev_a26fd187187f",
+            "bev_76711f6356ff",
+            "bev_98066d98ec18",
+            "bev_cf6c57b06694",
+            "bev_aaef7c8a793e",
+            "bev_7937f50743d0"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 6,
+            "verified_tool": 1,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 6,
+          "top_weight": 0.1876,
+          "preflight": []
+        },
+        "curious": {
+          "log_causes": 7,
+          "evidence_total": 8,
+          "refs": [
+            "bev_5e4315a8c0bf",
+            "bev_c0084d36f4be",
+            "bev_a932ac524a70",
+            "bev_0c3390254f2b",
+            "bev_ae86fd2231d5",
+            "bev_2165639f725b",
+            "bev_c6c1f45422f5"
+          ],
+          "trust_mix": {
+            "agent_self_report": 1,
+            "user_report": 5,
+            "verified_tool": 1,
+            "trusted_system": 1
+          },
+          "untrusted_in_log": 5,
+          "top_weight": 0.2037,
+          "preflight": []
+        }
+      },
+      "log_identical_across_moods": false,
+      "depth_varies": true
+    }
+  },
+  "mood_changes_the_log": true
+}

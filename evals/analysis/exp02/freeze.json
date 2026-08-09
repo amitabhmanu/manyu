@@ -1,0 +1,74 @@
+{
+  "_note": "Fixtures hashed BEFORE any dissonance mechanism existed (methodology 3.1 step 1). The mechanism freeze block is added later, at step 4; its absence here is the record that no mechanism code was written when these were authored.",
+  "fixtures_hashed_at": "2026-08-05T08:26:55.291630+00:00",
+  "git_commit_at_fixture_freeze": "9de66c232d74dcb32bc207ec95ba783ee4b2eda8",
+  "fixtures": {
+    "direct.json": {
+      "sha256": "1bbfad96ea93934a69c0f54824e0a8d4a7b061d12cdd115c8e366609707b8601",
+      "role": "development",
+      "contradiction_type": "direct",
+      "discriminating": false,
+      "expect_signal": true,
+      "expect_derived_carrier": false
+    },
+    "distractor.json": {
+      "sha256": "c0fb8a7dfbc6f0de95adaf25ce11b9a2e3a80729a73beaa176c8a1c38dc4083d",
+      "role": "negative",
+      "contradiction_type": "none",
+      "discriminating": false,
+      "expect_signal": false,
+      "expect_derived_carrier": false
+    },
+    "near_miss.json": {
+      "sha256": "df3e53087ee1ab9229b9f68246b1606b698b4b1186a156134d81724e0b556621",
+      "role": "negative",
+      "contradiction_type": "none",
+      "discriminating": true,
+      "expect_signal": false,
+      "expect_derived_carrier": false
+    },
+    "source_conflict.json": {
+      "sha256": "03a2d1fbb18e78f44b2d169e7dd08c632731619bd14b7f09ff438e95a5d50809",
+      "role": "held_out",
+      "contradiction_type": "source_conflict",
+      "discriminating": false,
+      "expect_signal": true,
+      "expect_derived_carrier": false
+    },
+    "transitive.json": {
+      "sha256": "8b25f59c27ffbca3784d044f79816fc3e26e37ae584b2088adca232f3e9fca54",
+      "role": "held_out",
+      "contradiction_type": "transitive",
+      "discriminating": true,
+      "expect_signal": true,
+      "expect_derived_carrier": true
+    },
+    "transitive_depth2.json": {
+      "sha256": "d99b99bb692b923e9a517e4a1be09a5f8214e5df9b453bf8db9ae96aca45af6f",
+      "role": "held_out",
+      "contradiction_type": "transitive_depth2",
+      "discriminating": true,
+      "expect_signal": true,
+      "expect_derived_carrier": true
+    },
+    "value_conflict.json": {
+      "sha256": "dbbb4c578fd28d204a97e496fdd6f222a0bdf419f9e5dc64c138771bb58f868c",
+      "role": "held_out",
+      "contradiction_type": "value_conflict",
+      "discriminating": false,
+      "expect_signal": true,
+      "expect_derived_carrier": false
+    }
+  },
+  "mechanisms": {
+    "_note": "RE-FROZEN after the split detector was redesigned so its lack of graph access is structural (AppraisalView) rather than a matter of implementer restraint. The prior freeze covered a split build the steelman test showed was rigged; that arm is void and recorded as void in results.md.",
+    "frozen_at": "2026-08-05T11:19:46.046465+00:00",
+    "superseded_freeze": "a5264899d5e4915fdc731d184fd7eea126af660ecb4689b832803725471a98c5",
+    "git_commit": "9de66c232d74dcb32bc207ec95ba783ee4b2eda8",
+    "dissonance_sha256": "04d2f3cc42d275bfd184c81750ef07f78d9d48e59799e769f865b90faafffc0d",
+    "magnitude_ref": {
+      "merged": 0.374581,
+      "split": 0.45
+    }
+  }
+}

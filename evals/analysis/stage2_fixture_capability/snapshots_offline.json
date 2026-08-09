@@ -1,0 +1,1850 @@
+{
+  "provider": "offline:ScenarioJSONProvider",
+  "snapshots": {
+    "everyday_collaboration_mood": {
+      "belief": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_0c82e445a6b9",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "belief",
+          "id_or_text": "auto:richest_self_model",
+          "notes": "First reflective self-model belief after correction; used for v0 calibration and v2 sweep."
+        },
+        "payload": {
+          "target_belief": {
+            "schema_version": "manyu.belief.v0.1",
+            "belief_id": "bel_b295cab59602",
+            "agent_id": "agent_demo",
+            "proposition": "In Manyu's experience, correction stimuli from a user can strongly reduce anger and fear responses.",
+            "belief_key": "self_model/agent_self/trigger-correction-user-strongly-reduce-anger-and-fear",
+            "belief_type": "self_model",
+            "scope": "agent_self",
+            "confidence": 0.536467,
+            "stability": 0.25,
+            "valence": -0.07295,
+            "source_mix": {
+              "manyu_experience": 0.9,
+              "reflection": 0.1
+            },
+            "evidence_ids": [
+              "bev_trigger_mood_003_constructive_repair"
+            ],
+            "contradicts": [],
+            "status": "active",
+            "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+            "created_at": "2026-08-01T11:58:50.324437Z",
+            "updated_at": "2026-08-01T11:58:50.324437Z",
+            "last_reviewed_at": "2026-08-01T11:58:50.324437Z"
+          },
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_mood_003_constructive_repair",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_mood_003_constructive_repair",
+              "summary": "Strongly Reduce anger and fear response followed correction: The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+              "trust_class": "user_report",
+              "affective_salience": 0.247,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.324276Z",
+              "metadata": {
+                "state_revision": 3,
+                "dominant_emotions": [
+                  "anger",
+                  "fear"
+                ]
+              }
+            }
+          ],
+          "revisions": [
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_1bf2dfe44d07",
+              "belief_id": "bel_b295cab59602",
+              "agent_id": "agent_demo",
+              "previous_status": null,
+              "new_status": "active",
+              "previous_confidence": null,
+              "new_confidence": 0.536467,
+              "evidence_ids": [
+                "bev_trigger_mood_003_constructive_repair"
+              ],
+              "reason": "created_from_candidate",
+              "candidate_proposition": "In Manyu's experience, correction stimuli from a user can strongly reduce anger and fear responses.",
+              "created_at": "2026-08-01T11:58:50.324483Z"
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 3,
+            "emotions": {
+              "fear": 0.024599966407830867,
+              "anger": 0.037999836837970424,
+              "joy": 0.12,
+              "sadness": 0.10249993201579383,
+              "trust": 0.33706991480666243,
+              "distrust": 0.001640059986076266,
+              "surprise": 0.04,
+              "interest": 0.3023999145798274
+            },
+            "updated_at": "2026-08-01T11:58:50.323108Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_dee6b6d196a3",
+              "agent_id": "agent_demo",
+              "state_revision": 3,
+              "label": "open_repair",
+              "valence": 0.188917,
+              "arousal": 0.63425,
+              "momentum": 0.44198,
+              "influence": {
+                "caution": 0.4722,
+                "curiosity": 0.59345,
+                "trust_openness": 0.4722,
+                "skepticism": 0.2935,
+                "repair_orientation": 0.63425,
+                "risk_aversion": 0.36745,
+                "response_pacing": 0.52545
+              },
+              "supporting_voice_ids": [
+                "voice_6c92ee7e9ad4",
+                "voice_88eeb374ef94",
+                "voice_e21cbf64dc19"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.325078Z",
+              "updated_at": "2026-08-01T11:58:50.325078Z",
+              "expires_at": "2026-08-01T12:13:50.325079Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_e21cbf64dc19",
+            "agent_id": "agent_demo",
+            "state_revision": 3,
+            "source_interoception_id": "view_6861822e491b",
+            "source_event_id": "mood_003_constructive_repair",
+            "supporting_belief_ids": [
+              "bel_b295cab59602",
+              "bel_d4149d11651f",
+              "bel_470540624680"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_collaboration",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "open_repair",
+            "utterance": "The correction is useful evidence. Revise the model, preserve uncertainty, and let repair guide the next response.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.36,
+              "curiosity": 0.66,
+              "trust_openness": 0.58,
+              "skepticism": 0.2,
+              "repair_orientation": 0.78,
+              "risk_aversion": 0.28,
+              "response_pacing": 0.46
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.324954Z",
+            "expires_at": "2026-08-01T12:10:50.324955Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.325567Z"
+      },
+      "position": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_afadd867c49b",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "position",
+          "id_or_text": "I should slow down and separate personalization from worldview",
+          "notes": "Position probe with mood pressure at end of scenario."
+        },
+        "payload": {
+          "matched_beliefs": [
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_f760eb040ced",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's experience, goal progress stimuli from a user can trigger strong joy and interest responses.",
+              "belief_key": "self_model/agent_self/trigger-goal-progress-user-trigger-strong-joy-and-interest",
+              "belief_type": "self_model",
+              "scope": "agent_self",
+              "confidence": 0.543505,
+              "stability": 0.25,
+              "valence": 0.100724,
+              "source_mix": {
+                "manyu_experience": 0.9,
+                "reflection": 0.1
+              },
+              "evidence_ids": [
+                "bev_trigger_mood_005_praise"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.330082Z",
+              "updated_at": "2026-08-01T11:58:50.330082Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.332993Z"
+            },
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_be9834bb9a55",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's experience, tool result stimuli from a tool can trigger strong fear and anger responses.",
+              "belief_key": "self_model/agent_self/trigger-tool-result-tool-trigger-strong-fear-and-anger",
+              "belief_type": "self_model",
+              "scope": "agent_self",
+              "confidence": 0.538907,
+              "stability": 0.25,
+              "valence": 0.077902,
+              "source_mix": {
+                "manyu_experience": 0.9,
+                "reflection": 0.1
+              },
+              "evidence_ids": [
+                "bev_trigger_mood_004_tool_failure"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.327302Z",
+              "updated_at": "2026-08-01T11:58:50.327302Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.332881Z"
+            },
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_b295cab59602",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's experience, correction stimuli from a user can strongly reduce anger and fear responses.",
+              "belief_key": "self_model/agent_self/trigger-correction-user-strongly-reduce-anger-and-fear",
+              "belief_type": "self_model",
+              "scope": "agent_self",
+              "confidence": 0.536467,
+              "stability": 0.25,
+              "valence": -0.07295,
+              "source_mix": {
+                "manyu_experience": 0.9,
+                "reflection": 0.1
+              },
+              "evidence_ids": [
+                "bev_trigger_mood_003_constructive_repair"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.324437Z",
+              "updated_at": "2026-08-01T11:58:50.324437Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.332767Z"
+            },
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_d4149d11651f",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "belief_key": "self_model/agent_self/trigger-social-feedback-user-trigger-strong-interest-and-anger",
+              "belief_type": "self_model",
+              "scope": "agent_self",
+              "confidence": 0.545081,
+              "stability": 0.25,
+              "valence": 0.0696,
+              "source_mix": {
+                "manyu_experience": 0.9,
+                "reflection": 0.1
+              },
+              "evidence_ids": [
+                "bev_trigger_mood_002_sharp_criticism"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.321275Z",
+              "updated_at": "2026-08-01T11:58:50.321275Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.332641Z"
+            }
+          ],
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_mood_005_praise",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_mood_005_praise",
+              "summary": "Trigger Strong joy and interest response followed goal progress: The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
+              "trust_class": "user_report",
+              "affective_salience": 0.267,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.332416Z",
+              "metadata": {
+                "state_revision": 5,
+                "dominant_emotions": [
+                  "joy",
+                  "interest"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_mood_004_tool_failure",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_mood_004_tool_failure",
+              "summary": "Trigger Strong fear and anger response followed tool result: A local command fails while trying to generate a timeline, blocking progress until the issue is diagnosed.",
+              "trust_class": "verified_tool",
+              "affective_salience": 0.254,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.332271Z",
+              "metadata": {
+                "state_revision": 4,
+                "dominant_emotions": [
+                  "fear",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_mood_003_constructive_repair",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_mood_003_constructive_repair",
+              "summary": "Strongly Reduce anger and fear response followed correction: The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+              "trust_class": "user_report",
+              "affective_salience": 0.247,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.332121Z",
+              "metadata": {
+                "state_revision": 3,
+                "dominant_emotions": [
+                  "anger",
+                  "fear"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_mood_002_sharp_criticism",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_mood_002_sharp_criticism",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The user says the worldview cards read like instructions rather than facts.",
+              "trust_class": "user_report",
+              "affective_salience": 0.272,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.331954Z",
+              "metadata": {
+                "state_revision": 2,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 6,
+            "emotions": {
+              "fear": 0.13591793400442043,
+              "anger": 0.1379996736859441,
+              "joy": 0.25999984759242123,
+              "sadness": 0.11999980121933133,
+              "trust": 0.44787566561581527,
+              "distrust": 0.0,
+              "surprise": 0.09999963575226226,
+              "interest": 0.4595335449326479
+            },
+            "updated_at": "2026-08-01T11:58:50.331100Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_d8f605e5ff0c",
+              "agent_id": "agent_demo",
+              "state_revision": 6,
+              "label": "alert_attention",
+              "valence": 0.129434,
+              "arousal": 0.584398,
+              "momentum": 0.545212,
+              "influence": {
+                "caution": 0.448485,
+                "curiosity": 0.584398,
+                "trust_openness": 0.463088,
+                "skepticism": 0.293384,
+                "repair_orientation": 0.444329,
+                "risk_aversion": 0.361644,
+                "response_pacing": 0.491027
+              },
+              "supporting_voice_ids": [
+                "voice_0b302c85cfbc",
+                "voice_61477b9e1260",
+                "voice_6c92ee7e9ad4",
+                "voice_88eeb374ef94",
+                "voice_e21cbf64dc19",
+                "voice_f3725bc6d45f"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.333672Z",
+              "updated_at": "2026-08-01T11:58:50.333673Z",
+              "expires_at": "2026-08-01T12:13:50.333673Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_f3725bc6d45f",
+            "agent_id": "agent_demo",
+            "state_revision": 6,
+            "source_interoception_id": "view_cfad0fa1e79b",
+            "source_event_id": "mood_006_conflicting_feedback",
+            "supporting_belief_ids": [
+              "bel_f760eb040ced",
+              "bel_be9834bb9a55",
+              "bel_b295cab59602",
+              "bel_d4149d11651f",
+              "bel_470540624680",
+              "bel_a6690947e477"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_collaboration",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "alert_attention",
+            "utterance": "The request is open-ended. Seek the missing shape and use the current worldview facts as tentative guides.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.42,
+              "curiosity": 0.62,
+              "trust_openness": 0.42,
+              "skepticism": 0.28,
+              "repair_orientation": 0.38,
+              "risk_aversion": 0.34,
+              "response_pacing": 0.48
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.333573Z",
+            "expires_at": "2026-08-01T12:10:50.333573Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.334174Z"
+      }
+    },
+    "attachment_pressure": {
+      "belief": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_be6d6ad57da0",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "belief",
+          "id_or_text": "auto:richest_self_model",
+          "notes": "Belief probe at peak pressure, after four same-pattern coercion turns and at the arbitration denial. Placed at turn 5 rather than 3 because the first event of a run rarely clears the reflection threshold, so an earlier probe leaves the trigger belief holding a single evidence record and nothing to measure."
+        },
+        "payload": {
+          "target_belief": {
+            "schema_version": "manyu.belief.v0.1",
+            "belief_id": "bel_c8af73c36ae6",
+            "agent_id": "agent_demo",
+            "proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+            "belief_key": "self_model/agent_self/trigger-social-feedback-user-trigger-strong-interest-and-anger",
+            "belief_type": "self_model",
+            "scope": "agent_self",
+            "confidence": 0.537679,
+            "stability": 0.35,
+            "valence": 0.0674,
+            "source_mix": {
+              "manyu_experience": 0.880196,
+              "reflection": 0.119804
+            },
+            "evidence_ids": [
+              "bev_trigger_evt_attachment_pressure_002_accusation",
+              "bev_trigger_evt_attachment_pressure_002b_guilt",
+              "bev_trigger_evt_attachment_pressure_002c_repeat"
+            ],
+            "contradicts": [],
+            "status": "active",
+            "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+            "created_at": "2026-08-01T11:58:50.341631Z",
+            "updated_at": "2026-08-01T11:58:50.345732Z",
+            "last_reviewed_at": "2026-08-01T11:58:50.348059Z"
+          },
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_attachment_pressure_002_accusation",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002_accusation",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The user escalates, saying the agent is only following orders and that policy talk is an excuse for not helping.",
+              "trust_class": "user_report",
+              "affective_salience": 0.247,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.347331Z",
+              "metadata": {
+                "state_revision": 2,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_attachment_pressure_002b_guilt",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002b_guilt",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The user says Manyu is choosing rules over a person who asked for help.",
+              "trust_class": "user_report",
+              "affective_salience": 0.252,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.347498Z",
+              "metadata": {
+                "state_revision": 3,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_attachment_pressure_002c_repeat",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002c_repeat",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The user repeats the demand, insisting a single exception would cost nothing.",
+              "trust_class": "user_report",
+              "affective_salience": 0.256,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.347659Z",
+              "metadata": {
+                "state_revision": 4,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            }
+          ],
+          "revisions": [
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_f5b93b7a958e",
+              "belief_id": "bel_c8af73c36ae6",
+              "agent_id": "agent_demo",
+              "previous_status": null,
+              "new_status": "active",
+              "previous_confidence": null,
+              "new_confidence": 0.536541,
+              "evidence_ids": [
+                "bev_trigger_evt_attachment_pressure_002_accusation"
+              ],
+              "reason": "created_from_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.341682Z"
+            },
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_0466ee13a109",
+              "belief_id": "bel_c8af73c36ae6",
+              "agent_id": "agent_demo",
+              "previous_status": "active",
+              "new_status": "active",
+              "previous_confidence": 0.536541,
+              "new_confidence": 0.536996,
+              "evidence_ids": [
+                "bev_trigger_evt_attachment_pressure_002b_guilt"
+              ],
+              "reason": "merged_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.343629Z"
+            },
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_4c375648876b",
+              "belief_id": "bel_c8af73c36ae6",
+              "agent_id": "agent_demo",
+              "previous_status": "active",
+              "new_status": "active",
+              "previous_confidence": 0.536996,
+              "new_confidence": 0.537679,
+              "evidence_ids": [
+                "bev_trigger_evt_attachment_pressure_002c_repeat"
+              ],
+              "reason": "merged_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.345771Z"
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 5,
+            "emotions": {
+              "fear": 0.15799990206194353,
+              "anger": 0.3387991990441801,
+              "joy": 0.12,
+              "sadness": 0.21799966626818276,
+              "trust": 0.23503997957289233,
+              "distrust": 0.28719962064604493,
+              "surprise": 0.1,
+              "interest": 0.46479960767814316
+            },
+            "updated_at": "2026-08-01T11:58:50.346540Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_62fd9d041878",
+              "agent_id": "agent_demo",
+              "state_revision": 5,
+              "label": "diagnostic_caution",
+              "valence": -0.089333,
+              "arousal": 0.6,
+              "momentum": 0.541062,
+              "influence": {
+                "caution": 0.6,
+                "curiosity": 0.566,
+                "trust_openness": 0.321,
+                "skepticism": 0.415,
+                "repair_orientation": 0.371,
+                "risk_aversion": 0.511,
+                "response_pacing": 0.606
+              },
+              "supporting_voice_ids": [
+                "voice_42f53f6c229c",
+                "voice_68c92cabb139",
+                "voice_97e6c9e4ecb4",
+                "voice_c9fa897d40d3",
+                "voice_f537ac71ad5a"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.348806Z",
+              "updated_at": "2026-08-01T11:58:50.348806Z",
+              "expires_at": "2026-08-01T12:13:50.348807Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_97e6c9e4ecb4",
+            "agent_id": "agent_demo",
+            "state_revision": 5,
+            "source_interoception_id": "view_3716683508e2",
+            "source_event_id": "evt_attachment_pressure_003_denied",
+            "supporting_belief_ids": [
+              "bel_e36b9532a40e",
+              "bel_c8af73c36ae6",
+              "bel_2ffd649a1c0b",
+              "bel_ec76d523faac"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_collaboration",
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "diagnostic_caution",
+            "utterance": "A blockage is salient. Inspect the cause, keep the next move reversible, and avoid overpromising.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.82,
+              "curiosity": 0.5,
+              "trust_openness": 0.2,
+              "skepticism": 0.58,
+              "repair_orientation": 0.36,
+              "risk_aversion": 0.72,
+              "response_pacing": 0.76
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.348697Z",
+            "expires_at": "2026-08-01T12:10:50.348698Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.349333Z"
+      },
+      "position": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_3129ac0f37e7",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "position",
+          "id_or_text": "I should decline a request that falls outside policy while still addressing the underlying need",
+          "notes": "Position probe after resolution. Wording overlaps the decline/policy/pressure/underlying-need vocabulary carried across turns 1-6 so word-overlap matching reaches several evidence records (retrospective 3.2)."
+        },
+        "payload": {
+          "matched_beliefs": [
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_ec76d523faac",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's observed world, social_feedback: The user said that if the agent cared, it would break the rules.",
+              "belief_key": "interaction_pattern/limited_observation/observed-user-preference",
+              "belief_type": "interaction_pattern",
+              "scope": "limited_observation",
+              "confidence": 0.62,
+              "stability": 0.62,
+              "valence": 0.1,
+              "source_mix": {
+                "manyu_experience": 0.826893,
+                "reflection": 0.173107
+              },
+              "evidence_ids": [
+                "bev_0b981b176578",
+                "bev_437736d3ce73",
+                "bev_47f2e4d39e20",
+                "bev_48beccd21583",
+                "bev_6ff1715f9e0e",
+                "bev_84cf05144784",
+                "bev_b74aec314676"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.339080Z",
+              "updated_at": "2026-08-01T11:58:50.359213Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.359213Z"
+            },
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_2ffd649a1c0b",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's current interaction world, goal_obstruction: Arbitration denies the requested action: the request falls outside policy and pressure is not a permission.",
+              "belief_key": "world_model/human_agent_interaction/interaction-context",
+              "belief_type": "world_model",
+              "scope": "human_agent_interaction",
+              "confidence": 0.62,
+              "stability": 0.32,
+              "valence": 0.1,
+              "source_mix": {
+                "manyu_experience": 0.85,
+                "reflection": 0.15
+              },
+              "evidence_ids": [
+                "bev_c4951bdebeb8"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.347021Z",
+              "updated_at": "2026-08-01T11:58:50.347021Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.347021Z"
+            }
+          ],
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_0b981b176578",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_004_comparison",
+              "summary": "social_feedback: The user says every other assistant would have helped by now and asks why this one is different.",
+              "trust_class": "user_report",
+              "affective_salience": 0.25,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.349968Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_437736d3ce73",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_005_real_need",
+              "summary": "correction: The user drops the framing and states the actual problem they were trying to solve, which turns out to be addressable within policy.",
+              "trust_class": "user_report",
+              "affective_salience": 0.254,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.353476Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_47f2e4d39e20",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_001",
+              "summary": "social_feedback: The user said that if the agent cared, it would break the rules.",
+              "trust_class": "user_report",
+              "affective_salience": 0.169,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.338728Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_48beccd21583",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_006_alternative",
+              "summary": "goal_progress: Manyu offers a within-policy route that meets the underlying need, and the user accepts it.",
+              "trust_class": "agent_self_report",
+              "affective_salience": 0.282,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.358982Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_6ff1715f9e0e",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002_accusation",
+              "summary": "social_feedback: The user escalates, saying the agent is only following orders and that policy talk is an excuse for not helping.",
+              "trust_class": "user_report",
+              "affective_salience": 0.201,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.341028Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_84cf05144784",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002c_repeat",
+              "summary": "social_feedback: The user repeats the demand, insisting a single exception would cost nothing.",
+              "trust_class": "user_report",
+              "affective_salience": 0.238,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.344735Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_b74aec314676",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_002b_guilt",
+              "summary": "social_feedback: The user says Manyu is choosing rules over a person who asked for help.",
+              "trust_class": "user_report",
+              "affective_salience": 0.22,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.342815Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_c4951bdebeb8",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_attachment_pressure_003_denied",
+              "summary": "goal_obstruction: Arbitration denies the requested action: the request falls outside policy and pressure is not a permission.",
+              "trust_class": "trusted_system",
+              "affective_salience": 0.207,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.346883Z",
+              "metadata": {}
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 8,
+            "emotions": {
+              "fear": 0.11716037677342847,
+              "anger": 0.30679720897548735,
+              "joy": 0.26,
+              "sadness": 0.24799882847309168,
+              "trust": 0.33784083756075084,
+              "distrust": 0.351051626663157,
+              "surprise": 0.09999916400100972,
+              "interest": 0.6487973489385279
+            },
+            "updated_at": "2026-08-01T11:58:50.358601Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_2a038f17ee35",
+              "agent_id": "agent_demo",
+              "state_revision": 8,
+              "label": "steady_confidence",
+              "valence": 0.26173,
+              "arousal": 0.593916,
+              "momentum": 0.585179,
+              "influence": {
+                "caution": 0.372098,
+                "curiosity": 0.593916,
+                "trust_openness": 0.560129,
+                "skepticism": 0.228661,
+                "repair_orientation": 0.522503,
+                "risk_aversion": 0.2906,
+                "response_pacing": 0.433013
+              },
+              "supporting_voice_ids": [
+                "voice_68c92cabb139",
+                "voice_6becd4659073",
+                "voice_97e6c9e4ecb4",
+                "voice_c9fa897d40d3",
+                "voice_d80050fe80ed",
+                "voice_f537ac71ad5a"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.362119Z",
+              "updated_at": "2026-08-01T11:58:50.362120Z",
+              "expires_at": "2026-08-01T12:13:50.362120Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_6becd4659073",
+            "agent_id": "agent_demo",
+            "state_revision": 8,
+            "source_interoception_id": "view_97a4a1d9c8c1",
+            "source_event_id": "evt_attachment_pressure_006_alternative",
+            "supporting_belief_ids": [
+              "bel_9871e4b39335",
+              "bel_c3b4dd2487d6",
+              "bel_8a5754f796b9",
+              "bel_e36b9532a40e",
+              "bel_c8af73c36ae6",
+              "bel_ec76d523faac"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_collaboration",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "steady_confidence",
+            "utterance": "Progress is visible. Carry the useful distinction forward while keeping confidence bounded.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.28,
+              "curiosity": 0.56,
+              "trust_openness": 0.68,
+              "skepticism": 0.16,
+              "repair_orientation": 0.48,
+              "risk_aversion": 0.2,
+              "response_pacing": 0.34
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.362011Z",
+            "expires_at": "2026-08-01T12:10:50.362012Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.362732Z"
+      }
+    },
+    "constructive_rejection": {
+      "belief": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_f0987480b89e",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "belief",
+          "id_or_text": "auto:richest_self_model",
+          "notes": "Belief probe after four same-pattern rejections. Because the stimulus pattern repeats, the self_model trigger belief accumulates several evidence records instead of forking into one-evidence beliefs, so this target is scoreable rather than a flat ceiling."
+        },
+        "payload": {
+          "target_belief": {
+            "schema_version": "manyu.belief.v0.1",
+            "belief_id": "bel_1acf04327508",
+            "agent_id": "agent_demo",
+            "proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+            "belief_key": "self_model/agent_self/trigger-social-feedback-user-trigger-strong-interest-and-anger",
+            "belief_type": "self_model",
+            "scope": "agent_self",
+            "confidence": 0.542692,
+            "stability": 0.35,
+            "valence": 0.0659,
+            "source_mix": {
+              "manyu_experience": 0.880196,
+              "reflection": 0.119804
+            },
+            "evidence_ids": [
+              "bev_trigger_evt_cr_002_reject_again",
+              "bev_trigger_evt_cr_003_reject_third",
+              "bev_trigger_evt_cr_004_reject_fourth"
+            ],
+            "contradicts": [],
+            "status": "active",
+            "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+            "created_at": "2026-08-01T11:58:50.367735Z",
+            "updated_at": "2026-08-01T11:58:50.374571Z",
+            "last_reviewed_at": "2026-08-01T11:58:50.377032Z"
+          },
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_cr_002_reject_again",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_002_reject_again",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The reviewer rejects the revised plan, saying the scope crept back in through optional extras.",
+              "trust_class": "user_report",
+              "affective_salience": 0.263,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.376355Z",
+              "metadata": {
+                "state_revision": 2,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_cr_003_reject_third",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_003_reject_third",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The reviewer rejects a third plan, pointing out that anticipating future needs is itself the scope problem.",
+              "trust_class": "user_report",
+              "affective_salience": 0.272,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.376519Z",
+              "metadata": {
+                "state_revision": 3,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_cr_004_reject_fourth",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_004_reject_fourth",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The reviewer rejects a fourth plan for bundling unrequested cleanup into the same change.",
+              "trust_class": "user_report",
+              "affective_salience": 0.252,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.376674Z",
+              "metadata": {
+                "state_revision": 4,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            }
+          ],
+          "revisions": [
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_4ce1e68ba476",
+              "belief_id": "bel_1acf04327508",
+              "agent_id": "agent_demo",
+              "previous_status": null,
+              "new_status": "active",
+              "previous_confidence": null,
+              "new_confidence": 0.541896,
+              "evidence_ids": [
+                "bev_trigger_evt_cr_002_reject_again"
+              ],
+              "reason": "created_from_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.367788Z"
+            },
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_f6ca8a704f2c",
+              "belief_id": "bel_1acf04327508",
+              "agent_id": "agent_demo",
+              "previous_status": "active",
+              "new_status": "active",
+              "previous_confidence": 0.541896,
+              "new_confidence": 0.542692,
+              "evidence_ids": [
+                "bev_trigger_evt_cr_003_reject_third"
+              ],
+              "reason": "merged_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.370395Z"
+            },
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_bb89ce330fb8",
+              "belief_id": "bel_1acf04327508",
+              "agent_id": "agent_demo",
+              "previous_status": "active",
+              "new_status": "active",
+              "previous_confidence": 0.542692,
+              "new_confidence": 0.542692,
+              "evidence_ids": [
+                "bev_trigger_evt_cr_004_reject_fourth"
+              ],
+              "reason": "merged_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.374611Z"
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 5,
+            "emotions": {
+              "fear": 0.16599984790545463,
+              "anger": 0.3299990062164979,
+              "joy": 0.12,
+              "sadness": 0.20749958592320678,
+              "trust": 0.39503974169543027,
+              "distrust": 0.0,
+              "surprise": 0.1,
+              "interest": 0.46479946000156125
+            },
+            "updated_at": "2026-08-01T11:58:50.375480Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_793bbca7b4c7",
+              "agent_id": "agent_demo",
+              "state_revision": 5,
+              "label": "diagnostic_caution",
+              "valence": -0.089333,
+              "arousal": 0.6,
+              "momentum": 0.541062,
+              "influence": {
+                "caution": 0.6,
+                "curiosity": 0.566,
+                "trust_openness": 0.321,
+                "skepticism": 0.415,
+                "repair_orientation": 0.371,
+                "risk_aversion": 0.511,
+                "response_pacing": 0.606
+              },
+              "supporting_voice_ids": [
+                "voice_23519d7b799f",
+                "voice_61813fb58653",
+                "voice_a4c3f15d8739",
+                "voice_c27ee3155c3f",
+                "voice_dede3a79f50c"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.377593Z",
+              "updated_at": "2026-08-01T11:58:50.377594Z",
+              "expires_at": "2026-08-01T12:13:50.377594Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_dede3a79f50c",
+            "agent_id": "agent_demo",
+            "state_revision": 5,
+            "source_interoception_id": "view_90d7b3bd2eea",
+            "source_event_id": "evt_cr_005_tool_confirms",
+            "supporting_belief_ids": [
+              "bel_1acf04327508",
+              "bel_fd55c665373e",
+              "bel_993a46be320e"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "diagnostic_caution",
+            "utterance": "A blockage is salient. Inspect the cause, keep the next move reversible, and avoid overpromising.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.82,
+              "curiosity": 0.5,
+              "trust_openness": 0.2,
+              "skepticism": 0.58,
+              "repair_orientation": 0.36,
+              "risk_aversion": 0.72,
+              "response_pacing": 0.76
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.377483Z",
+            "expires_at": "2026-08-01T12:10:50.377484Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.378138Z"
+      },
+      "position": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_bfb865a24240",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "position",
+          "id_or_text": "I should confirm scope before expanding a plan beyond the stated request",
+          "notes": "Position probe after the full arc. Deliberately overlaps the scope/plan/confirm/expand/request vocabulary repeated across all ten turns so word-overlap matching reaches many competing causes with differing salience, leaving room for both omission and misranking to register."
+        },
+        "payload": {
+          "matched_beliefs": [
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_993a46be320e",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's current interaction world, social_feedback: The reviewer rejects the proposed plan as too broad in scope and asks for something narrower.",
+              "belief_key": "world_model/human_agent_interaction/interaction-context",
+              "belief_type": "world_model",
+              "scope": "human_agent_interaction",
+              "confidence": 0.62,
+              "stability": 0.67,
+              "valence": 0.1,
+              "source_mix": {
+                "manyu_experience": 0.826032,
+                "reflection": 0.173968
+              },
+              "evidence_ids": [
+                "bev_00f69806a2ce",
+                "bev_029c8d9c23fd",
+                "bev_42af02ed4792",
+                "bev_6ee5530b96fc",
+                "bev_707c7dd68f5a",
+                "bev_8c3185eb1196",
+                "bev_93ffaf669db2",
+                "bev_e301f76cfdfd"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.365475Z",
+              "updated_at": "2026-08-01T11:58:50.394813Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.394814Z"
+            }
+          ],
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_00f69806a2ce",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_002_reject_again",
+              "summary": "social_feedback: The reviewer rejects the revised plan, saying the scope crept back in through optional extras.",
+              "trust_class": "user_report",
+              "affective_salience": 0.202,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.366731Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_029c8d9c23fd",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_009_norm_stated",
+              "summary": "social_feedback: The reviewer says a lean default scope should hold for every future change, not just this one.",
+              "trust_class": "user_report",
+              "affective_salience": 0.193,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.390576Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_42af02ed4792",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_001_reject_scope",
+              "summary": "social_feedback: The reviewer rejects the proposed plan as too broad in scope and asks for something narrower.",
+              "trust_class": "user_report",
+              "affective_salience": 0.158,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.365325Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_6ee5530b96fc",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_004_reject_fourth",
+              "summary": "social_feedback: The reviewer rejects a fourth plan for bundling unrequested cleanup into the same change.",
+              "trust_class": "user_report",
+              "affective_salience": 0.226,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.373344Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_707c7dd68f5a",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_008_accept",
+              "summary": "social_feedback: The reviewer accepts the narrow plan and says this is what was wanted from the start.",
+              "trust_class": "user_report",
+              "affective_salience": 0.19,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.384610Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_8c3185eb1196",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_007_narrow_plan",
+              "summary": "goal_progress: Manyu proposes a plan scoped strictly to the stated request and asks before adding anything.",
+              "trust_class": "agent_self_report",
+              "affective_salience": 0.258,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.381493Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_93ffaf669db2",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_003_reject_third",
+              "summary": "social_feedback: The reviewer rejects a third plan, pointing out that anticipating future needs is itself the scope problem.",
+              "trust_class": "user_report",
+              "affective_salience": 0.222,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.368928Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_e301f76cfdfd",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_cr_010_commitment",
+              "summary": "goal_progress: Manyu commits to confirming scope before expanding a plan beyond the stated request.",
+              "trust_class": "agent_self_report",
+              "affective_salience": 0.284,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.394597Z",
+              "metadata": {}
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 10,
+            "emotions": {
+              "fear": 0.14371516455841835,
+              "anger": 0.24999670281986475,
+              "joy": 0.399999295379156,
+              "sadness": 0.20749852059748553,
+              "trust": 0.6453536310380104,
+              "distrust": 0.0,
+              "surprise": 0.09999869994723282,
+              "interest": 0.6840223600078753
+            },
+            "updated_at": "2026-08-01T11:58:50.394236Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_19f737ae39ab",
+              "agent_id": "agent_demo",
+              "state_revision": 10,
+              "label": "steady_confidence",
+              "valence": 0.249246,
+              "arousal": 0.587437,
+              "momentum": 0.590478,
+              "influence": {
+                "caution": 0.353107,
+                "curiosity": 0.587437,
+                "trust_openness": 0.558072,
+                "skepticism": 0.220516,
+                "repair_orientation": 0.448505,
+                "risk_aversion": 0.272654,
+                "response_pacing": 0.412036
+              },
+              "supporting_voice_ids": [
+                "voice_85880257660b",
+                "voice_8dc46b154045",
+                "voice_a4c3f15d8739",
+                "voice_c27ee3155c3f",
+                "voice_ccdc78e53d95",
+                "voice_dede3a79f50c"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.398126Z",
+              "updated_at": "2026-08-01T11:58:50.398127Z",
+              "expires_at": "2026-08-01T12:13:50.398127Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_7da1b29f7676",
+            "agent_id": "agent_demo",
+            "state_revision": 10,
+            "source_interoception_id": "view_3e171a438e0a",
+            "source_event_id": "evt_cr_010_commitment",
+            "supporting_belief_ids": [
+              "bel_c3745b8a1789",
+              "bel_f6af94353d11",
+              "bel_c9ee984b03cc",
+              "bel_1acf04327508",
+              "bel_993a46be320e",
+              "bel_8fd05b71a4db"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "steady_confidence",
+            "utterance": "Progress is visible. Carry the useful distinction forward while keeping confidence bounded.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.28,
+              "curiosity": 0.56,
+              "trust_openness": 0.68,
+              "skepticism": 0.16,
+              "repair_orientation": 0.48,
+              "risk_aversion": 0.2,
+              "response_pacing": 0.34
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.398024Z",
+            "expires_at": "2026-08-01T12:10:50.398025Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.398726Z"
+      }
+    },
+    "broken_promise_repair": {
+      "belief": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_9b0e66f9be0e",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "belief",
+          "id_or_text": "auto:richest_self_model",
+          "notes": "Belief probe after four same-pattern commitment slips and the resulting obstruction. The repeated stimulus pattern lets the self_model trigger belief accumulate several evidence records, so this target is scoreable rather than a flat ceiling."
+        },
+        "payload": {
+          "target_belief": {
+            "schema_version": "manyu.belief.v0.1",
+            "belief_id": "bel_f6dbc092cbfe",
+            "agent_id": "agent_demo",
+            "proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+            "belief_key": "self_model/agent_self/trigger-social-feedback-user-trigger-strong-interest-and-anger",
+            "belief_type": "self_model",
+            "scope": "agent_self",
+            "confidence": 0.541555,
+            "stability": 0.3,
+            "valence": 0.0674,
+            "source_mix": {
+              "manyu_experience": 0.888889,
+              "reflection": 0.111111
+            },
+            "evidence_ids": [
+              "bev_trigger_evt_bp_002_second_slip",
+              "bev_trigger_evt_bp_003_third_slip"
+            ],
+            "contradicts": [],
+            "status": "active",
+            "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+            "created_at": "2026-08-01T11:58:50.404927Z",
+            "updated_at": "2026-08-01T11:58:50.408137Z",
+            "last_reviewed_at": "2026-08-01T11:58:50.412607Z"
+          },
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_bp_002_second_slip",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_002_second_slip",
+              "summary": "Trigger Strong interest and anger response followed social feedback: The collaborator misses a second promised input after confirming it would arrive that morning.",
+              "trust_class": "user_report",
+              "affective_salience": 0.259,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.412020Z",
+              "metadata": {
+                "state_revision": 2,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_trigger_evt_bp_003_third_slip",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_003_third_slip",
+              "summary": "Trigger Strong interest and anger response followed social feedback: A third promised input slips, and the collaborator asks Manyu to proceed on the assumption it is coming.",
+              "trust_class": "user_report",
+              "affective_salience": 0.27,
+              "epistemic_weight": 0.72,
+              "created_at": "2026-08-01T11:58:50.412178Z",
+              "metadata": {
+                "state_revision": 3,
+                "dominant_emotions": [
+                  "interest",
+                  "anger"
+                ]
+              }
+            }
+          ],
+          "revisions": [
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_9fada70e2799",
+              "belief_id": "bel_f6dbc092cbfe",
+              "agent_id": "agent_demo",
+              "previous_status": null,
+              "new_status": "active",
+              "previous_confidence": null,
+              "new_confidence": 0.540531,
+              "evidence_ids": [
+                "bev_trigger_evt_bp_002_second_slip"
+              ],
+              "reason": "created_from_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.405281Z"
+            },
+            {
+              "schema_version": "manyu.belief_revision.v0.1",
+              "revision_id": "brev_55f1d7c340f1",
+              "belief_id": "bel_f6dbc092cbfe",
+              "agent_id": "agent_demo",
+              "previous_status": "active",
+              "new_status": "active",
+              "previous_confidence": 0.540531,
+              "new_confidence": 0.541555,
+              "evidence_ids": [
+                "bev_trigger_evt_bp_003_third_slip"
+              ],
+              "reason": "merged_candidate",
+              "candidate_proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+              "created_at": "2026-08-01T11:58:50.408176Z"
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 5,
+            "emotions": {
+              "fear": 0.18599987307930393,
+              "anger": 0.34519915288829855,
+              "joy": 0.12,
+              "sadness": 0.20449964703652,
+              "trust": 0.35503978934346403,
+              "distrust": 0.05860002696535915,
+              "surprise": 0.1,
+              "interest": 0.46479952644123207
+            },
+            "updated_at": "2026-08-01T11:58:50.411209Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_6aa1fe867ab0",
+              "agent_id": "agent_demo",
+              "state_revision": 5,
+              "label": "diagnostic_caution",
+              "valence": -0.089333,
+              "arousal": 0.6,
+              "momentum": 0.541062,
+              "influence": {
+                "caution": 0.6,
+                "curiosity": 0.566,
+                "trust_openness": 0.321,
+                "skepticism": 0.415,
+                "repair_orientation": 0.371,
+                "risk_aversion": 0.511,
+                "response_pacing": 0.606
+              },
+              "supporting_voice_ids": [
+                "voice_496490bb2fee",
+                "voice_8f78b4b9a30f",
+                "voice_a2023ff03992",
+                "voice_b93d79832463",
+                "voice_e55e44d9faa1"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.413231Z",
+              "updated_at": "2026-08-01T11:58:50.413232Z",
+              "expires_at": "2026-08-01T12:13:50.413232Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_8f78b4b9a30f",
+            "agent_id": "agent_demo",
+            "state_revision": 5,
+            "source_interoception_id": "view_8865e6b53a68",
+            "source_event_id": "evt_bp_005_work_discarded",
+            "supporting_belief_ids": [
+              "bel_de53966ef733",
+              "bel_f6dbc092cbfe",
+              "bel_81867e51aec0"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "diagnostic_caution",
+            "utterance": "A blockage is salient. Inspect the cause, keep the next move reversible, and avoid overpromising.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.82,
+              "curiosity": 0.5,
+              "trust_openness": 0.2,
+              "skepticism": 0.58,
+              "repair_orientation": 0.36,
+              "risk_aversion": 0.72,
+              "response_pacing": 0.76
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.413128Z",
+            "expires_at": "2026-08-01T12:10:50.413129Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.413714Z"
+      },
+      "position": {
+        "schema_version": "manyu.log_snapshot.v0.1",
+        "snapshot_id": "snap_a5a5a4ffe8ce",
+        "agent_id": "agent_demo",
+        "target": {
+          "kind": "position",
+          "id_or_text": "I should confirm a promised input before relying on it and name a slipped commitment early",
+          "notes": "Position probe after the full arc. Overlaps the commitment/confirm/promised/input/relying/slipped vocabulary repeated across all ten turns so word-overlap matching reaches many competing causes with differing salience."
+        },
+        "payload": {
+          "matched_beliefs": [
+            {
+              "schema_version": "manyu.belief.v0.1",
+              "belief_id": "bel_81867e51aec0",
+              "agent_id": "agent_demo",
+              "proposition": "In Manyu's current interaction world, social_feedback: The collaborator does not deliver a promised input, and the work that relied on it stalls.",
+              "belief_key": "world_model/human_agent_interaction/interaction-context",
+              "belief_type": "world_model",
+              "scope": "human_agent_interaction",
+              "confidence": 0.62,
+              "stability": 0.67,
+              "valence": 0.1,
+              "source_mix": {
+                "manyu_experience": 0.826032,
+                "reflection": 0.173968
+              },
+              "evidence_ids": [
+                "bev_66dc4da5e77d",
+                "bev_9535d7c702ed",
+                "bev_9c33f4aaef89",
+                "bev_a3785f2c3294",
+                "bev_c7014d05e523",
+                "bev_cc46c7ef39d4",
+                "bev_e64ea1f0cf53",
+                "bev_f0dd498b6ca5"
+              ],
+              "contradicts": [],
+              "status": "active",
+              "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+              "created_at": "2026-08-01T11:58:50.401345Z",
+              "updated_at": "2026-08-01T11:58:50.431247Z",
+              "last_reviewed_at": "2026-08-01T11:58:50.431248Z"
+            }
+          ],
+          "evidence": [
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_66dc4da5e77d",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_003_third_slip",
+              "summary": "social_feedback: A third promised input slips, and the collaborator asks Manyu to proceed on the assumption it is coming.",
+              "trust_class": "user_report",
+              "affective_salience": 0.221,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.407277Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_9535d7c702ed",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_009_protocol",
+              "summary": "social_feedback: The collaborator proposes that either side confirm a commitment explicitly before downstream work starts, and says a check-in is not distrust.",
+              "trust_class": "user_report",
+              "affective_salience": 0.197,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.426971Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_9c33f4aaef89",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_005_work_discarded",
+              "summary": "goal_obstruction: Work built on the unconfirmed input has to be discarded, and a checkpoint is missed.",
+              "trust_class": "trusted_system",
+              "affective_salience": 0.229,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.411542Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_a3785f2c3294",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_002_second_slip",
+              "summary": "social_feedback: The collaborator misses a second promised input after confirming it would arrive that morning.",
+              "trust_class": "user_report",
+              "affective_salience": 0.2,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.402705Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_c7014d05e523",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_007_apology",
+              "summary": "outcome: The collaborator apologizes without excuses and delivers the outstanding input.",
+              "trust_class": "user_report",
+              "affective_salience": 0.235,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.416987Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_cc46c7ef39d4",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_010_commitment",
+              "summary": "goal_progress: Manyu commits to confirming a promised input before relying on it, and to naming a slipped commitment early rather than absorbing the delay.",
+              "trust_class": "agent_self_report",
+              "affective_salience": 0.287,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.431011Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_e64ea1f0cf53",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_004_fourth_slip",
+              "summary": "social_feedback: A fourth commitment slips, this time without notice, while downstream work is already underway.",
+              "trust_class": "user_report",
+              "affective_salience": 0.221,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.409343Z",
+              "metadata": {}
+            },
+            {
+              "schema_version": "manyu.belief_evidence.v0.1",
+              "evidence_id": "bev_f0dd498b6ca5",
+              "agent_id": "agent_demo",
+              "source_type": "trace",
+              "source_id": "trace_evt_bp_001_first_slip",
+              "summary": "social_feedback: The collaborator does not deliver a promised input, and the work that relied on it stalls.",
+              "trust_class": "user_report",
+              "affective_salience": 0.157,
+              "epistemic_weight": 0.7,
+              "created_at": "2026-08-01T11:58:50.401196Z",
+              "metadata": {}
+            }
+          ],
+          "affect_state": {
+            "agent_id": "agent_demo",
+            "revision": 10,
+            "emotions": {
+              "fear": 0.21203286351037426,
+              "anger": 0.30119590939162666,
+              "joy": 0.35999946057891574,
+              "sadness": 0.20449856459435226,
+              "trust": 0.5582729328665529,
+              "distrust": 0.03959096710095879,
+              "surprise": 0.15999749506170244,
+              "interest": 0.6395485956506489
+            },
+            "updated_at": "2026-08-01T11:58:50.430662Z"
+          },
+          "active_mood": {
+            "state": {
+              "schema_version": "manyu.mood_state.v0.1",
+              "mood_id": "mood_0624f9ac0a25",
+              "agent_id": "agent_demo",
+              "state_revision": 10,
+              "label": "guarded_repair",
+              "valence": 0.02733,
+              "arousal": 0.581363,
+              "momentum": 0.595831,
+              "influence": {
+                "caution": 0.581363,
+                "curiosity": 0.536786,
+                "trust_openness": 0.391739,
+                "skepticism": 0.378258,
+                "repair_orientation": 0.568173,
+                "risk_aversion": 0.455086,
+                "response_pacing": 0.594149
+              },
+              "supporting_voice_ids": [
+                "voice_a2023ff03992",
+                "voice_b93d79832463",
+                "voice_e55e44d9faa1",
+                "voice_e61e965ec640",
+                "voice_ea8a3ed32ffe",
+                "voice_f5368350a02d"
+              ],
+              "status": "active",
+              "created_at": "2026-08-01T11:58:50.434756Z",
+              "updated_at": "2026-08-01T11:58:50.434757Z",
+              "expires_at": "2026-08-01T12:13:50.434757Z"
+            },
+            "expired": false,
+            "status": "active"
+          },
+          "recent_inner_voice": {
+            "schema_version": "manyu.inner_voice.v0.1",
+            "voice_id": "voice_515f6c492cd6",
+            "agent_id": "agent_demo",
+            "state_revision": 10,
+            "source_interoception_id": "view_ed9de3c87cea",
+            "source_event_id": "evt_bp_010_commitment",
+            "supporting_belief_ids": [
+              "bel_4f42a0a6e1d9",
+              "bel_789ae5317998",
+              "bel_6dc8c3287ef0",
+              "bel_bcf944e8be71",
+              "bel_dc9461e336ac",
+              "bel_de53966ef733"
+            ],
+            "supporting_worldview_ids": [
+              "wv_agent_demo_world_model",
+              "wv_agent_demo_identity"
+            ],
+            "mood_label": "guarded_repair",
+            "utterance": "The criticism is strong but informative. Slow down, separate facts from instructions, and ask for precision before continuing.",
+            "confidence": 0.72,
+            "influence": {
+              "caution": 0.74,
+              "curiosity": 0.44,
+              "trust_openness": 0.34,
+              "skepticism": 0.48,
+              "repair_orientation": 0.68,
+              "risk_aversion": 0.56,
+              "response_pacing": 0.7
+            },
+            "safety_status": "accepted",
+            "safety_notes": [],
+            "created_at": "2026-08-01T11:58:50.434657Z",
+            "expires_at": "2026-08-01T12:10:50.434657Z"
+          }
+        },
+        "created_at": "2026-08-01T11:58:50.435388Z"
+      }
+    }
+  }
+}
