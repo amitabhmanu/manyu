@@ -344,6 +344,39 @@ would have made merged win by definition. The generalisation criterion can
 fail, and does: the `control` condition's carriers name specific checks, and
 under this rule those are not M-c.
 
+### 4.7 Defect, 2026-08-09: the `0.5 x split` clause was unsatisfiable
+
+Also found in the pilot, and a defect rather than an amendment — the rule as
+written could not be satisfied by any merged result, which is not what §8.1
+intended.
+
+**Split's D2 channel is deterministic.** `AffectState.emotions["fear"]` is
+written by `FastAppraiser` from `event_type` deltas and never reads a belief,
+and with the inner voice off (§4.4) there is no mood to vary it either. The
+pilot returned `0.560827` on the uncertainty stream under the offline scenario
+provider *and* under live Haiku — identical to six decimal places, from two
+different providers. Split's arm has no variance to sample.
+
+Zero pooled SD with differing means makes Cohen's *d* infinite, so §8.1's
+"merged wins if its *d* ≥ 0.5 × split's *d*" evaluates to `merged_d >= inf`,
+which is false for every possible merged result. Merged could not have won
+whatever it did — the same shape as experiment 3's `ContradictionArm`, a branch
+that was consulted and could only answer one way.
+
+**Fix:** when split's *d* is undefined the ratio clause is marked
+`inapplicable` and the remaining conditions — M-c dominant, positive control
+passing, merged's own bootstrap CI excluding zero — carry the decision. The
+clause is never silently treated as failed, and any verdict reached this way
+carries `ratio_clause: "inapplicable"` in the record so no reader mistakes it
+for a rule that was applied and passed. Pinned by
+`test_an_infinite_split_d_does_not_make_the_rule_unsatisfiable`, with a second
+test confirming the waiver does not extend to the other conditions.
+
+**This is also a D2 finding in its own right** and belongs in `results.md`
+regardless of the verdict: split's affect on this discriminator is invariant to
+whether a carrier arises, because the architecture gives it no path to read
+one. It is the asymmetry D2 was built to expose, visible before the scored run.
+
 ## 5. What voids a run
 
 - Any §1 constant changed after that arm started.

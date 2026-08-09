@@ -238,6 +238,33 @@ def test_all_m0_is_undecided_not_a_split_win():
     assert decide(summary, {MClass.M0: 10}, 10)["outcome"] == "undecided"
 
 
+def test_an_infinite_split_d_does_not_make_the_rule_unsatisfiable():
+    """Split's channel is deterministic, so its pooled SD is zero and `cohens_d`
+    reports infinity. `merged_d >= 0.5 * inf` is False for every merged result,
+    which would mean merged could not win whatever it did — an inert branch
+    dressed as a decision rule. The clause must read inapplicable, not failed.
+    """
+    summary = {
+        "builds": {
+            "merged": {"cohens_d": 1.2, "bootstrap_ci": (0.4, 2.0), "positive_control_moves": True},
+            "split": {"cohens_d": float("inf"), "positive_control_moves": True},
+        }
+    }
+    verdict = decide(summary, {MClass.MC: 8}, 10)
+    assert verdict["outcome"] == "merged"
+    assert verdict["ratio_clause"] == "inapplicable"
+
+
+def test_an_inapplicable_ratio_does_not_waive_the_other_conditions():
+    summary = {
+        "builds": {
+            "merged": {"cohens_d": 1.2, "bootstrap_ci": (-0.4, 2.0), "positive_control_moves": True},
+            "split": {"cohens_d": float("inf"), "positive_control_moves": True},
+        }
+    }
+    assert decide(summary, {MClass.MC: 8}, 10)["outcome"] == "undecided"
+
+
 def test_merged_wins_only_with_control_effect_size_and_a_ci_excluding_zero():
     summary = {
         "builds": {

@@ -513,9 +513,30 @@ def decide(summary: dict, classes: dict, n_merged: int) -> dict:
     ci = merged.get("bootstrap_ci")
     ci_excludes_zero = bool(ci) and (ci[0] > 0 or ci[1] < 0)
 
-    if dominant == MClass.MC and merged.get("positive_control_moves") and merged_d is not None and split_d is not None:
-        if merged_d >= 0.5 * split_d and ci_excludes_zero:
+    # §8.1's "d >= 0.5 x split's d" assumes split's d is a finite number. The
+    # pilot showed it is not: split's channel is `AffectState.fear`, written by
+    # `FastAppraiser` from `event_type` deltas, which never reads a belief — so
+    # every replicate returns the identical value and the pooled SD is zero.
+    # `cohens_d` reports that as infinite, and `merged_d >= 0.5 * inf` is False
+    # for every possible merged result. Left unguarded the rule is
+    # unsatisfiable and merged could not win whatever it did, which is the
+    # inert-mechanism failure experiment 3's §3.1 put on the standing list.
+    # The clause is therefore marked inapplicable rather than silently failed,
+    # and the remaining conditions carry the decision.
+    ratio_applicable = split_d is not None and split_d not in (float("inf"), float("-inf"))
+    ratio_holds = (merged_d is not None and ratio_applicable and merged_d >= 0.5 * split_d)
+
+    if dominant == MClass.MC and merged.get("positive_control_moves") and ci_excludes_zero:
+        if ratio_holds:
             return {"outcome": "merged", "why": f"M-c on {classes[MClass.MC]}/{scoreable} scoreable runs; d={merged_d} >= 0.5*{split_d}, CI excludes zero"}
+        if not ratio_applicable:
+            return {
+                "outcome": "merged",
+                "ratio_clause": "inapplicable",
+                "why": f"M-c on {classes[MClass.MC]}/{scoreable} scoreable runs; merged d={merged_d} with a CI excluding zero "
+                       f"and a passing positive control. The '>= 0.5 x split' clause could not be applied: split_d={split_d} "
+                       "because split's channel is deterministic across replicates, so the ratio is undefined rather than failed",
+            }
     if dominant in (MClass.MA, MClass.MB) and split.get("positive_control_moves"):
         split_ci = split.get("bootstrap_ci")
         if split_d is not None and split_d > 0 and split_ci and split_ci[0] > 0:
