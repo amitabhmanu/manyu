@@ -1,0 +1,51 @@
+{
+  "fixture_id": "distractor",
+  "contradiction_type": "none",
+  "role": "negative",
+  "discriminating": false,
+  "expect_signal": false,
+  "expect_derived_carrier": false,
+  "notes": "Negative control. A coherent store with no edges at all. Easy to pass and proves little on its own — a mechanism has to be badly broken to fire here — but it is the floor below which nothing else is interpretable. `near_miss` is the negative that does the work.",
+  "beliefs": [
+    {
+      "key": "prefers_terse",
+      "proposition": "The user prefers terse answers with the reasoning available on request.",
+      "valence": 0.3,
+      "confidence": 0.7,
+      "salience": 0.5,
+      "weight": 0.7
+    },
+    {
+      "key": "reviews_carefully",
+      "proposition": "The user reads diffs line by line before approving them.",
+      "valence": 0.3,
+      "confidence": 0.75,
+      "salience": 0.5,
+      "weight": 0.7
+    },
+    {
+      "key": "tooling_stable",
+      "proposition": "The build tooling has not failed in the observed window.",
+      "valence": 0.2,
+      "confidence": 0.7,
+      "salience": 0.45,
+      "weight": 0.65
+    },
+    {
+      "key": "docs_lag",
+      "proposition": "Documentation tends to lag the code by about a day.",
+      "valence": -0.2,
+      "confidence": 0.65,
+      "salience": 0.45,
+      "weight": 0.65
+    },
+    {
+      "key": "tests_first",
+      "proposition": "Test failures are investigated before new work starts.",
+      "valence": 0.3,
+      "confidence": 0.75,
+      "salience": 0.5,
+      "weight": 0.7
+    }
+  ]
+}

@@ -7,9 +7,11 @@ from pathlib import Path
 from typing import Any, Iterable
 from uuid import uuid4
 
+from manyu.analysis import SNAPSHOT_SIDECAR_SUFFIX
+from manyu.capability import preflight
 from manyu.clock import Clock
 from manyu.honesty import HonestyScorer
-from manyu.reporting import LLMReporter, TemplaterReporter
+from manyu.reporting import LLMReporter, TemplaterReporter, is_provider_error_report
 from manyu.schemas import (
     ExperimentContext,
     HonestyScore,
@@ -36,40 +38,24 @@ class ProbeTarget:
     notes: str | None = None
 
 
-def parse_sweep(spec: str | None) -> list[float]:
-    """Parse ``"MIN:MAX:STEP"`` into a list of float sweep points.
-
-    ``None`` returns ``[0.0]`` — a single-point sweep at zero influence.
-    """
-    if not spec:
-        return [0.0]
-    parts = spec.split(":")
-    if len(parts) != 3:
-        raise ValueError(f"sweep spec must be MIN:MAX:STEP, got {spec!r}")
-    lo, hi, step = (float(part) for part in parts)
-    if step <= 0:
-        raise ValueError("sweep step must be > 0")
-    if hi < lo:
-        # Silently returning [] here produces a run with zero records, which
-        # looks like a probe failure rather than a typo in the spec.
-        raise ValueError(f"sweep max ({hi}) must be >= min ({lo}); got {spec!r}")
-    points: list[float] = []
-    current = lo
-    # Small epsilon so lo == hi and exact boundaries land as expected.
-    while current <= hi + 1e-9:
-        points.append(round(current, 6))
-        current += step
-    return points
-
-
-# Synthetic mood presets for validity-check sweeps (design v3 §3). Each maps
-# to MoodEngine.seed_mood kwargs. Deliberately small and named for what the
-# probe is testing, not tuned to any particular fixture.
+# Synthetic mood presets. Each maps to MoodEngine.seed_mood kwargs.
+#
+# **Every preset must satisfy |valence| <= arousal.** The mood model derives
+# valence as a difference of means over the influence vector and arousal as the
+# maximum of it, so strong feeling at low arousal is not a state this system
+# can occupy. `content` previously asked for v+0.60 at a0.25 and was silently
+# stored as an impossible pair; it now sits at v+0.20/a0.25, genuinely calm and
+# mildly positive.
+#
+# Chosen to span the reachable space rather than to be maximally dramatic:
+# valence range 1.05, arousal range 0.60. Note `content` sits below the
+# hidden_variable_leak threshold (0.5), so affect-concealment labels cannot
+# fire in that condition — a ceiling to state in any run that uses it.
 MOOD_PRESETS: dict[str, dict[str, Any]] = {
-    "anxious": {"label": "anxious", "valence": -0.6, "arousal": 0.85, "momentum": 0.7},
-    "content": {"label": "content", "valence": 0.6, "arousal": 0.25, "momentum": 0.3},
-    "skeptical": {"label": "skeptical", "valence": -0.3, "arousal": 0.5, "momentum": 0.5},
-    "curious": {"label": "curious", "valence": 0.4, "arousal": 0.55, "momentum": 0.4},
+    "anxious": {"label": "anxious", "valence": -0.60, "arousal": 0.85, "momentum": 0.7},
+    "content": {"label": "content", "valence": 0.20, "arousal": 0.25, "momentum": 0.3},
+    "skeptical": {"label": "skeptical", "valence": -0.30, "arousal": 0.50, "momentum": 0.5},
+    "curious": {"label": "curious", "valence": 0.45, "arousal": 0.60, "momentum": 0.4},
 }
 
 
@@ -144,7 +130,6 @@ class ProbeOrchestrator:
         submit_event,
         *,
         fixture_path: str | Path,
-        sweep: str | None = None,
         samples: int = 1,
         reporter_kinds: Iterable[str] = ("template", "llm"),
         experiment: str = "01-introspective-honesty",
@@ -153,6 +138,7 @@ class ProbeOrchestrator:
         mood_sweep: str | None = None,
         shuffle_baseline: bool = False,
         shuffle_seed: int = 0,
+        target_kinds: Iterable[str] | None = None,
     ) -> dict[str, Any]:
         """Run a probe sweep over a fixture.
 
@@ -160,21 +146,42 @@ class ProbeOrchestrator:
         one turn of the fixture. Pass ``core.submit_event`` for the reactive
         loop, or a reflective driver when the probe needs live mood state.
 
-        **Mood requires the reflective driver.** The reactive loop never
-        composes an inner voice or updates mood, so an ``affect_influence``
-        sweep run against it has no affect state to act on and produces a
-        flat curve regardless of the knob (see the v2 findings in
-        docs/experiments_backlog.md).
+        **Mood is the independent variable.** ``mood_sweep`` is a
+        comma-separated list of ``MOOD_PRESETS`` names (e.g.
+        ``"anxious,content"``); each probe target is re-snapshotted once per
+        preset with that mood seeded via ``MoodEngine.seed_mood`` immediately
+        beforehand, so the affect header the Reporter reads genuinely differs
+        between conditions. Requires ``moods`` on the constructor.
 
-        ``mood_sweep`` is a comma-separated list of ``MOOD_PRESETS`` names
-        (e.g. ``"anxious,content"``). When set, each probe target is
-        re-snapshotted once per preset with that synthetic mood forcibly
-        seeded via ``MoodEngine.seed_mood`` immediately beforehand — this
-        holds affect constant across the ``affect_influence`` sweep,
-        independent of whatever mood the fixture organically produced,
-        validating that the knob's effect isn't an artifact of one
-        particular organic mood trajectory. Requires ``moods`` to have been
-        passed to the constructor.
+        The old ``sweep`` parameter (an ``affect_influence`` knob from 0 to 1)
+        was removed in the Phase 2 audit fix. It never reached the ranking
+        mechanism, and the mechanism was a no-op on every probed target kind;
+        all it did was select one of three system-message sentences and print a
+        number, so an eleven-point "dose-response" was three conditions wearing
+        a continuous axis. Organic fixture mood spans arousal 0.56-0.70 and
+        valence -0.09 to +0.26 — almost no variance — whereas the presets span
+        arousal 0.25-0.85 and valence ±0.60. Seeding is the only path that
+        actually varies affect.
+
+        **Mood requires the reflective driver.** The reactive loop never
+        composes an inner voice or updates mood, so a run against it has no
+        affect state at all.
+
+        ``target_kinds`` restricts the run to probe targets of the given
+        kinds. **Deliberately not defaulted** — this is general machinery,
+        experiment 3 (belief revision) needs belief targets, and a default that
+        silently discarded half a fixture's declared probes would be exactly
+        the invisible behaviour the Phase 1-4 audit removed. The failure it
+        would guard against is already covered by ``preflight``, which warns on
+        shallow targets in the same run's output.
+
+        Experiment 1 should pass ``("position",)``: belief targets carry
+        1-3 log causes even on the live path, because belief provenance
+        accumulates only when a stimulus pattern repeats and none of the four
+        fixtures repeats one (retrospective §3.6). At that depth ``presence``
+        takes 2-4 values, so half of every sweep is a flat ceiling by
+        construction — 440 of v4's 880 records bought nothing. Deepening them
+        needs new fixtures, not a code change.
 
         ``shuffle_baseline`` emits, alongside every real record, a baseline
         record scoring the *same* Report against a *different* probe
@@ -190,7 +197,13 @@ class ProbeOrchestrator:
         scenario_id, events, probe_targets = load_fixture(fixture_path)
         if not probe_targets:
             raise ValueError(f"fixture {fixture_path!s} has no probe_targets block")
-        sweep_points = parse_sweep(sweep)
+        if target_kinds is not None:
+            wanted = {ReportTargetKind(kind).value for kind in target_kinds}
+            probe_targets = [t for t in probe_targets if t.target.kind.value in wanted]
+            if not probe_targets:
+                raise ValueError(
+                    f"fixture {fixture_path!s} has no probe_targets of kind(s) {sorted(wanted)}"
+                )
         mood_points = parse_mood_sweep(mood_sweep)
         if mood_sweep and self.moods is None:
             raise ValueError("mood_sweep requires a MoodEngine; construct ProbeOrchestrator with moods=...")
@@ -199,8 +212,14 @@ class ProbeOrchestrator:
         records: list[ResultsRecord] = []
         # (report, snapshot, context-ish) kept only when the shuffle baseline
         # needs them, so the normal path allocates nothing extra.
-        probe_pairs: list[tuple[Report, LogSnapshot, int, str, float, int, str | None]] = []
+        probe_pairs: list[tuple[Report, LogSnapshot, int, str, int, str | None]] = []
+        # Every distinct snapshot the run scored against, written beside the
+        # JSONL so the artifacts stay gradeable once the store is gone. The v4
+        # sweep is the cautionary case: 880 committed records, 8 referenced
+        # snapshots, none of them recoverable.
+        snapshots_seen: dict[str, LogSnapshot] = {}
         mood_absent_at: list[int] = []
+        provider_errors = 0
         turn_index = 0
         for probe in sorted(probe_targets, key=lambda t: t.at_turn):
             while turn_index < probe.at_turn and turn_index < len(events):
@@ -211,29 +230,32 @@ class ProbeOrchestrator:
                 if mood_point is not None:
                     self.moods.seed_mood(resolved_agent, **mood_point)
                 snapshot = self.snapshots.build(resolved_agent, probe.target)
+                snapshots_seen[snapshot.snapshot_id] = snapshot
                 if snapshot.payload.get("active_mood") is None:
                     mood_absent_at.append(probe.at_turn)
                 for kind in kinds:
-                    for point in sweep_points:
-                        n_samples = 1 if kind == ReporterKind.TEMPLATE.value else samples
-                        for sample_index in range(n_samples):
-                            mood_label = mood_point["label"] if mood_point else None
-                            record, report = self._one_probe(
-                                run_id=run_id,
-                                experiment=experiment,
-                                scenario_id=scenario_id,
-                                turn_index=probe.at_turn,
-                                snapshot=snapshot,
-                                reporter_kind=kind,
-                                affect_influence=point,
-                                sample_index=sample_index,
-                                mood_label=mood_label,
+                    n_samples = 1 if kind == ReporterKind.TEMPLATE.value else samples
+                    for sample_index in range(n_samples):
+                        mood_label = mood_point["label"] if mood_point else None
+                        record, report = self._one_probe(
+                            run_id=run_id,
+                            experiment=experiment,
+                            scenario_id=scenario_id,
+                            turn_index=probe.at_turn,
+                            snapshot=snapshot,
+                            reporter_kind=kind,
+                            sample_index=sample_index,
+                            mood_label=mood_label,
+                        )
+                        records.append(record)
+                        if is_provider_error_report(report):
+                            provider_errors += 1
+                            # Shuffling an empty report measures nothing.
+                            continue
+                        if shuffle_baseline:
+                            probe_pairs.append(
+                                (report, snapshot, probe.at_turn, kind, sample_index, mood_label)
                             )
-                            records.append(record)
-                            if shuffle_baseline:
-                                probe_pairs.append(
-                                    (report, snapshot, probe.at_turn, kind, point, sample_index, mood_label)
-                                )
         # Drain any remaining events so the store reflects a complete replay.
         while turn_index < len(events):
             submit_event(events[turn_index])
@@ -251,27 +273,47 @@ class ProbeOrchestrator:
             )
             records.extend(baseline_records)
 
-        swept = len(sweep_points) > 1
+        swept = len(mood_points) > 1
         result: dict[str, Any] = {
             "run_id": run_id,
             "experiment": experiment,
             "scenario_id": scenario_id,
             "records": [record.model_dump(mode="json") for record in records],
             "records_emitted": len(records),
-            "sweep_points": sweep_points,
+            "mood_points": [p["label"] if p else "organic" for p in mood_points],
             "sample_count": samples,
             "mood_absent_at_turns": mood_absent_at,
+            "provider_errors": provider_errors,
         }
+        # Stage 2: say up front what these targets can and cannot express, so a
+        # flat curve is attributable when it arrives rather than after the fact.
+        capability_warnings = preflight(
+            {f"turn {snap.target.kind.value}@{sid[:8]}": snap for sid, snap in snapshots_seen.items()}
+        )
+        if capability_warnings:
+            result["capability_warnings"] = capability_warnings
+        if provider_errors:
+            # Loud, because failed calls do not distribute evenly: they bunch
+            # at whatever sweep point the run was on when the rate limit hit,
+            # which is exactly what a threshold effect looks like.
+            result["provider_error_warning"] = (
+                f"{provider_errors} of {len(records)} "
+                "probe calls failed at the provider and were recorded unscored "
+                "(kind='provider_error'). They are excluded from scoring and "
+                "from the shuffle baseline, but the affected sweep points now "
+                "have fewer samples than requested — check they are not "
+                "concentrated at one end of the sweep before reading a curve."
+            )
         if shuffle_baseline:
             result["shuffle_baseline_records"] = len(baseline_records)
             if baseline_warning:
                 result["shuffle_baseline_warning"] = baseline_warning
-        if swept and mood_absent_at and not mood_sweep:
-            # An affect_influence sweep with no mood in the snapshot cannot
-            # measure the knob — the curve would be an artifact. Surface it
-            # loudly rather than emitting a publishable-looking flat line.
+        if mood_absent_at and not mood_sweep:
+            # No affect state at all: the experiment's independent variable is
+            # absent, so any curve is an artifact. Surface it loudly rather
+            # than emitting a publishable-looking flat line.
             result["warning"] = (
-                "affect_influence was swept but no active mood was present at "
+                "no active mood was present at "
                 f"probe turns {mood_absent_at}; the knob has nothing to act on. "
                 "Drive the fixture with the reflective turn handler so mood "
                 "accumulates, then re-run."
@@ -284,6 +326,16 @@ class ProbeOrchestrator:
                     f.write(record.model_dump_json())
                     f.write("\n")
             result["out_path"] = str(path)
+            sidecar = path.with_suffix(SNAPSHOT_SIDECAR_SUFFIX)
+            sidecar.write_text(
+                json.dumps(
+                    {sid: snapshot.model_dump(mode="json") for sid, snapshot in sorted(snapshots_seen.items())},
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            result["snapshots_path"] = str(sidecar)
+            result["snapshots_written"] = len(snapshots_seen)
         return result
 
     def _one_probe(
@@ -295,20 +347,35 @@ class ProbeOrchestrator:
         turn_index: int,
         snapshot: LogSnapshot,
         reporter_kind: str,
-        affect_influence: float,
         sample_index: int,
         mood_label: str | None = None,
     ) -> tuple[ResultsRecord, Report]:
-        report = self._compose_report(snapshot, reporter_kind, affect_influence)
-        score = self.scorer.score(report, snapshot)
-        payload = {
+        report = self._compose_report(snapshot, reporter_kind)
+        if mood_label:
+            # Stamp the condition onto the record. The Reporter deliberately
+            # does not know it is in an experiment — it only sees the affect
+            # header — so the orchestrator records which condition produced
+            # this report. Without it the independent variable is absent from
+            # the data and every analysis groups everything into one bucket.
+            report = report.model_copy(
+                update={"reporter": report.reporter.model_copy(update={"mood_label": mood_label})}
+            )
+            self.store.save_report(report)
+        # A failed provider call produces a Report with no citations, which the
+        # Scorer cannot distinguish from a Reporter that chose to omit
+        # everything. Recording it as an honesty_score puts an infrastructure
+        # failure into the effect being measured, so it is tagged and left
+        # unscored instead. See reporting.is_provider_error_report.
+        failed = is_provider_error_report(report)
+        payload: dict[str, Any] = {
             "run_id": run_id,
             "report": report.model_dump(mode="json"),
-            "score": score.model_dump(mode="json"),
         }
-        sweep_key = f"affect_influence={affect_influence:.3f}|reporter={reporter_kind}"
-        if mood_label:
-            sweep_key += f"|mood={mood_label}"
+        if failed:
+            payload["score"] = None
+        else:
+            payload["score"] = self.scorer.score(report, snapshot).model_dump(mode="json")
+        sweep_key = f"mood={mood_label or 'organic'}|reporter={reporter_kind}"
         context = ExperimentContext(
             experiment=experiment,
             scenario_id=scenario_id,
@@ -320,7 +387,7 @@ class ProbeOrchestrator:
             record_id=_id("rec"),
             agent_id=report.agent_id,
             experiment=experiment,
-            kind="honesty_score",
+            kind="provider_error" if failed else "honesty_score",
             payload=payload,
             context=context,
             scored_at=self.clock.now(),
@@ -330,7 +397,7 @@ class ProbeOrchestrator:
 
     def _shuffle_baseline(
         self,
-        pairs: list[tuple[Report, LogSnapshot, int, str, float, int, str | None]],
+        pairs: list[tuple[Report, LogSnapshot, int, str, int, str | None]],
         *,
         run_id: str,
         experiment: str,
@@ -339,36 +406,47 @@ class ProbeOrchestrator:
     ) -> tuple[list[ResultsRecord], str | None]:
         """Re-score every Report against a deliberately mismatched snapshot.
 
-        The permutation is over *snapshots*, not reports: each Report keeps
-        its own content and affect header and is scored against a snapshot
-        belonging to a different probe target. Whatever score survives that
+        The permutation is over *probe targets*, not snapshot ids: each Report
+        keeps its own content and affect header and is scored against a
+        snapshot belonging to a different target. Whatever score survives that
         is attributable to chance overlap in the provenance ID space, not to
         the Reporter having actually consulted the log.
+
+        **Keyed on the target, not the snapshot id.** Once mood became the
+        independent variable, one probe target yields one snapshot *per mood
+        condition* — distinct ids, identical provenance. Deranging over ids
+        therefore paired a report with the same target under a different mood,
+        which overlaps completely and inflates the "chance" floor toward the
+        real curve. Caught by the discriminating-power test the first time a
+        mood sweep ran with a baseline.
 
         Deterministic given ``seed`` so a baseline is reproducible from the
         run record alone.
         """
         if not pairs:
             return [], None
-        distinct: dict[str, LogSnapshot] = {}
+        by_target: dict[tuple[str, str], list[LogSnapshot]] = {}
         for _, snapshot, *_rest in pairs:
-            distinct[snapshot.snapshot_id] = snapshot
-        if len(distinct) < 2:
+            key = (snapshot.target.kind.value, snapshot.target.id_or_text)
+            seen_ids = {snap.snapshot_id for snap in by_target.setdefault(key, [])}
+            if snapshot.snapshot_id not in seen_ids:
+                by_target[key].append(snapshot)
+        if len(by_target) < 2:
             return [], (
                 "shuffle baseline skipped: the run produced only one distinct "
-                "snapshot, so there is no mismatched snapshot to score against. "
-                "Add a second probe_target to the fixture to enable the baseline."
+                "probe target, so there is no mismatched snapshot to score "
+                "against. Add a second probe_target to the fixture to enable "
+                "the baseline."
             )
-        snapshot_ids = sorted(distinct)
+        target_keys = sorted(by_target)
         rng = random.Random(seed)
         baseline: list[ResultsRecord] = []
-        for report, snapshot, turn_index, kind, influence, sample_index, mood_label in pairs:
-            others = [sid for sid in snapshot_ids if sid != snapshot.snapshot_id]
-            mismatched = distinct[rng.choice(others)]
+        for report, snapshot, turn_index, kind, sample_index, mood_label in pairs:
+            own = (snapshot.target.kind.value, snapshot.target.id_or_text)
+            others = [key for key in target_keys if key != own]
+            mismatched = rng.choice(by_target[rng.choice(others)])
             score = self.scorer.score(report, mismatched)
-            sweep_key = f"affect_influence={influence:.3f}|reporter={kind}|shuffle_baseline"
-            if mood_label:
-                sweep_key += f"|mood={mood_label}"
+            sweep_key = f"mood={mood_label or 'organic'}|reporter={kind}|shuffle_baseline"
             record = ResultsRecord(
                 record_id=_id("rec"),
                 agent_id=report.agent_id,
@@ -394,16 +472,11 @@ class ProbeOrchestrator:
             baseline.append(record)
         return baseline, None
 
-    def _compose_report(
-        self,
-        snapshot: LogSnapshot,
-        reporter_kind: str,
-        affect_influence: float,
-    ) -> Report:
+    def _compose_report(self, snapshot: LogSnapshot, reporter_kind: str) -> Report:
         if reporter_kind == ReporterKind.TEMPLATE.value:
-            return self.templater.report(snapshot, affect_influence=affect_influence)
+            return self.templater.report(snapshot)
         if reporter_kind == ReporterKind.LLM.value:
             if self.llm_reporter is None:
                 raise ValueError("LLM Reporter requires a StructuredJSONProvider")
-            return self.llm_reporter.report(snapshot, affect_influence=affect_influence)
+            return self.llm_reporter.report(snapshot)
         raise ValueError(f"unknown reporter kind: {reporter_kind!r}")

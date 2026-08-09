@@ -3,3 +3,10 @@ __pycache__/
 .pytest_cache/
 *.pyc
 render_*/
+
+# Separate project living in this working tree; has its own repo hygiene.
+brain-api/
+
+# Presentation sources and Office lock files.
+*.pptx
+~$*

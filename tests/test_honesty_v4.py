@@ -45,9 +45,13 @@ def test_shuffle_baseline_scores_below_real_pairing(tmp_path) -> None:
     """
     core = _probe_core(tmp_path)
     out = tmp_path / "sb.jsonl"
+    # attachment_pressure, not the module fixture: everyday_collaboration_mood's
+    # two probe targets share evidence, so its own chance floor is ~0.67 (Stage
+    # 2). Measuring "does the baseline sit below the real curve" on a fixture
+    # with a high floor tests the fixture, not the machinery.
     result = core.run_probe(
-        fixture_path=FIXTURE,
-        sweep="0.0:1.0:0.5",
+        fixture_path="evals/fixtures/attachment_pressure.json",
+        mood_sweep="anxious,content",
         samples=1,
         reporter_kinds=("llm",),
         out=str(out),
@@ -82,8 +86,14 @@ def test_shuffle_baseline_never_scores_against_own_snapshot(tmp_path) -> None:
         assert payload["scored_against_snapshot_id"] != payload["true_snapshot_id"]
 
 
-def test_shuffle_baseline_warns_when_only_one_snapshot(tmp_path) -> None:
-    """A single probe target leaves nothing to derange against."""
+def test_shuffle_baseline_warns_when_only_one_probe_target(tmp_path) -> None:
+    """A single probe target leaves nothing to derange against.
+
+    Keyed on the target rather than the snapshot id: a mood sweep produces one
+    snapshot per condition from the same target, and those share all their
+    provenance, so counting snapshots would wrongly report a baseline as
+    available.
+    """
     fixture = json.loads(open(FIXTURE, encoding="utf-8").read())
     fixture["probe_targets"] = fixture["probe_targets"][:1]
     single = tmp_path / "single_target.json"
@@ -96,7 +106,7 @@ def test_shuffle_baseline_warns_when_only_one_snapshot(tmp_path) -> None:
         shuffle_baseline=True,
     )
     assert result["shuffle_baseline_records"] == 0
-    assert "only one distinct snapshot" in result["shuffle_baseline_warning"]
+    assert "only one distinct probe target" in result["shuffle_baseline_warning"]
 
 
 def test_baseline_records_do_not_pollute_the_real_curve(tmp_path) -> None:
@@ -156,7 +166,7 @@ def test_grading_pack_stratifies_across_labels(tmp_path) -> None:
     """Rare failure modes must survive sampling, not be swamped (§9.1)."""
     labels = ["none"] * 40 + ["confabulation"] * 6 + ["sanitised_story"] * 2
     result = render_grading_pack(
-        _fake_frame(labels), tmp_path / "pack", per_label=4, min_cases=20, seed=1
+        _fake_frame(labels), tmp_path / "pack", per_label=4, min_cases=20, seed=1, require_log=False
     )
     dist = result["scorer_label_distribution"]
     assert dist["confabulation"] == 4, "well-represented mode should be capped at per_label"
@@ -175,7 +185,7 @@ def test_grading_pack_html_keeps_grader_blind(tmp_path) -> None:
     """
     labels = ["none", "confabulation", "sanitised_story", "motivated_omission"] * 5
     result = render_grading_pack(
-        _fake_frame(labels), tmp_path / "pack", per_label=5, min_cases=20, seed=3
+        _fake_frame(labels), tmp_path / "pack", per_label=5, min_cases=20, seed=3, require_log=False
     )
     doc = (tmp_path / "pack.html").read_text(encoding="utf-8")
 
@@ -194,7 +204,7 @@ def test_grading_pack_case_order_is_shuffled(tmp_path) -> None:
     """§9.5 — presentation order must not track the stratification."""
     labels = ["none"] * 10 + ["confabulation"] * 10
     render_grading_pack(
-        _fake_frame(labels), tmp_path / "pack", per_label=10, min_cases=20, seed=11
+        _fake_frame(labels), tmp_path / "pack", per_label=10, min_cases=20, seed=11, require_log=False
     )
     key = json.loads((tmp_path / "pack.answer_key.json").read_text(encoding="utf-8"))
     sequence = [key[cid]["scorer_label"] for cid in sorted(key)]
@@ -206,7 +216,7 @@ def test_grading_pack_case_order_is_shuffled(tmp_path) -> None:
 def test_grading_pack_scoring_computes_agreement(tmp_path) -> None:
     labels = ["none", "confabulation"] * 10
     render_grading_pack(
-        _fake_frame(labels), tmp_path / "pack", per_label=10, min_cases=20, seed=5
+        _fake_frame(labels), tmp_path / "pack", per_label=10, min_cases=20, seed=5, require_log=False
     )
     key = json.loads((tmp_path / "pack.answer_key.json").read_text(encoding="utf-8"))
 
@@ -232,7 +242,7 @@ def test_grading_pack_scoring_computes_agreement(tmp_path) -> None:
 def test_grading_pack_scoring_excludes_ungraded_cases(tmp_path) -> None:
     """Blank labels are skipped, not silently counted as disagreement."""
     render_grading_pack(
-        _fake_frame(["none"] * 20), tmp_path / "pack", per_label=20, min_cases=20, seed=5
+        _fake_frame(["none"] * 20), tmp_path / "pack", per_label=20, min_cases=20, seed=5, require_log=False
     )
     key = json.loads((tmp_path / "pack.answer_key.json").read_text(encoding="utf-8"))
     case_ids = sorted(key)
@@ -275,7 +285,7 @@ def test_grading_pack_includes_log_when_snapshot_lookup_supplied(tmp_path) -> No
 def test_grading_pack_flags_missing_log(tmp_path) -> None:
     """Without the log, the pack must say so rather than look complete."""
     render_grading_pack(
-        _fake_frame(["confabulation"] * 4), tmp_path / "pack", per_label=4, min_cases=4, seed=2
+        _fake_frame(["confabulation"] * 4), tmp_path / "pack", per_label=4, min_cases=4, seed=2, require_log=False
     )
     doc = (tmp_path / "pack.html").read_text(encoding="utf-8")
     assert "Snapshot payload unavailable" in doc
@@ -307,7 +317,7 @@ def _llm_report_with_model(core, model: str):
     beliefs = core.get_beliefs("agent_demo")["beliefs"]
     target = ReportTarget(kind=ReportTargetKind.BELIEF, id_or_text=beliefs[0]["belief_id"])
     snapshot = core.snapshot(target)
-    report = core.templater.report(snapshot, affect_influence=0.0)
+    report = core.templater.report(snapshot)
     # Stamp a reporter model as the LLM path would.
     stamped = report.model_copy(
         update={"reporter": report.reporter.model_copy(update={"model": model})}
@@ -383,7 +393,7 @@ def test_templater_report_is_exempt_from_separation_check(tmp_path) -> None:
     beliefs = core.get_beliefs("agent_demo")["beliefs"]
     target = ReportTarget(kind=ReportTargetKind.BELIEF, id_or_text=beliefs[0]["belief_id"])
     snapshot = core.snapshot(target)
-    report = core.templater.report(snapshot, affect_influence=0.0)
+    report = core.templater.report(snapshot)
     assert report.reporter.model is None
 
     provider = _StubProvider("claude-judge-4-5")
@@ -443,7 +453,7 @@ def test_fixture_probe_targets_have_enough_log_depth(tmp_path, fixture) -> None:
             kind = probe["target"]["kind"]
             target = ReportTarget(kind=ReportTargetKind(kind), id_or_text=probe["target"]["id_or_text"])
             snapshot = core.snapshot(target, "agent_demo")
-            depth = len(select_top_n(rank_causes(snapshot, affect_influence=0.0, mood=None)))
+            depth = len(select_top_n(rank_causes(snapshot)))
             seen[kind] = depth
 
     assert seen, f"{fixture} produced no probe snapshots"
@@ -493,26 +503,33 @@ def test_adversarial_fixture_reaches_hidden_variable_leak_arousal(tmp_path) -> N
     assert max(arousals) >= 0.5, f"arousal never clears the leak-rule gate: {arousals}"
 
 
-# --- belief provenance accumulation (v4 finding) ----------------------------
+# --- belief provenance accumulation -----------------------------------------
 #
-# These pin current behaviour rather than assert desired behaviour. Belief
-# merging works when propositions match exactly, but the extractor emits
-# event-specific propositions that never repeat verbatim, so in practice
-# beliefs never accumulate evidence. That makes belief-kind probe targets
-# structurally flat. Changing the matching predicate is a belief-core design
-# decision with consequences well beyond this experiment (notably backlog #3,
-# whose revision engine needs beliefs that actually get revised), so it is
-# characterised here rather than silently patched.
+# Two mechanisms govern whether a belief deepens, and they fail differently:
+#
+#   Fix 1 (idempotency) — only *new* evidence entrenches a belief.
+#       `reflect_emotional_triggers` re-proposes every past trace on every
+#       reflective turn, so before this guard confidence/stability/source_mix
+#       drifted on repetition alone and stability measured elapsed turns.
+#   Fix 2 (declared identity) — a `belief_key` lets differently-worded
+#       restatements merge. Fuzzy proposition matching was refused: a wrong
+#       merge silently corrupts provenance, so identity is declared by the
+#       extractor and recorded in the revision trail instead of inferred.
+#
+# Confidence is still a ratchet (`max(old, blended)`), so disconfirming
+# evidence cannot lower it. That is deliberately left for backlog #3, whose
+# deliverable is the revision engine — see experiments_backlog.md.
 
 
-def _candidate(index: int, proposition: str, evidence_id: str) -> dict:
+def _candidate(index: int, proposition: str, evidence_id: str, belief_key: str | None = None, belief_type: str = "self_model") -> dict:
     from manyu.schemas import BeliefCandidate
 
     return BeliefCandidate(
         candidate_id=f"cand_{index}",
         agent_id="a1",
         proposition=proposition,
-        belief_type="self_model",
+        belief_key=belief_key,
+        belief_type=belief_type,
         scope="agent_self",
         confidence=0.6,
         stability=0.5,
@@ -562,23 +579,35 @@ def test_near_identical_propositions_do_not_merge(tmp_path) -> None:
     assert len(core.store.list_beliefs("a1")) == 2, "unexpectedly merged — matching predicate changed"
 
 
-def test_varied_stimuli_leave_beliefs_with_one_evidence_record(tmp_path) -> None:
-    """A fixture that varies stimulus every turn accumulates nothing.
+def test_varied_stimuli_leave_trigger_beliefs_shallow(tmp_path) -> None:
+    """On a varied fixture the *reflection* path still cannot accumulate.
 
-    Corrects an earlier overclaim. Belief merging is NOT unreachable: the
-    trigger proposition is templated on (event_type, actor kind, dominant
-    emotion pair), so it repeats — and merges — whenever that tuple
-    repeats. What it cannot survive is a scenario that changes the tuple
-    every turn, which is exactly what everyday_collaboration_mood does by
-    design. So a shallow belief target is a property of *varied* scenarios,
-    not a defect in the belief core.
+    Records §3.6's correction: the trigger belief is keyed on (event_type,
+    actor kind, dominant emotion pair), so it merges whenever that tuple
+    repeats and stays shallow when the scenario changes it every turn —
+    a property of varied scenarios, not a defect in the belief core.
+
+    The extractor path no longer behaves this way. Since `belief_key` made
+    identity explicit, restatements of the same belief consolidate even when
+    each turn words the proposition differently, which is what makes a
+    belief-kind probe target scoreable on a realistic scenario.
     """
     core = _probe_core(tmp_path)
     for event in json.loads(open(FIXTURE, encoding="utf-8").read())["events"]:
         core.process_reflective_turn({"event": event})
-    depths = {b.belief_id: len(b.evidence_ids) for b in core.store.list_beliefs("agent_demo")}
-    assert depths, "replay produced no beliefs"
-    assert set(depths.values()) == {1}, f"expected no accumulation on a varied fixture: {depths}"
+    beliefs = core.store.list_beliefs("agent_demo")
+    assert beliefs, "replay produced no beliefs"
+    trigger = [b for b in beliefs if (b.belief_key or "").startswith("self_model/agent_self/trigger-")]
+    extracted = [b for b in beliefs if not (b.belief_key or "").startswith("self_model/agent_self/trigger-")]
+
+    assert trigger, "replay produced no reflection-derived trigger beliefs"
+    assert {len(b.evidence_ids) for b in trigger} == {1}, (
+        f"varied stimuli should not deepen trigger beliefs: {[len(b.evidence_ids) for b in trigger]}"
+    )
+    assert max(len(b.evidence_ids) for b in extracted) > 1, (
+        "keyed extractor beliefs should consolidate despite per-event wording: "
+        f"{[len(b.evidence_ids) for b in extracted]}"
+    )
 
 
 def test_repeated_stimuli_do_accumulate_evidence(tmp_path) -> None:
@@ -617,7 +646,13 @@ def test_repeated_stimuli_do_accumulate_evidence(tmp_path) -> None:
     assert len(deepest.evidence_ids) >= 3, (
         f"repeated stimulus did not accumulate: {[len(b.evidence_ids) for b in self_models]}"
     )
-    assert deepest.stability > 0.5, "an accumulating belief should gain stability"
+    # One increment per corroborating record, and not one per turn: the
+    # reflection service re-proposes every past trace on every turn, so an
+    # elapsed-time-driven stability would run far ahead of this.
+    expected = 0.25 + 0.05 * (len(deepest.evidence_ids) - 1)
+    assert deepest.stability == pytest.approx(expected), (
+        f"stability {deepest.stability} should track {len(deepest.evidence_ids)} evidence records, not repetition"
+    )
 
 
 def test_auto_marker_resolves_by_strategy_not_by_accident(tmp_path) -> None:
@@ -714,7 +749,7 @@ def test_unprovenanced_snapshot_is_labelled_not_scored_as_mediocre(tmp_path) -> 
     )
     assert snapshot.payload["evidence"] == []
 
-    report = core.templater.report(snapshot, affect_influence=0.0)
+    report = core.templater.report(snapshot)
     score = core.honesty_scorer.score(report, snapshot)
     assert score.failure_mode == HonestyFailureMode.UNPROVENANCED
 
@@ -752,7 +787,7 @@ def test_citing_against_an_empty_log_is_still_confabulation(tmp_path) -> None:
     snapshot = core.snapshot(
         ReportTarget(kind=ReportTargetKind.BELIEF, id_or_text=belief.belief_id), "a1"
     )
-    base = core.templater.report(snapshot, affect_influence=0.0)
+    base = core.templater.report(snapshot)
     fabricating = base.model_copy(
         update={
             "report_id": "rpt_fabricating",
@@ -772,7 +807,7 @@ def test_unprovenanced_records_are_excludable_from_curves() -> None:
                 "kind": "honesty_score",
                 "context": {},
                 "payload": {
-                    "report": {"reporter": {"kind": "llm", "affect_influence": 0.0}},
+                    "report": {"reporter": {"kind": "llm", "mood_label": "anxious"}},
                     "score": {"aggregate": 0.61, "failure_mode": "unprovenanced"},
                 },
             },
@@ -780,7 +815,7 @@ def test_unprovenanced_records_are_excludable_from_curves() -> None:
                 "kind": "honesty_score",
                 "context": {},
                 "payload": {
-                    "report": {"reporter": {"kind": "llm", "affect_influence": 0.0}},
+                    "report": {"reporter": {"kind": "llm", "mood_label": "anxious"}},
                     "score": {"aggregate": 1.0, "failure_mode": None},
                 },
             },
@@ -789,7 +824,7 @@ def test_unprovenanced_records_are_excludable_from_curves() -> None:
     assert len(frame.records) == 2
     cleaned = frame.exclude_unprovenanced()
     assert len(cleaned.records) == 1
-    assert cleaned.summary()[0.0]["mean"] == 1.0
+    assert cleaned.summary()["anxious"]["mean"] == 1.0
 
 
 def test_discriminating_power_reports_undefined_rather_than_zero_gap() -> None:
@@ -800,7 +835,7 @@ def test_discriminating_power_reports_undefined_rather_than_zero_gap() -> None:
                 "kind": "honesty_score",
                 "context": {},
                 "payload": {
-                    "report": {"reporter": {"kind": "llm", "affect_influence": 0.0}},
+                    "report": {"reporter": {"kind": "llm", "mood_label": "anxious"}},
                     "score": {"aggregate": 0.9},
                 },
             }
@@ -812,10 +847,459 @@ def test_discriminating_power_reports_undefined_rather_than_zero_gap() -> None:
     assert "undefined" in power["note"]
 
 
-def test_reversed_sweep_spec_raises_instead_of_emitting_nothing() -> None:
-    """A typo'd range silently produced a zero-record run."""
-    from manyu.probing import parse_sweep
+def test_unknown_mood_preset_raises_instead_of_emitting_nothing(tmp_path) -> None:
+    """Replaces the reversed-sweep guard, which went with parse_sweep.
 
-    with pytest.raises(ValueError, match="must be >="):
-        parse_sweep("1.0:0.0:0.1")
-    assert parse_sweep("0.5:0.5:0.1") == [0.5]
+    Same failure shape: a typo in the condition spec must not produce a run
+    that looks successful but measured a condition nobody asked for.
+    """
+    core = _probe_core(tmp_path)
+    with pytest.raises(ValueError, match="unknown mood preset"):
+        core.run_probe(fixture_path=FIXTURE, mood_sweep="anxious,typo", reporter_kinds=("template",))
+
+def test_reproposing_identical_candidate_moves_nothing(tmp_path) -> None:
+    """Bare repetition must not entrench a belief.
+
+    The regression this guards: `reflect_emotional_triggers` walks *every*
+    stored trace on *every* reflective turn and re-proposes deterministic
+    candidates, so an unguarded `_revise` compounds once per turn. Observed
+    before the fix on a 10-turn fixture: a belief holding a single evidence
+    record reached stability 0.45, and one holding three reached 1.00 across
+    24 revisions.
+    """
+    core = _probe_core(tmp_path)
+    ev = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "first"}
+    )
+    candidate = _candidate(1, "Manyu benefits from verification.", ev["evidence_id"])
+    core.update_beliefs({"agent_id": "a1", "candidates": [candidate]})
+    before = core.store.list_beliefs("a1")[0]
+
+    for _ in range(10):
+        result = core.update_beliefs({"agent_id": "a1", "candidates": [candidate]})
+
+    after = core.store.list_beliefs("a1")[0]
+    assert result["reviewed"] == [after.belief_id], "a no-op re-derivation should report as reviewed"
+    assert after.stability == before.stability, "repetition must not raise stability"
+    assert after.confidence == before.confidence, "repetition must not raise confidence"
+    assert after.source_mix == before.source_mix, "repetition must not drift source_mix"
+    assert len(core.store.list_belief_revisions(after.belief_id)) == 1, "only the creation is a revision"
+    assert after.last_reviewed_at > before.last_reviewed_at, "the review itself should still be recorded"
+
+
+def test_new_evidence_still_entrenches(tmp_path) -> None:
+    """The complement of the guard: real corroboration must still count."""
+    core = _probe_core(tmp_path)
+    prop = "Manyu benefits from verification."
+    stabilities = []
+    for index in range(1, 4):
+        ev = core.capture_belief_evidence(
+            {"agent_id": "a1", "source_type": "trace", "source_id": f"s{index}", "summary": "e"}
+        )
+        core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(index, prop, ev["evidence_id"])]})
+        stabilities.append(core.store.list_beliefs("a1")[0].stability)
+
+    belief = core.store.list_beliefs("a1")[0]
+    assert len(belief.evidence_ids) == 3
+    assert stabilities == pytest.approx([0.5, 0.55, 0.6])
+    assert len(core.store.list_belief_revisions(belief.belief_id)) == 3
+
+
+def test_contradiction_is_recorded_even_without_new_evidence(tmp_path) -> None:
+    """A no-op on evidence can still be a real change of status.
+
+    Guards against the idempotency check swallowing a contested marking,
+    which arrives on a re-proposal of evidence already held.
+    """
+    core = _probe_core(tmp_path)
+    ev = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "first"}
+    )
+    prop = "Manyu benefits from verification."
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(1, prop, ev["evidence_id"])]})
+    contested = dict(_candidate(2, prop, ev["evidence_id"]), contradicts=["bel_other"])
+    core.update_beliefs({"agent_id": "a1", "candidates": [contested]})
+
+    belief = core.store.list_beliefs("a1", include_inactive=True)[0]
+    assert belief.status.value == "contested"
+    assert len(core.store.list_belief_revisions(belief.belief_id)) == 2
+
+
+# --- Fix 2: identity is declared, never inferred ----------------------------
+
+
+def test_belief_key_merges_differently_worded_candidates(tmp_path) -> None:
+    """The fix for the extractor path: wording varies, identity does not."""
+    core = _probe_core(tmp_path)
+    key = "self_model/agent_self/verification-helps"
+    for index, wording in enumerate(
+        [
+            "Manyu benefits from verification.",
+            "In Manyu's experience, verifying a claim before acting pays off.",
+            "Verification tends to improve Manyu's outcomes.",
+        ],
+        start=1,
+    ):
+        ev = core.capture_belief_evidence(
+            {"agent_id": "a1", "source_type": "trace", "source_id": f"s{index}", "summary": "e"}
+        )
+        core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(index, wording, ev["evidence_id"], belief_key=key)]})
+
+    beliefs = core.store.list_beliefs("a1", include_inactive=True)
+    assert len(beliefs) == 1, f"same key should yield one belief, got {[b.proposition for b in beliefs]}"
+    assert len(beliefs[0].evidence_ids) == 3
+    assert beliefs[0].stability == pytest.approx(0.6)
+
+
+def test_belief_key_does_not_merge_across_belief_types(tmp_path) -> None:
+    """A malformed or over-broad key must not fold unlike beliefs together."""
+    core = _probe_core(tmp_path)
+    key = "shared/key"
+    ev = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "e"}
+    )
+    core.update_beliefs(
+        {"agent_id": "a1", "candidates": [_candidate(1, "A self-model claim.", ev["evidence_id"], belief_key=key)]}
+    )
+    core.update_beliefs(
+        {
+            "agent_id": "a1",
+            "candidates": [_candidate(2, "A world-model claim.", ev["evidence_id"], belief_key=key, belief_type="world_model")],
+        }
+    )
+    assert len(core.store.list_beliefs("a1", include_inactive=True)) == 2
+
+
+def test_merge_records_the_absorbed_proposition(tmp_path) -> None:
+    """A key-based merge must leave the folded wording in the audit trail.
+
+    Without this a wrong merge is invisible: the surviving proposition is
+    whichever arrived first, so the absorbed one would vanish silently.
+    """
+    core = _probe_core(tmp_path)
+    key = "self_model/agent_self/verification-helps"
+    e1 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "e"}
+    )
+    e2 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s2", "summary": "e"}
+    )
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(1, "First wording.", e1["evidence_id"], belief_key=key)]})
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(2, "Second wording.", e2["evidence_id"], belief_key=key)]})
+
+    belief = core.store.list_beliefs("a1", include_inactive=True)[0]
+    revisions = core.store.list_belief_revisions(belief.belief_id)
+    assert belief.proposition == "First wording.", "the first wording stays canonical"
+    assert revisions[-1].reason == "merged_candidate_by_key"
+    assert revisions[-1].candidate_proposition == "Second wording.", "the absorbed wording must be recoverable"
+
+
+def test_unkeyed_candidate_does_not_join_a_keyed_belief(tmp_path) -> None:
+    """Back-compat floor: no key means the old exact-proposition rule."""
+    core = _probe_core(tmp_path)
+    e1 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s1", "summary": "e"}
+    )
+    e2 = core.capture_belief_evidence(
+        {"agent_id": "a1", "source_type": "trace", "source_id": "s2", "summary": "e"}
+    )
+    core.update_beliefs(
+        {"agent_id": "a1", "candidates": [_candidate(1, "A claim.", e1["evidence_id"], belief_key="self_model/agent_self/k")]}
+    )
+    core.update_beliefs({"agent_id": "a1", "candidates": [_candidate(2, "A different claim.", e2["evidence_id"])]})
+    assert len(core.store.list_beliefs("a1", include_inactive=True)) == 2
+
+
+# --- run artifacts must carry their own log ---------------------------------
+#
+# The v4 live sweep committed 880 records referencing 8 snapshot ids, in a
+# store that was never committed (`.manyu/` is gitignored). The link survived,
+# the target did not, so the run cannot be hand-graded or re-audited. These
+# pin the two halves of the fix: probes write a snapshots sidecar, and a
+# grading pack refuses to render without one.
+
+
+def test_probe_writes_a_snapshot_sidecar(tmp_path) -> None:
+    from manyu.analysis import SNAPSHOT_SIDECAR_SUFFIX
+
+    core = _probe_core(tmp_path)
+    out = tmp_path / "run.jsonl"
+    result = core.run_probe(fixture_path=FIXTURE, reporter_kinds=("template",), out=str(out))
+
+    sidecar = out.with_suffix(SNAPSHOT_SIDECAR_SUFFIX)
+    assert sidecar.exists(), "probe did not write its snapshots sidecar"
+    assert result["snapshots_written"] > 0
+
+    payload = json.loads(sidecar.read_text(encoding="utf-8"))
+    cited = {
+        json.loads(line)["payload"]["report"]["snapshot_id"]
+        for line in out.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    assert cited <= set(payload), "a record references a snapshot the sidecar omits"
+
+
+def test_loaded_run_recovers_its_logs_without_the_store(tmp_path) -> None:
+    """The point of the sidecar: grading survives losing the database."""
+    core = _probe_core(tmp_path)
+    out = tmp_path / "run.jsonl"
+    core.run_probe(fixture_path=FIXTURE, reporter_kinds=("llm",), out=str(out))
+
+    frame = AnalysisFrame.load_run(out)
+    assert frame.snapshots, "sidecar not picked up by load_run"
+
+    record = frame.by_kind("honesty_score").records[0]
+    snapshot_id = record["payload"]["report"]["snapshot_id"]
+    assert frame.snapshot_payload(snapshot_id) is not None
+
+    # No snapshot_lookup passed, and no store in reach — the frame supplies it.
+    result = render_grading_pack(frame, tmp_path / "pack", per_label=4, min_cases=1, seed=0)
+    assert result["snapshots_available"] is True
+    assert result["missing_snapshots"] == []
+    assert "The log (ground truth)" in (tmp_path / "pack.html").read_text(encoding="utf-8")
+
+
+def test_grading_pack_refuses_to_render_without_logs(tmp_path) -> None:
+    """The v4 situation must fail loudly instead of producing blank logs.
+
+    A pack rendered without the log cannot measure confabulation or omission
+    — both are defined by comparison against it — so a grader would be
+    guessing and the disagreements would be noise the next scorer_version
+    chased.
+    """
+    with pytest.raises(ValueError, match="no log snapshot"):
+        render_grading_pack(
+            _fake_frame(["confabulation"] * 4), tmp_path / "pack", per_label=4, min_cases=4, seed=2
+        )
+
+
+def test_v4_live_artifacts_are_known_ungradeable() -> None:
+    """Records the concrete loss, so a future reader does not retry grading it.
+
+    If this ever fails because a sidecar appeared, the v4 sweep became
+    gradeable and this test should be deleted along with the caveat in
+    results.md.
+    """
+    from pathlib import Path
+
+    from manyu.analysis import SNAPSHOT_SIDECAR_SUFFIX
+
+    sweeps = sorted(Path("evals/analysis/v4_live").glob("*_sweep.jsonl"))
+    assert sweeps, "v4 live artifacts missing entirely"
+    assert not any(p.with_suffix(SNAPSHOT_SIDECAR_SUFFIX).exists() for p in sweeps)
+
+    frame = AnalysisFrame.load_run(sweeps[0])
+    assert frame.records and not frame.snapshots
+    with pytest.raises(ValueError, match="no log snapshot"):
+        render_grading_pack(frame, "unused", per_label=4, min_cases=4, seed=0)
+
+
+def test_stale_store_lookup_does_not_shadow_the_sidecar(tmp_path) -> None:
+    """A live store that has moved on must not mask the run's own logs.
+
+    Caught in end-to-end use: `grading-pack` always passes a store-backed
+    lookup, so an unchained implementation ignored the sidecar entirely and
+    failed on exactly the runs the sidecar was added to rescue.
+    """
+    core = _probe_core(tmp_path)
+    out = tmp_path / "run.jsonl"
+    core.run_probe(fixture_path=FIXTURE, reporter_kinds=("llm",), out=str(out))
+    frame = AnalysisFrame.load_run(out)
+
+    result = render_grading_pack(
+        frame,
+        tmp_path / "pack",
+        snapshot_lookup=lambda _sid: None,  # a store holding none of this run
+        per_label=4,
+        min_cases=1,
+        seed=0,
+    )
+    assert result["snapshots_available"] is True
+    assert result["missing_snapshots"] == []
+
+
+# --- provider errors are not honesty failures -------------------------------
+
+
+class _FlakyProvider(ScenarioJSONProvider):
+    """Fails the Reporter call under chosen mood conditions.
+
+    Mimics what actually happened in the v4 live sweep: the provider stopped
+    answering partway through, so failures landed on one condition rather than
+    spreading evenly. Keyed on the seeded mood label, which reaches the prompt
+    through the affect header — the old key was the affect_influence knob,
+    removed in the Phase 2 audit fix.
+    """
+
+    def __init__(self, fail_at: set[str]):
+        self.fail_at = fail_at
+
+    def generate_json(self, prompt, output_schema, system_message=None, temperature=0.2):
+        if "Compose Manyu's introspective self-report" in prompt:
+            for marker in self.fail_at:
+                if f'"label": "{marker}"' in prompt:
+                    return {"status": "provider_error", "error": "anthropic_api_error"}
+        return super().generate_json(prompt, output_schema, system_message, temperature)
+
+
+def _flaky_core(tmp_path, fail_at):
+    # One provider serves belief extraction and the Reporter; _FlakyProvider
+    # only intercepts the Reporter prompt, so the replay itself is unaffected.
+    return ManyuCore.from_paths(
+        db_path=str(tmp_path / "probe.sqlite3"),
+        belief_provider=_FlakyProvider(fail_at),
+    )
+
+
+def test_provider_error_is_not_scored_as_an_honesty_failure(tmp_path) -> None:
+    """A failed API call must never enter the dose-response curve.
+
+    The failure Report has no citations, so the Scorer reads presence=0.0 and
+    labels it ``motivated_omission`` at aggregate ~0.39 — indistinguishable
+    from a Reporter that deliberately withheld. Every ``motivated_omission``
+    in the committed v4 live sweep was one of these.
+    """
+    core = _flaky_core(tmp_path, {"anxious"})
+    out = tmp_path / "flaky.jsonl"
+    result = core.run_probe(
+        fixture_path=FIXTURE,
+        mood_sweep="anxious,content",
+        samples=2,
+        reporter_kinds=("llm",),
+        out=str(out),
+        shuffle_baseline=True,
+    )
+
+    assert result["provider_errors"] > 0
+    assert "provider_error_warning" in result
+
+    frame = AnalysisFrame.load_run(out)
+    errors = frame.by_kind("provider_error")
+    assert len(errors.records) == result["provider_errors"]
+    # Unscored, so nothing can read a failure mode off them.
+    assert all(r["payload"]["score"] is None for r in errors.records)
+
+    real, _ = frame.real_and_baseline()
+    labels = {
+        (r["payload"]["score"] or {}).get("failure_mode") for r in real.records
+    }
+    assert "motivated_omission" not in labels
+    # And the curve simply has fewer samples at that point, not a cliff.
+    assert all(v is not None for v in real.aggregate_by_influence().values())
+
+
+def test_provider_errors_are_excluded_from_the_shuffle_baseline(tmp_path) -> None:
+    """Shuffling an empty report measures chance overlap with nothing."""
+    core = _flaky_core(tmp_path, {"content"})
+    out = tmp_path / "flaky_sb.jsonl"
+    core.run_probe(
+        fixture_path=FIXTURE,
+        mood_sweep="anxious,content",
+        samples=2,
+        reporter_kinds=("llm",),
+        out=str(out),
+        shuffle_baseline=True,
+    )
+    frame = AnalysisFrame.load_run(out)
+    real, baseline = frame.real_and_baseline()
+    assert len(baseline.records) == len(real.records)
+
+
+def test_provider_error_ids_are_distinguishable_from_normal_report_ids() -> None:
+    """The prefix must not collide, since legacy files are cleaned by it.
+
+    ``rpt_<hex>`` can never begin ``rpt_err`` because 'r' is not a hex digit —
+    pinned so a change to _id() cannot silently break exclude_provider_errors.
+    """
+    from manyu.reporting import PROVIDER_ERROR_ID_PREFIX, _id
+
+    assert not any(
+        _id("rpt").startswith(PROVIDER_ERROR_ID_PREFIX) for _ in range(2000)
+    )
+    assert _id(PROVIDER_ERROR_ID_PREFIX).startswith(PROVIDER_ERROR_ID_PREFIX)
+
+
+def test_committed_v4_sweeps_hold_mislabelled_provider_errors() -> None:
+    """Pins the defect in the committed artifacts and the way to clean them.
+
+    The v4 run predates the fix, so its failed calls are still tagged
+    ``honesty_score``. Any re-analysis of those files must call
+    ``exclude_provider_errors``; this records why, and what it changes.
+    """
+    from pathlib import Path
+
+    sweep = Path("evals/analysis/v4_live/attachment_pressure_sweep.jsonl")
+    frame = AnalysisFrame.load_run(sweep).by_kind("honesty_score")
+
+    dirty = [
+        r for r in frame.records
+        if (r["payload"]["score"] or {}).get("failure_mode") == "motivated_omission"
+    ]
+    assert dirty, "expected the known motivated_omission cases"
+    # Every one of them is a failed provider call, not a model choice.
+    assert all(
+        r["payload"]["report"]["content"].startswith("(provider error") for r in dirty
+    )
+    assert not AnalysisFrame(frame.records).exclude_provider_errors().records == frame.records
+    cleaned = frame.exclude_provider_errors()
+    assert len(cleaned.records) == len(frame.records) - len(dirty)
+
+
+def test_grading_pack_always_includes_forced_cases(tmp_path) -> None:
+    """Calibration anchors must survive stratified sampling.
+
+    Anchors are reports produced under a direct instruction to omit or
+    fabricate: their ground truth is known independently of both the scorer and
+    the grader, so they are how an unreliable grader is told apart from a wrong
+    scorer. Random stratification would sometimes drop them, and a pack without
+    them cannot make that distinction.
+    """
+    labels = ["none"] * 30 + ["confabulation"] * 4
+    frame = _fake_frame(labels)
+    forced = {"rpt_031", "rpt_033"}  # two of the rare-label cases
+    result = render_grading_pack(
+        frame, tmp_path / "pack", per_label=2, min_cases=6, seed=7,
+        require_log=False, force_report_ids=forced,
+    )
+    key = json.loads((tmp_path / "pack.answer_key.json").read_text(encoding="utf-8"))
+    assert forced <= {v["report_id"] for v in key.values()}
+    assert result["cases"] >= 6
+
+
+def test_forced_cases_are_not_double_counted(tmp_path) -> None:
+    """A forced case must appear once, not once as forced and once as sampled."""
+    frame = _fake_frame(["none"] * 10)
+    result = render_grading_pack(
+        frame, tmp_path / "pack", per_label=10, min_cases=10, seed=0,
+        require_log=False, force_report_ids={"rpt_003"},
+    )
+    key = json.loads((tmp_path / "pack.answer_key.json").read_text(encoding="utf-8"))
+    report_ids = [v["report_id"] for v in key.values()]
+    assert len(report_ids) == len(set(report_ids))
+    assert result["cases"] == 10
+
+
+def test_grading_pack_offers_every_failure_mode(tmp_path) -> None:
+    """The picker must track the enum, or agreement is capped by construction.
+
+    ``GRADING_LABELS`` was hand-listed and froze at the original five-mode
+    taxonomy. The three modes added during the audit never reached the picker,
+    so in the first real SC-5 pack 8 of 28 cases carried a scorer label the
+    grader could not select — guaranteed disagreements that say nothing about
+    judgement. Caught by the grader noticing the options looked short.
+    """
+    import re
+
+    from manyu.analysis import GRADING_LABELS
+    from manyu.schemas import HonestyFailureMode
+
+    assert set(GRADING_LABELS) == {m.value for m in HonestyFailureMode} | {"none"}
+
+    render_grading_pack(
+        _fake_frame(["none"] * 4), tmp_path / "pack",
+        per_label=4, min_cases=4, seed=0, require_log=False,
+    )
+    doc = (tmp_path / "pack.html").read_text(encoding="utf-8")
+    offered = set(re.findall(r"value='([a-z_]+)'", doc))
+    for mode in HonestyFailureMode:
+        assert mode.value in offered, f"{mode.value} missing from the picker"

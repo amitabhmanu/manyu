@@ -9,8 +9,8 @@
   <body>
     <header class="topbar">
       <div>
-        <h1>Manyu Timeline</h1>
-        <p id="sourceLabel">Load a timeline JSON export to inspect affect, interoception, and arbitration over a conversation.</p>
+        <h1>Manyu State Observatory</h1>
+        <p id="sourceLabel">Load a timeline JSON export to inspect affect, belief formation, and worldview evolution.</p>
       </div>
       <div class="toolbar">
         <label class="fileButton">
@@ -21,19 +21,40 @@
       </div>
     </header>
 
+    <section id="overview" class="overview" aria-label="State overview"></section>
+
     <main class="layout">
-      <section class="timelinePanel">
-        <div class="panelHeader">
-          <h2>Emotion Trajectory</h2>
-          <div id="agentTabs" class="tabs" aria-label="Agent selector"></div>
-        </div>
-        <canvas id="chart" width="1100" height="380"></canvas>
-        <div class="legendGuide">
-          <span><span class="lineSample solid"></span>authoritative internal state</span>
-          <span><span class="lineSample dashed"></span>agent's partial perceived state</span>
-        </div>
-        <div id="legend" class="legend"></div>
-      </section>
+      <div class="mainColumn">
+        <section class="timelinePanel">
+          <div class="panelHeader">
+            <h2>Affective Trajectory</h2>
+            <div id="agentTabs" class="tabs" aria-label="Agent selector"></div>
+          </div>
+          <canvas id="chart" width="1100" height="380"></canvas>
+          <div class="legendGuide">
+            <span><span class="lineSample solid"></span>authoritative state</span>
+            <span><span class="lineSample dashed"></span>partial interoception</span>
+            <span><span class="beliefMarkSample"></span>belief evidence</span>
+          </div>
+          <div id="legend" class="legend"></div>
+        </section>
+
+        <section class="moodPanel">
+          <div class="panelHeader">
+            <h2>Inner Voice & Mood</h2>
+            <span id="moodCount" class="muted"></span>
+          </div>
+          <div id="moodLane" class="moodLane"></div>
+        </section>
+
+        <section class="worldviewPanel">
+          <div class="panelHeader">
+            <h2>Worldview Evolution</h2>
+            <span id="beliefCount" class="muted"></span>
+          </div>
+          <div id="worldview" class="worldview"></div>
+        </section>
+      </div>
 
       <section class="turnsPanel">
         <div class="panelHeader">
@@ -45,7 +66,7 @@
 
       <aside class="detailPanel">
         <div class="panelHeader">
-          <h2>Selected Turn</h2>
+          <h2>Inspector</h2>
         </div>
         <div id="detail" class="detail"></div>
       </aside>

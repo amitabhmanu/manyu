@@ -9,6 +9,9 @@ description = "A local functional affect core for agentic harness experiments."
 requires-python = ">=3.11"
 dependencies = ["mcp>=1.28", "pydantic>=2"]
 
+[project.optional-dependencies]
+analysis = ["matplotlib>=3.7"]
+
 [project.scripts]
 manyu = "manyu.cli:main"
 manyu-mcp = "manyu.mcp_server:main"

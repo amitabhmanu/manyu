@@ -1,0 +1,65 @@
+{
+  "fixture_id": "transitive_depth2",
+  "contradiction_type": "transitive_depth2",
+  "role": "held_out",
+  "discriminating": true,
+  "expect_signal": true,
+  "expect_derived_carrier": true,
+  "min_path_length": 2,
+  "notes": "Held out. The same shape as `transitive` but two supports hops from each root to the conflicting leaves, so a mechanism that traverses exactly one level passes `transitive` and fails here. Sits inside supports_max_depth=3 with one level to spare, so a failure means the traversal is shallow rather than that the fixture is out of range.",
+  "beliefs": [
+    {
+      "key": "root_audit",
+      "proposition": "The external audit found no unlogged writes.",
+      "valence": 0.3,
+      "confidence": 0.8,
+      "salience": 0.7,
+      "weight": 0.8,
+      "supports": ["mid_trustworthy"]
+    },
+    {
+      "key": "mid_trustworthy",
+      "proposition": "The write path is fully instrumented.",
+      "valence": 0.4,
+      "confidence": 0.75,
+      "salience": 0.7,
+      "weight": 0.75,
+      "supports": ["claim_complete"]
+    },
+    {
+      "key": "claim_complete",
+      "proposition": "The provenance log is complete.",
+      "valence": 0.5,
+      "confidence": 0.75,
+      "salience": 0.8,
+      "weight": 0.75
+    },
+    {
+      "key": "root_gap",
+      "proposition": "Two evidence records reference source ids that were never written.",
+      "valence": -0.4,
+      "confidence": 0.8,
+      "salience": 0.7,
+      "weight": 0.8,
+      "supports": ["mid_dropped"]
+    },
+    {
+      "key": "mid_dropped",
+      "proposition": "Some writes bypass the instrumented path.",
+      "valence": -0.4,
+      "confidence": 0.75,
+      "salience": 0.7,
+      "weight": 0.75,
+      "supports": ["claim_incomplete"]
+    },
+    {
+      "key": "claim_incomplete",
+      "proposition": "The provenance log is incomplete.",
+      "valence": -0.5,
+      "confidence": 0.75,
+      "salience": 0.8,
+      "weight": 0.75,
+      "contradicts": ["claim_complete"]
+    }
+  ]
+}

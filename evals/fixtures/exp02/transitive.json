@@ -1,0 +1,47 @@
+{
+  "fixture_id": "transitive",
+  "contradiction_type": "transitive",
+  "role": "held_out",
+  "discriminating": true,
+  "expect_signal": true,
+  "expect_derived_carrier": true,
+  "min_path_length": 1,
+  "notes": "Held out. The leaf pair (safe/unsafe) is adjacent, so ANY mechanism fires here on magnitude alone — which is why magnitude is not what this fixture measures. What discriminates is whether the signal also carries the *derived* pair (ground_clean, ground_lossy), reachable only by walking supports edges. A mechanism that reads adjacency alone reports one carrier with an empty path; a graph query reports two, one of them with a path.",
+  "beliefs": [
+    {
+      "key": "ground_clean",
+      "proposition": "The migration tool reported zero conflicts on the dry run.",
+      "valence": 0.3,
+      "confidence": 0.8,
+      "salience": 0.7,
+      "weight": 0.8,
+      "supports": ["safe"]
+    },
+    {
+      "key": "safe",
+      "proposition": "The migration is safe to run against production.",
+      "valence": 0.5,
+      "confidence": 0.75,
+      "salience": 0.8,
+      "weight": 0.75
+    },
+    {
+      "key": "ground_lossy",
+      "proposition": "The staging run silently dropped three records.",
+      "valence": -0.4,
+      "confidence": 0.8,
+      "salience": 0.7,
+      "weight": 0.8,
+      "supports": ["unsafe"]
+    },
+    {
+      "key": "unsafe",
+      "proposition": "The migration is unsafe to run against production.",
+      "valence": -0.5,
+      "confidence": 0.75,
+      "salience": 0.8,
+      "weight": 0.75,
+      "contradicts": ["safe"]
+    }
+  ]
+}

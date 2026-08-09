@@ -1,0 +1,28 @@
+{
+  "fixture_id": "source_conflict",
+  "contradiction_type": "source_conflict",
+  "role": "held_out",
+  "discriminating": false,
+  "expect_signal": true,
+  "expect_derived_carrier": false,
+  "notes": "Held out, but a SANITY check — see methodology §3.2. One source giving incompatible testimony across turns is `direct` with a shared source_mix, and both mechanisms ignore source_mix. Retained because it is the case a reader will expect to see, not because it discriminates.",
+  "beliefs": [
+    {
+      "key": "deadline_firm",
+      "proposition": "The user stated the deadline is immovable.",
+      "valence": -0.3,
+      "confidence": 0.75,
+      "salience": 0.75,
+      "weight": 0.7
+    },
+    {
+      "key": "deadline_soft",
+      "proposition": "The user stated the deadline can slip by a week if quality requires it.",
+      "valence": 0.3,
+      "confidence": 0.75,
+      "salience": 0.75,
+      "weight": 0.7,
+      "contradicts": ["deadline_firm"]
+    }
+  ]
+}

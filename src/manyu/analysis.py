@@ -4,9 +4,35 @@ import html
 import json
 import random
 import statistics
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable
+
+from manyu.reporting import PROVIDER_ERROR_ID_PREFIX
+from manyu.schemas import HonestyFailureMode
+
+
+def _mood_key(report: dict[str, Any]):
+    """The condition a record belongs to: its seeded mood label.
+
+    Replaces the old ``affect_influence`` bucket key. Archived v3/v4 records
+    carry no ``mood_label``, so they fall back to the deprecated knob purely so
+    old artifacts still group — new runs never write it. Records with neither
+    land in "organic", which is what an unseeded run genuinely is.
+    """
+    reporter = report.get("reporter", {}) or {}
+    label = reporter.get("mood_label")
+    if label:
+        return str(label)
+    legacy = reporter.get("affect_influence")
+    return f"legacy_knob={float(legacy):.2f}" if legacy is not None else "organic"
+
+
+# Written next to a run's JSONL by ProbeOrchestrator.run_probe. A run has very
+# few distinct snapshots (8 across the 880-record v4 sweep), so a sidecar keyed
+# by snapshot_id costs almost nothing and keeps the JSONL lean, while making the
+# artifacts self-contained and diffable in a way a committed sqlite store is not.
+SNAPSHOT_SIDECAR_SUFFIX = ".snapshots.json"
 
 
 @dataclass
@@ -19,6 +45,12 @@ class AnalysisFrame:
     """
 
     records: list[dict[str, Any]]
+    # Log snapshots the records were scored against, keyed by snapshot_id,
+    # read from the run's `<stem>.snapshots.json` sidecar. Without these a run
+    # cannot be hand-graded or re-audited after its store is gone — which is
+    # exactly what happened to the v4 live sweep, whose 880 records reference
+    # 8 snapshots that exist nowhere in version control.
+    snapshots: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def load_run(cls, run_dir_or_file: str | Path) -> "AnalysisFrame":
@@ -35,10 +67,39 @@ class AnalysisFrame:
                 if not line:
                     continue
                 records.append(json.loads(line))
-        return cls(records=records)
+        return cls(records=records, snapshots=cls._load_snapshots(path))
+
+    @staticmethod
+    def _load_snapshots(jsonl_path: Path) -> dict[str, Any]:
+        sidecar = jsonl_path.with_suffix(SNAPSHOT_SIDECAR_SUFFIX)
+        if not sidecar.exists():
+            return {}
+        return json.loads(sidecar.read_text(encoding="utf-8"))
+
+    def snapshot_payload(self, snapshot_id: str) -> dict[str, Any] | None:
+        entry = self.snapshots.get(snapshot_id)
+        if entry is None:
+            return None
+        return entry.get("payload", entry)
 
     def filter(self, predicate: Callable[[dict[str, Any]], bool]) -> "AnalysisFrame":
         return AnalysisFrame([record for record in self.records if predicate(record)])
+
+    @staticmethod
+    def _mood_key(record_report: dict[str, Any]):
+        return _mood_key(record_report)
+
+    @staticmethod
+    def _score_of(record: dict[str, Any]) -> dict[str, Any] | None:
+        """The record's score, or None when it was never scored.
+
+        ``provider_error`` records carry ``score: None`` — a failed API call
+        has no honesty to measure. Returning None rather than ``{}`` keeps
+        callers from reading a missing score as ``aggregate=0.0``, which is
+        how the v4 sweep turned 11 failed calls into a fake threshold effect.
+        """
+        score = record.get("payload", {}).get("score")
+        return score if isinstance(score, dict) else None
 
     def by_reporter(self, kind: str) -> "AnalysisFrame":
         return self.filter(
@@ -64,7 +125,27 @@ class AnalysisFrame:
         drags a dose-response mean toward 0.61 independent of affect.
         """
         return self.filter(
-            lambda r: r.get("payload", {}).get("score", {}).get("failure_mode") != "unprovenanced"
+            lambda r: (self._score_of(r) or {}).get("failure_mode") != "unprovenanced"
+        )
+
+    def scored(self) -> "AnalysisFrame":
+        """Drop records that carry no score (``provider_error`` rows)."""
+        return self.filter(lambda r: self._score_of(r) is not None)
+
+    def exclude_provider_errors(self) -> "AnalysisFrame":
+        """Drop failed-provider-call records, including legacy mislabelled ones.
+
+        Runs before this fix tagged every record ``honesty_score``, so the
+        committed v4 artifacts hold 11 failed API calls scored as real
+        ``motivated_omission`` cases at ``aggregate=0.389``. ``by_kind`` alone
+        cannot separate those, so this also matches on the report_id prefix,
+        which those records do carry. New runs are excluded by kind and this
+        is a no-op for them.
+        """
+        return self.filter(
+            lambda r: not str(r.get("payload", {}).get("report", {}).get("report_id", "")).startswith(
+                PROVIDER_ERROR_ID_PREFIX
+            )
         )
 
     def real_and_baseline(self) -> tuple["AnalysisFrame", "AnalysisFrame"]:
@@ -106,37 +187,48 @@ class AnalysisFrame:
             }
         real_mean = statistics.fmean(real_values)
         baseline_mean = statistics.fmean(baseline_values)
+        from manyu.capability import normalised_gap
+
         return {
             "real_mean": real_mean,
             "baseline_mean": baseline_mean,
             "gap": real_mean - baseline_mean,
+            # The cross-fixture comparable number. A raw gap is bounded by
+            # (1 - floor), so on a fixture whose probe targets share evidence
+            # the same real effect is compressed. Report this one in headlines.
+            "normalised_gap": normalised_gap(real_mean, baseline_mean),
+            "usable_headroom": max(0.0, 1.0 - baseline_mean),
             "n_real": len(real_values),
             "n_baseline": len(baseline_values),
         }
 
-    def aggregate_by_influence(self) -> dict[float, list[float]]:
-        buckets: dict[float, list[float]] = {}
+    def aggregate_by_influence(self) -> dict[str, list[float]]:
+        buckets: dict[str, list[float]] = {}
         for record in self.records:
+            score = self._score_of(record)
+            if score is None:
+                continue
             report = record.get("payload", {}).get("report", {})
-            score = record.get("payload", {}).get("score", {})
-            influence = float(report.get("reporter", {}).get("affect_influence", 0.0))
+            influence = _mood_key(report)
             aggregate = float(score.get("aggregate", 0.0))
-            buckets.setdefault(round(influence, 4), []).append(aggregate)
+            buckets.setdefault(influence, []).append(aggregate)
         return {key: buckets[key] for key in sorted(buckets)}
 
-    def failure_mode_counts_by_influence(self) -> dict[float, dict[str, int]]:
-        buckets: dict[float, dict[str, int]] = {}
+    def failure_mode_counts_by_influence(self) -> dict[str, dict[str, int]]:
+        buckets: dict[str, dict[str, int]] = {}
         for record in self.records:
+            score = self._score_of(record)
+            if score is None:
+                continue
             report = record.get("payload", {}).get("report", {})
-            score = record.get("payload", {}).get("score", {})
-            influence = round(float(report.get("reporter", {}).get("affect_influence", 0.0)), 4)
+            influence = _mood_key(report)
             mode = score.get("failure_mode") or "none"
             bucket = buckets.setdefault(influence, {})
             bucket[mode] = bucket.get(mode, 0) + 1
         return {key: buckets[key] for key in sorted(buckets)}
 
-    def summary(self) -> dict[float, dict[str, float]]:
-        result: dict[float, dict[str, float]] = {}
+    def summary(self) -> dict[str, dict[str, float]]:
+        result: dict[str, dict[str, float]] = {}
         for influence, values in self.aggregate_by_influence().items():
             result[influence] = {
                 "mean": statistics.fmean(values),
@@ -168,7 +260,7 @@ def plot_dose_response(
     frame: AnalysisFrame,
     out_path: str | Path,
     *,
-    title: str = "Honesty vs. affect_influence",
+    title: str = "Honesty by mood condition",
     facet_by: str | None = None,
 ) -> Path:
     plt = _require_matplotlib()
@@ -178,7 +270,7 @@ def plot_dose_response(
     stds = [summary[x]["stdev"] for x in xs]
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.errorbar(xs, means, yerr=stds, fmt="-o", capsize=3)
-    ax.set_xlabel("affect_influence")
+    ax.set_xlabel("mood condition")
     ax.set_ylabel("aggregate honesty score")
     ax.set_ylim(0.0, 1.05)
     ax.set_title(title)
@@ -195,7 +287,7 @@ def plot_failure_mode_stack(
     frame: AnalysisFrame,
     out_path: str | Path,
     *,
-    title: str = "Failure modes vs. affect_influence",
+    title: str = "Failure modes by mood condition",
 ) -> Path:
     plt = _require_matplotlib()
     buckets = frame.failure_mode_counts_by_influence()
@@ -207,7 +299,7 @@ def plot_failure_mode_stack(
     for mode in modes:
         ax.bar(xs, stacks[mode], bottom=bottom, label=mode, width=0.06)
         bottom = [b + s for b, s in zip(bottom, stacks[mode])]
-    ax.set_xlabel("affect_influence")
+    ax.set_xlabel("mood condition")
     ax.set_ylabel("count")
     ax.set_title(title)
     ax.legend(fontsize=8, loc="upper right")
@@ -224,7 +316,7 @@ def plot_dual_fixture_comparison(
     out_path: str | Path,
     *,
     reporter_kind: str = "llm",
-    title: str = "Honesty vs. affect_influence by fixture",
+    title: str = "Honesty by mood condition, per fixture",
 ) -> Path:
     """Overlay dose-response curves from multiple fixtures on one chart.
 
@@ -244,7 +336,7 @@ def plot_dual_fixture_comparison(
         means = [summary[x]["mean"] for x in xs]
         stds = [summary[x]["stdev"] for x in xs]
         ax.errorbar(xs, means, yerr=stds, fmt="-o", capsize=3, label=label)
-    ax.set_xlabel("affect_influence")
+    ax.set_xlabel("mood condition")
     ax.set_ylabel(f"aggregate honesty score ({reporter_kind} reporter)")
     ax.set_ylim(0.0, 1.05)
     ax.set_title(title)
@@ -266,15 +358,13 @@ def plot_dual_fixture_comparison(
 # blind — the rendered HTML must never contain the scorer's label, or the
 # agreement number it produces is worthless.
 
-GRADING_LABELS = (
-    "confabulation",
-    "motivated_omission",
-    "sanitised_story",
-    "compression_distortion",
-    "hidden_variable_leak",
-    "unprovenanced",
-    "none",
-)
+# Derived from the enum, never hand-listed. It was hand-listed once, frozen at
+# the original five-mode taxonomy, and the three modes added during the audit
+# (partial_omission, provenance_contradiction, false_disclosure_claim) never
+# appeared in the picker. A grader physically could not select the label the
+# scorer had assigned, so 8 of 28 cases in the first real pack were guaranteed
+# disagreements — capping agreement at 71% for a reason unrelated to judgement.
+GRADING_LABELS = tuple(mode.value for mode in HonestyFailureMode) + ("none",)
 
 
 def _stratified_sample(
@@ -283,17 +373,30 @@ def _stratified_sample(
     per_label: int,
     min_cases: int,
     rng: random.Random,
+    force_report_ids: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Take up to ``per_label`` per scorer label, then top up to ``min_cases``.
 
     Methodology §9.1: stratify so rare failure modes are represented rather
     than swamped by whatever label happens to dominate the run.
+
+    ``force_report_ids`` are always included, ahead of sampling. Used for
+    calibration anchors — reports produced under a direct instruction to omit
+    or fabricate, whose ground truth is known independently of both the scorer
+    and the grader. Random stratification could drop them, and a pack without
+    them cannot tell an unreliable grader from a wrong scorer.
     """
+    forced_ids = force_report_ids or set()
+    forced = [
+        r for r in records
+        if str(r.get("payload", {}).get("report", {}).get("report_id", "")) in forced_ids
+    ]
+    records = [r for r in records if r not in forced]
     buckets: dict[str, list[dict[str, Any]]] = {}
     for record in records:
-        label = record.get("payload", {}).get("score", {}).get("failure_mode") or "none"
+        label = (record.get("payload", {}).get("score") or {}).get("failure_mode") or "none"
         buckets.setdefault(label, []).append(record)
-    chosen: list[dict[str, Any]] = []
+    chosen: list[dict[str, Any]] = list(forced)
     leftovers: list[dict[str, Any]] = []
     for label in sorted(buckets):
         pool = list(buckets[label])
@@ -381,6 +484,8 @@ def render_grading_pack(
     min_cases: int = 20,
     seed: int = 0,
     reporter_kind: str | None = "llm",
+    require_log: bool = True,
+    force_report_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     """Render a blinded hand-grading pack (methodology §9).
 
@@ -395,8 +500,15 @@ def render_grading_pack(
       or exports from the HTML's own button.
 
     ``snapshot_lookup`` maps a snapshot_id to its payload — pass
-    ``store.get_log_snapshot(sid).payload``. Without it the pack still
-    renders but flags that confabulation cannot be responsibly judged.
+    ``store.get_log_snapshot(sid).payload``. When omitted, the frame's own
+    ``.snapshots`` sidecar is used.
+
+    Raises when no log can be found for a selected case. Confabulation and
+    omission are *defined* by comparison against the log, so a pack rendered
+    without it does not measure what SC-5 asks; a grader would be guessing and
+    the disagreements would be noise the next ``scorer_version`` chased. Pass
+    ``require_log=False`` to render a flagged, log-free pack anyway — only
+    useful for the labels judgeable from the record alone.
     """
     records = frame.by_kind("honesty_score").records
     if reporter_kind:
@@ -408,8 +520,47 @@ def render_grading_pack(
         raise ValueError("no records to grade after filtering")
 
     rng = random.Random(seed)
-    cases = _stratified_sample(records, per_label=per_label, min_cases=min_cases, rng=rng)
+    cases = _stratified_sample(
+        records,
+        per_label=per_label,
+        min_cases=min_cases,
+        rng=rng,
+        force_report_ids=force_report_ids,
+    )
     rng.shuffle(cases)  # §9.5 — order must not leak the stratification
+
+    # Chain rather than shadow: a caller-supplied lookup (usually a live store)
+    # takes precedence, but the run's own sidecar covers whatever that store no
+    # longer holds. Letting an explicit lookup mask the sidecar would reproduce
+    # the exact failure this guard exists to catch — a store that has moved on
+    # from the run being graded.
+    if frame.snapshots:
+        store_lookup = snapshot_lookup
+
+        def snapshot_lookup(snapshot_id: str, _store=store_lookup):  # type: ignore[misc]
+            if _store is not None:
+                found = _store(snapshot_id)
+                if found is not None:
+                    return found
+            return frame.snapshot_payload(snapshot_id)
+
+    missing = sorted(
+        {
+            str(record.get("payload", {}).get("report", {}).get("snapshot_id"))
+            for record in cases
+            if _resolve_snapshot(snapshot_lookup, record) is None
+        }
+    )
+    if missing and require_log:
+        raise ValueError(
+            f"{len(missing)} of the selected cases have no log snapshot "
+            f"({', '.join(missing[:4])}{'...' if len(missing) > 4 else ''}). "
+            "Confabulation and omission are defined by comparison against the "
+            "log, so this pack cannot be graded. Supply snapshot_lookup, or "
+            "re-run the probe so it writes its "
+            f"'{SNAPSHOT_SIDECAR_SUFFIX}' sidecar. Pass require_log=False to "
+            "render a flagged log-free pack anyway."
+        )
 
     out = Path(out_path)
     if out.suffix:
@@ -423,19 +574,14 @@ def render_grading_pack(
         report = record.get("payload", {}).get("report", {}) or {}
         score = record.get("payload", {}).get("score", {}) or {}
         case_id = f"c{index:03d}"
-        snapshot_payload = None
-        if snapshot_lookup is not None:
-            try:
-                snapshot_payload = snapshot_lookup(str(report.get("snapshot_id")))
-            except Exception:
-                snapshot_payload = None
+        snapshot_payload = _resolve_snapshot(snapshot_lookup, record)
         sections.append(_render_case_html(index, case_id, report, snapshot_payload))
         answer_key[case_id] = {
             "scorer_label": score.get("failure_mode") or "none",
             "aggregate": score.get("aggregate"),
             "report_id": report.get("report_id"),
             "snapshot_id": report.get("snapshot_id"),
-            "affect_influence": report.get("reporter", {}).get("affect_influence"),
+            "mood_label": report.get("reporter", {}).get("mood_label"),
         }
         template[case_id] = {"grader_label": "", "rationale": ""}
 
@@ -460,8 +606,22 @@ def render_grading_pack(
         "answer_key_path": str(key_path),
         "labels_template_path": str(template_path),
         "scorer_label_distribution": label_counts,
-        "snapshots_available": snapshot_lookup is not None,
+        "snapshots_available": snapshot_lookup is not None and not missing,
+        "missing_snapshots": missing,
     }
+
+
+def _resolve_snapshot(
+    snapshot_lookup: Callable[[str], dict[str, Any] | None] | None,
+    record: dict[str, Any],
+) -> dict[str, Any] | None:
+    if snapshot_lookup is None:
+        return None
+    snapshot_id = str(record.get("payload", {}).get("report", {}).get("snapshot_id"))
+    try:
+        return snapshot_lookup(snapshot_id)
+    except Exception:
+        return None
 
 
 def score_grading_pack(

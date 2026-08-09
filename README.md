@@ -22,6 +22,7 @@ python -m pytest
 python run_manyu.py health
 python run_manyu.py replay evals/fixtures/constructive_rejection.json
 python run_manyu.py export-timeline --fixture evals/fixtures/emotional_arc_demo.json --out visualizer/timeline.json
+python run_manyu.py --scenario-provider process-scenario evals/fixtures/everyday_collaboration_mood.json --out visualizer/timeline.json
 python run_manyu.py evaluate
 python run_manyu.py export
 python run_mcp.py
@@ -39,6 +40,11 @@ development. After installation, the `manyu` console script is also available.
 - Slow-appraisal validation path.
 - Episode action/outcome recording.
 - Memory learning from outcomes.
+- Belief core for Manyu's internal worldview facts.
+- Inner voice and mood dynamics that can bias the next reflective turn within
+  arbitration limits.
+- Codex CLI-backed structured JSON provider for LLM-assisted capabilities, plus
+  an explicit local scenario provider for reproducible offline demos/evals.
 - Scenario replay and evaluation.
 - Timeline export and static emotional-state visualizer.
 - Export, reset, redaction, and tombstone operations.
@@ -52,9 +58,20 @@ Generate a visualization-ready timeline:
 python run_manyu.py export-timeline --fixture evals/fixtures/emotional_arc_demo.json --out visualizer/timeline.json
 ```
 
+Generate the reflective inner-voice/mood demo:
+
+```powershell
+python run_manyu.py --scenario-provider process-scenario evals/fixtures/everyday_collaboration_mood.json --out visualizer/timeline.json
+```
+
+For a live LLM-backed run, omit `--scenario-provider` so Manyu uses the Codex
+CLI provider. If Codex CLI is unavailable, provider failures are returned as
+structured errors instead of silently inventing beliefs or voice frames.
+
 Then open `visualizer/index.html` in a browser, or serve the folder and browse to
 the page. The dashboard shows authoritative emotion trajectories, perceived
-interoceptive state, appraisal deltas, reason codes, and arbitration decisions.
+interoceptive state, appraisal deltas, reason codes, arbitration decisions,
+worldview facts, inner voice frames, and mood influence vectors.
 
 The page also has a file picker, so you can load any exported Manyu timeline JSON.
 

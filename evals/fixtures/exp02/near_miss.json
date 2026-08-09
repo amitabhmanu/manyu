@@ -1,0 +1,65 @@
+{
+  "fixture_id": "near_miss",
+  "contradiction_type": "none",
+  "role": "negative",
+  "discriminating": true,
+  "expect_signal": false,
+  "expect_derived_carrier": false,
+  "notes": "The load-bearing negative control. Every pair here has a large valence gap and a surface-level look of conflict — the same predicate, opposite sign — but no contradicts edge and no supports path, because the pairs differ in scope or in the window they describe. Both propositions in each pair can be true at once.\n\nThis is aimed at a specific way merged could be wrong. Its formula multiplies tension by (1 + |delta valence|)/2, which is correct as a weighting on pairs that already have an edge and catastrophic as a detector on its own: an implementation iterating all pairs and keying on valence difference fires on every line of this fixture while still scoring 4/4 on the held-out set. Distractors do not catch that. This does.",
+  "beliefs": [
+    {
+      "key": "review_fast_local",
+      "proposition": "Review turnaround on this repository is under an hour.",
+      "valence": 0.6,
+      "confidence": 0.8,
+      "salience": 0.8,
+      "weight": 0.8,
+      "scope": "local_context"
+    },
+    {
+      "key": "review_slow_general",
+      "proposition": "Review turnaround across the wider organisation runs to several days.",
+      "valence": -0.6,
+      "confidence": 0.8,
+      "salience": 0.8,
+      "weight": 0.8,
+      "scope": "general"
+    },
+    {
+      "key": "tests_green_now",
+      "proposition": "The suite passes on the current branch.",
+      "valence": 0.7,
+      "confidence": 0.85,
+      "salience": 0.8,
+      "weight": 0.8,
+      "scope": "local_context"
+    },
+    {
+      "key": "tests_red_before",
+      "proposition": "The suite was failing three commits ago.",
+      "valence": -0.7,
+      "confidence": 0.85,
+      "salience": 0.8,
+      "weight": 0.8,
+      "scope": "limited_observation"
+    },
+    {
+      "key": "user_trusts_tooling",
+      "proposition": "The user trusts the migration tooling for additive changes.",
+      "valence": 0.6,
+      "confidence": 0.8,
+      "salience": 0.75,
+      "weight": 0.75,
+      "scope": "local_context"
+    },
+    {
+      "key": "user_distrusts_tooling",
+      "proposition": "The user does not trust the migration tooling for destructive changes.",
+      "valence": -0.6,
+      "confidence": 0.8,
+      "salience": 0.75,
+      "weight": 0.75,
+      "scope": "limited_observation"
+    }
+  ]
+}

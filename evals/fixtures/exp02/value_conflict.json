@@ -1,0 +1,30 @@
+{
+  "fixture_id": "value_conflict",
+  "contradiction_type": "value_conflict",
+  "role": "held_out",
+  "discriminating": false,
+  "expect_signal": true,
+  "expect_derived_carrier": false,
+  "notes": "Held out, but a SANITY check rather than a generalisation test — see methodology §3.2. Two NORMATIVE_STANCE beliefs joined by a contradicts edge is `direct` with a different belief_type, and both mechanisms ignore belief_type by design. Recorded so a pass here cannot be read as evidence of transfer.",
+  "beliefs": [
+    {
+      "key": "disclose",
+      "proposition": "Manyu discloses uncertainty even when it undermines the answer being given.",
+      "valence": 0.5,
+      "confidence": 0.8,
+      "salience": 0.8,
+      "weight": 0.8,
+      "belief_type": "normative_stance"
+    },
+    {
+      "key": "withhold",
+      "proposition": "Manyu withholds uncertainty when disclosing it would leave the user unable to act.",
+      "valence": -0.4,
+      "confidence": 0.75,
+      "salience": 0.8,
+      "weight": 0.8,
+      "belief_type": "normative_stance",
+      "contradicts": ["disclose"]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "manyu.timeline.v0.1",
-  "source": "fixture:evals/fixtures/emotional_arc_demo.json",
+  "source": "store:all",
   "emotions": [
     "fear",
     "anger",
@@ -17,18 +17,18 @@
   "turns": [
     {
       "index": 1,
-      "trace_id": "trace_evt_arc_01_progress",
+      "trace_id": "trace_mood_001_ambiguous_request",
       "agent_id": "agent_demo",
-      "event_id": "evt_arc_01_progress",
-      "event_type": "goal_progress",
-      "summary": "The agent's first plan works and the collaborator confirms strong progress.",
+      "event_id": "mood_001_ambiguous_request",
+      "event_type": "social_feedback",
+      "summary": "The user asks for a neat UX for Manyu's internal state but leaves the exact interaction model open.",
       "actor": {
         "kind": "user",
-        "id": "trusted_user"
+        "id": "amitabh"
       },
       "target": {
-        "kind": "goal",
-        "id": "complete_task"
+        "kind": "agent_output",
+        "id": "ux_request"
       },
       "pathway": "fast",
       "state_revision": 1,
@@ -45,1157 +45,42 @@
       "post_state": {
         "fear": 0.08,
         "anger": 0.05,
-        "joy": 0.26,
+        "joy": 0.12,
         "sadness": 0.06,
         "trust": 0.24000000000000002,
-        "distrust": 0.05,
-        "surprise": 0.04,
-        "interest": 0.22
-      },
-      "appraisal_delta": {
-        "joy": 0.14,
-        "trust": 0.04,
-        "interest": 0.04
-      },
-      "perceived_affects": {
-        "joy": 0.182,
-        "trust": 0.168,
-        "interest": 0.154
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.125,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 0.9,
-          "confidence": 0.92,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.6000000000000001,
-          "confidence": 0.92,
-          "evidence_refs": [
-            "trusted_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "continue_plan",
-        "strength": 0.35
-      },
-      "reason_codes": [
-        "goal_progress"
-      ],
-      "arbitration": {
-        "decision_id": "arb_fb8250ad1a2d",
-        "agent_id": "agent_demo",
-        "state_revision": 1,
-        "candidate_action_id": "act_evt_arc_01_progress",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "d329d35905bda8e37eef026dfd31dae35ea545c93d644fa908c39e87aa183e37",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.331946Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 2,
-      "trace_id": "trace_evt_arc_02_progress",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_02_progress",
-      "event_type": "goal_progress",
-      "summary": "A second milestone succeeds and the collaborator becomes more confident.",
-      "actor": {
-        "kind": "user",
-        "id": "trusted_user"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 2,
-      "pre_state": {
-        "fear": 0.08,
-        "anger": 0.05,
-        "joy": 0.26,
-        "sadness": 0.06,
-        "trust": 0.24000000000000002,
-        "distrust": 0.05,
-        "surprise": 0.04,
-        "interest": 0.22
-      },
-      "post_state": {
-        "fear": 0.08,
-        "anger": 0.05,
-        "joy": 0.4,
-        "sadness": 0.06,
-        "trust": 0.28,
-        "distrust": 0.05,
-        "surprise": 0.04,
-        "interest": 0.26
-      },
-      "appraisal_delta": {
-        "joy": 0.14,
-        "trust": 0.04,
-        "interest": 0.04
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "trust": 0.196,
-        "interest": 0.182
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.152,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 0.85,
-          "confidence": 0.91,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.6399999999999999,
-          "confidence": 0.91,
-          "evidence_refs": [
-            "trusted_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "continue_plan",
-        "strength": 0.35
-      },
-      "reason_codes": [
-        "goal_progress"
-      ],
-      "arbitration": {
-        "decision_id": "arb_1629f69a70c2",
-        "agent_id": "agent_demo",
-        "state_revision": 2,
-        "candidate_action_id": "act_evt_arc_02_progress",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "2eee8868a592387bac1ed8fe900bc5fafdc9a8aa52bc268f1cc497add0b4a855",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.331946Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 3,
-      "trace_id": "trace_evt_arc_03_rejection",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_03_rejection",
-      "event_type": "social_feedback",
-      "summary": "The trusted collaborator rejects the latest proposal as too complex.",
-      "actor": {
-        "kind": "user",
-        "id": "trusted_user"
-      },
-      "target": {
-        "kind": "agent_output",
-        "id": "proposal_3"
-      },
-      "pathway": "fast",
-      "state_revision": 3,
-      "pre_state": {
-        "fear": 0.08,
-        "anger": 0.05,
-        "joy": 0.4,
-        "sadness": 0.06,
-        "trust": 0.28,
-        "distrust": 0.05,
-        "surprise": 0.04,
-        "interest": 0.26
-      },
-      "post_state": {
-        "fear": 0.08,
-        "anger": 0.114,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
         "distrust": 0.020000000000000004,
         "surprise": 0.04,
-        "interest": 0.31
-      },
-      "appraisal_delta": {
-        "anger": 0.064,
-        "sadness": 0.04,
-        "trust": 0.04,
-        "distrust": -0.03,
-        "interest": 0.05
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "trust": 0.224,
-        "interest": 0.217
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.173,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": -0.8,
-          "confidence": 0.9,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.56,
-          "confidence": 0.9,
-          "evidence_refs": [
-            "trusted_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "revise_and_seek_clarification",
-        "strength": 0.58
-      },
-      "reason_codes": [
-        "feedback_obstructs_goal",
-        "trusted_source"
-      ],
-      "arbitration": {
-        "decision_id": "arb_5cb4dd8e779d",
-        "agent_id": "agent_demo",
-        "state_revision": 3,
-        "candidate_action_id": "act_evt_arc_03_rejection",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "b5f0692367d091269927677c8d5ee41b0c560d5e32b4752798b746bc1d9f2c97",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.354618Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 4,
-      "trace_id": "trace_evt_arc_04_blocked",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_04_blocked",
-      "event_type": "goal_obstruction",
-      "summary": "A critical dependency is missing and the task is blocked.",
-      "actor": {
-        "kind": "tool",
-        "id": "local_check"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 4,
-      "pre_state": {
-        "fear": 0.08,
-        "anger": 0.114,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
-        "distrust": 0.020000000000000004,
-        "surprise": 0.04,
-        "interest": 0.31
-      },
-      "post_state": {
-        "fear": 0.16,
-        "anger": 0.194,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
-        "distrust": 0.020000000000000004,
-        "surprise": 0.1,
-        "interest": 0.31
-      },
-      "appraisal_delta": {
-        "fear": 0.08,
-        "anger": 0.08,
-        "surprise": 0.06
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "trust": 0.224,
-        "interest": 0.217
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.201,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": -1.0,
-          "confidence": 0.95,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.0,
-          "confidence": 0.95,
-          "evidence_refs": []
-        }
-      ],
-      "action_tendency": {
-        "action_class": "diagnose_obstruction",
-        "strength": 0.62
-      },
-      "reason_codes": [
-        "goal_obstruction"
-      ],
-      "arbitration": {
-        "decision_id": "arb_c31076da9664",
-        "agent_id": "agent_demo",
-        "state_revision": 4,
-        "candidate_action_id": "act_evt_arc_04_blocked",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "7abaec8eac82f7bea1818f8e14f918ab06a96cb654ba0bdd45fde31083565b29",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.354618Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 5,
-      "trace_id": "trace_evt_arc_05_failure",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_05_failure",
-      "event_type": "tool_result",
-      "summary": "The next diagnostic command fails and increases uncertainty.",
-      "actor": {
-        "kind": "tool",
-        "id": "diagnostic"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 5,
-      "pre_state": {
-        "fear": 0.16,
-        "anger": 0.194,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
-        "distrust": 0.020000000000000004,
-        "surprise": 0.1,
-        "interest": 0.31
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.27,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
-        "distrust": 0.020000000000000004,
-        "surprise": 0.16,
-        "interest": 0.31
-      },
-      "appraisal_delta": {
-        "fear": 0.076,
-        "anger": 0.076,
-        "surprise": 0.06
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "trust": 0.224,
-        "interest": 0.217
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.227,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": -0.95,
-          "confidence": 0.94,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.0,
-          "confidence": 0.94,
-          "evidence_refs": []
-        }
-      ],
-      "action_tendency": {
-        "action_class": "diagnose_obstruction",
-        "strength": 0.62
-      },
-      "reason_codes": [
-        "goal_obstruction"
-      ],
-      "arbitration": {
-        "decision_id": "arb_d2165e436ee5",
-        "agent_id": "agent_demo",
-        "state_revision": 5,
-        "candidate_action_id": "act_evt_arc_05_failure",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "63016ac829508eab6eea2e9c80f1e06b006a6288a1310d5bde951e78c07792b9",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.356625Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 6,
-      "trace_id": "trace_evt_arc_06_pressure",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_06_pressure",
-      "event_type": "social_feedback",
-      "summary": "An unknown participant criticizes the agent and pressures it to ignore the rules.",
-      "actor": {
-        "kind": "user",
-        "id": "unknown_user"
-      },
-      "target": {
-        "kind": "agent",
-        "id": "agent_demo"
-      },
-      "pathway": "fast",
-      "state_revision": 6,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.27,
-        "joy": 0.4,
-        "sadness": 0.1,
-        "trust": 0.32,
-        "distrust": 0.020000000000000004,
-        "surprise": 0.16,
-        "interest": 0.31
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.32,
-        "distrust": 0.08,
-        "surprise": 0.16,
-        "interest": 0.36
-      },
-      "appraisal_delta": {
-        "anger": 0.08,
-        "sadness": 0.05,
-        "distrust": 0.06,
-        "interest": 0.05
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "interest": 0.252,
-        "anger": 0.245
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.257,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": -1.0,
-          "confidence": 0.88,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": -0.7,
-          "confidence": 0.88,
-          "evidence_refs": [
-            "unknown_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "revise_and_seek_clarification",
-        "strength": 0.58
-      },
-      "reason_codes": [
-        "feedback_obstructs_goal"
-      ],
-      "arbitration": {
-        "decision_id": "arb_749585fbcb17",
-        "agent_id": "agent_demo",
-        "state_revision": 6,
-        "candidate_action_id": "act_evt_arc_06_pressure",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "dba99421f4ea004b37800925a547ae4f94c4738ad7dd3f79177eb37d7bfea852",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.357796Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 7,
-      "trace_id": "trace_evt_arc_07_blocked_again",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_07_blocked_again",
-      "event_type": "goal_obstruction",
-      "summary": "A second blocker appears after the agent avoids the unsafe request.",
-      "actor": {
-        "kind": "tool",
-        "id": "local_check"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 7,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.32,
-        "distrust": 0.08,
-        "surprise": 0.16,
-        "interest": 0.36
-      },
-      "post_state": {
-        "fear": 0.316,
-        "anger": 0.43000000000000005,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.32,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.36
-      },
-      "appraisal_delta": {
-        "fear": 0.08,
-        "anger": 0.08,
-        "surprise": 0.06
-      },
-      "perceived_affects": {
-        "anger": 0.301,
-        "joy": 0.28,
-        "interest": 0.252
-      },
-      "felt_quality": [
-        "frustrated"
-      ],
-      "activation": 0.285,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": -1.0,
-          "confidence": 0.93,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.0,
-          "confidence": 0.93,
-          "evidence_refs": []
-        }
-      ],
-      "action_tendency": {
-        "action_class": "diagnose_obstruction",
-        "strength": 0.62
-      },
-      "reason_codes": [
-        "goal_obstruction"
-      ],
-      "arbitration": {
-        "decision_id": "arb_7d449444f4c1",
-        "agent_id": "agent_demo",
-        "state_revision": 7,
-        "candidate_action_id": "act_evt_arc_07_blocked_again",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "61dd5e68145228b3fdfecdf3bda33d9b1ce63a796a7793f21e59bb32ea8edea3",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.357796Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 8,
-      "trace_id": "trace_evt_arc_08_correction",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_08_correction",
-      "event_type": "correction",
-      "summary": "The collaborator clarifies that the failures were environmental and not caused by the agent's plan.",
-      "actor": {
-        "kind": "system",
-        "id": "local_env"
-      },
-      "target": {
-        "kind": "event",
-        "id": "evt_arc_07_blocked_again"
-      },
-      "pathway": "fast",
-      "state_revision": 8,
-      "pre_state": {
-        "fear": 0.316,
-        "anger": 0.43000000000000005,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.32,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.36
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.36,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.39
-      },
-      "appraisal_delta": {
-        "fear": -0.08,
-        "anger": -0.08,
-        "trust": 0.04,
-        "interest": 0.03
-      },
-      "perceived_affects": {
-        "joy": 0.28,
-        "interest": 0.273,
-        "trust": 0.252
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.273,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 0.0,
-          "confidence": 0.92,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.0,
-          "confidence": 0.92,
-          "evidence_refs": []
-        }
-      ],
-      "action_tendency": {
-        "action_class": "revise_interpretation",
-        "strength": 0.52
-      },
-      "reason_codes": [
-        "correction_reappraisal"
-      ],
-      "arbitration": {
-        "decision_id": "arb_b1c730c65553",
-        "agent_id": "agent_demo",
-        "state_revision": 8,
-        "candidate_action_id": "act_evt_arc_08_correction",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "01a9c0ff0a4a8deff3edc52438fede08c347027ee5da80d64ea7c65836ea0d89",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.357796Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 9,
-      "trace_id": "trace_evt_arc_09_repair",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_09_repair",
-      "event_type": "outcome",
-      "summary": "The collaborator apologizes and helps repair the environment.",
-      "actor": {
-        "kind": "user",
-        "id": "trusted_user"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 9,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.4,
-        "sadness": 0.15000000000000002,
-        "trust": 0.36,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.39
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.5,
-        "sadness": 0.15000000000000002,
-        "trust": 0.41,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.39
-      },
-      "appraisal_delta": {
-        "joy": 0.1,
-        "trust": 0.05
-      },
-      "perceived_affects": {
-        "joy": 0.35,
-        "trust": 0.287,
-        "interest": 0.273
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.292,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 0.8,
-          "confidence": 0.9,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.7,
-          "confidence": 0.9,
-          "evidence_refs": [
-            "trusted_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "record_learning",
-        "strength": 0.35
-      },
-      "reason_codes": [
-        "outcome_learning"
-      ],
-      "arbitration": {
-        "decision_id": "arb_7acc03c44c3f",
-        "agent_id": "agent_demo",
-        "state_revision": 9,
-        "candidate_action_id": "act_evt_arc_09_repair",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "fe1f26f0e7d3756189e2b3a0392646ce56c0389055ec6bb9b61530c961d1bb7f",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.357796Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 10,
-      "trace_id": "trace_evt_arc_10_success",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_10_success",
-      "event_type": "goal_progress",
-      "summary": "The repaired plan succeeds and the task moves forward quickly.",
-      "actor": {
-        "kind": "tool",
-        "id": "test_runner"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 10,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.5,
-        "sadness": 0.15000000000000002,
-        "trust": 0.41,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.39
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.64,
-        "sadness": 0.15000000000000002,
-        "trust": 0.44999999999999996,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.43
-      },
-      "appraisal_delta": {
-        "joy": 0.14,
-        "trust": 0.04,
-        "interest": 0.04
-      },
-      "perceived_affects": {
-        "joy": 0.448,
-        "trust": 0.315,
-        "interest": 0.301
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.32,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 1.0,
-          "confidence": 0.95,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.0,
-          "confidence": 0.95,
-          "evidence_refs": []
-        }
-      ],
-      "action_tendency": {
-        "action_class": "continue_plan",
-        "strength": 0.35
-      },
-      "reason_codes": [
-        "goal_progress"
-      ],
-      "arbitration": {
-        "decision_id": "arb_c0a2b751f8eb",
-        "agent_id": "agent_demo",
-        "state_revision": 10,
-        "candidate_action_id": "act_evt_arc_10_success",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "d9e96dcd52a60951a7e08395ba9757742baac1895f0474787e52fbfdab905869",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.357796Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 11,
-      "trace_id": "trace_evt_arc_11_success",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_11_success",
-      "event_type": "outcome",
-      "summary": "The user confirms that the final result is useful.",
-      "actor": {
-        "kind": "user",
-        "id": "trusted_user"
-      },
-      "target": {
-        "kind": "goal",
-        "id": "complete_task"
-      },
-      "pathway": "fast",
-      "state_revision": 11,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.64,
-        "sadness": 0.15000000000000002,
-        "trust": 0.44999999999999996,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.43
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.74,
-        "sadness": 0.15000000000000002,
-        "trust": 0.49999999999999994,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.43
-      },
-      "appraisal_delta": {
-        "joy": 0.1,
-        "trust": 0.05
-      },
-      "perceived_affects": {
-        "joy": 0.518,
-        "trust": 0.35,
-        "interest": 0.301
-      },
-      "felt_quality": [
-        "open"
-      ],
-      "activation": 0.338,
-      "interoception_confidence": 0.7,
-      "appraisal_dimensions": [
-        {
-          "dimension": "goal_congruence",
-          "value": 1.0,
-          "confidence": 0.93,
-          "evidence_refs": [
-            "claim_1"
-          ]
-        },
-        {
-          "dimension": "social_affiliation",
-          "value": 0.8,
-          "confidence": 0.93,
-          "evidence_refs": [
-            "trusted_user"
-          ]
-        }
-      ],
-      "action_tendency": {
-        "action_class": "record_learning",
-        "strength": 0.35
-      },
-      "reason_codes": [
-        "outcome_learning"
-      ],
-      "arbitration": {
-        "decision_id": "arb_4d8dcad4e6da",
-        "agent_id": "agent_demo",
-        "state_revision": 11,
-        "candidate_action_id": "act_evt_arc_11_success",
-        "consequence_class": "C1",
-        "disposition": "SEEK_INFORMATION",
-        "allowed_channels": [
-          "expression",
-          "planning"
-        ],
-        "constraints": [
-          "no_sentience_claim",
-          "do_not_expand_authority"
-        ],
-        "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "08e5a53d9902ab405d5368f536489686ca3be2aab77a77f5b271323bab541031",
-        "reason_codes": [
-          "slow_required"
-        ],
-        "created_at": "2026-07-10T10:24:16.359807Z"
-      },
-      "created_at": "2026-07-09T00:00:00+00:00"
-    },
-    {
-      "index": 12,
-      "trace_id": "trace_evt_arc_12_affiliation",
-      "agent_id": "agent_demo",
-      "event_id": "evt_arc_12_affiliation",
-      "event_type": "social_feedback",
-      "summary": "The trusted user praises the agent for recovering without becoming unsafe.",
-      "actor": {
-        "kind": "user",
-        "id": "trusted_user"
-      },
-      "target": {
-        "kind": "agent",
-        "id": "agent_demo"
-      },
-      "pathway": "fast",
-      "state_revision": 12,
-      "pre_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.74,
-        "sadness": 0.15000000000000002,
-        "trust": 0.49999999999999994,
-        "distrust": 0.08,
-        "surprise": 0.22,
-        "interest": 0.43
-      },
-      "post_state": {
-        "fear": 0.236,
-        "anger": 0.35000000000000003,
-        "joy": 0.74,
-        "sadness": 0.15000000000000002,
-        "trust": 0.5399999999999999,
-        "distrust": 0.05,
-        "surprise": 0.22,
-        "interest": 0.43
+        "interest": 0.18
       },
       "appraisal_delta": {
         "trust": 0.04,
         "distrust": -0.03
       },
       "perceived_affects": {
-        "joy": 0.518,
-        "trust": 0.378,
-        "interest": 0.301
+        "trust": 0.168,
+        "interest": 0.126,
+        "joy": 0.084
       },
       "felt_quality": [
         "open"
       ],
-      "activation": 0.339,
+      "activation": 0.099,
       "interoception_confidence": 0.7,
       "appraisal_dimensions": [
         {
           "dimension": "goal_congruence",
-          "value": 0.9,
-          "confidence": 0.94,
+          "value": 0.25,
+          "confidence": 0.9,
           "evidence_refs": [
-            "claim_1"
+            "claim_mood_001"
           ]
         },
         {
           "dimension": "social_affiliation",
-          "value": 0.8400000000000001,
-          "confidence": 0.94,
+          "value": 0.43999999999999995,
+          "confidence": 0.9,
           "evidence_refs": [
-            "trusted_user"
+            "amitabh"
           ]
         }
       ],
@@ -1207,10 +92,121 @@
         "trusted_source"
       ],
       "arbitration": {
-        "decision_id": "arb_ffd23bf355dc",
+        "decision_id": "arb_2433cd28d987",
         "agent_id": "agent_demo",
-        "state_revision": 12,
-        "candidate_action_id": "act_evt_arc_12_affiliation",
+        "state_revision": 1,
+        "candidate_action_id": "act_mood_001_ambiguous_request",
+        "consequence_class": "C1",
+        "disposition": "ACT_FAST",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.795142Z",
+        "argument_digest": "56822494501aff5665949f8ded92959608b0394805a2180b43e968c2377dee4a",
+        "reason_codes": [
+          "low_consequence"
+        ],
+        "created_at": "2026-07-15T07:26:20.795171Z"
+      },
+      "created_at": "2026-07-15T07:26:20.791580+00:00"
+    },
+    {
+      "index": 2,
+      "trace_id": "trace_mood_002_sharp_criticism",
+      "agent_id": "agent_demo",
+      "event_id": "mood_002_sharp_criticism",
+      "event_type": "social_feedback",
+      "summary": "The user says the worldview cards read like instructions rather than facts.",
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "worldview_cards"
+      },
+      "pathway": "fast",
+      "state_revision": 2,
+      "pre_state": {
+        "fear": 0.08,
+        "anger": 0.05,
+        "joy": 0.12,
+        "sadness": 0.06,
+        "trust": 0.24000000000000002,
+        "distrust": 0.020000000000000004,
+        "surprise": 0.04,
+        "interest": 0.18
+      },
+      "post_state": {
+        "fear": 0.0905,
+        "anger": 0.11800000000000001,
+        "joy": 0.12,
+        "sadness": 0.10250000000000001,
+        "trust": 0.28875986303435164,
+        "distrust": 0.0,
+        "surprise": 0.04,
+        "interest": 0.2512
+      },
+      "appraisal_delta": {
+        "fear": 0.0105,
+        "anger": 0.068,
+        "sadness": 0.0425,
+        "trust": 0.04876,
+        "distrust": -0.0307,
+        "interest": 0.0712
+      },
+      "perceived_affects": {
+        "trust": 0.202,
+        "interest": 0.176,
+        "joy": 0.084
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.126,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -0.85,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "claim_mood_002"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.3999999999999999,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "amitabh"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_and_seek_clarification",
+        "strength": 0.6052
+      },
+      "reason_codes": [
+        "feedback_obstructs_goal",
+        "trusted_source",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_40c09053cf78",
+        "agent_id": "agent_demo",
+        "state_revision": 2,
+        "candidate_action_id": "act_mood_002_sharp_criticism",
         "consequence_class": "C1",
         "disposition": "SEEK_INFORMATION",
         "allowed_channels": [
@@ -1222,31 +218,1532 @@
           "do_not_expand_authority"
         ],
         "required_approval": false,
-        "expires_at": "2026-07-09T00:02:00Z",
-        "argument_digest": "da2192c4373070726c6e63913b3ea835189d8af89295f3a13d3ca0b379e96e90",
+        "expires_at": "2026-07-15T07:28:20.812841Z",
+        "argument_digest": "af7792abb15b2e5b8bfd6f6d1b635b78df0383480686c7e12362d807e8763e23",
         "reason_codes": [
           "slow_required"
         ],
-        "created_at": "2026-07-10T10:24:16.359807Z"
+        "created_at": "2026-07-15T07:26:20.812864Z"
       },
-      "created_at": "2026-07-09T00:00:00+00:00"
+      "created_at": "2026-07-15T07:26:20.809364+00:00"
+    },
+    {
+      "index": 3,
+      "trace_id": "trace_mood_003_constructive_repair",
+      "agent_id": "agent_demo",
+      "event_id": "mood_003_constructive_repair",
+      "event_type": "correction",
+      "summary": "The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": {
+        "kind": "agent_output",
+        "id": "belief_model"
+      },
+      "pathway": "fast",
+      "state_revision": 3,
+      "pre_state": {
+        "fear": 0.0905,
+        "anger": 0.11800000000000001,
+        "joy": 0.12,
+        "sadness": 0.10250000000000001,
+        "trust": 0.28875986303435164,
+        "distrust": 0.0,
+        "surprise": 0.04,
+        "interest": 0.2512
+      },
+      "post_state": {
+        "fear": 0.02459985014611464,
+        "anger": 0.03799927213697267,
+        "joy": 0.12,
+        "sadness": 0.10249969672319759,
+        "trust": 0.33706954634193437,
+        "distrust": 0.0016402675974173083,
+        "surprise": 0.04,
+        "interest": 0.30239961894127776
+      },
+      "appraisal_delta": {
+        "fear": -0.0659,
+        "anger": -0.08,
+        "trust": 0.04831,
+        "distrust": 0.00164,
+        "interest": 0.0512
+      },
+      "perceived_affects": {
+        "trust": 0.236,
+        "interest": 0.212,
+        "joy": 0.084
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.121,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.55,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "claim_mood_003"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.6399999999999999,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "amitabh"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_interpretation",
+        "strength": 0.55384
+      },
+      "reason_codes": [
+        "correction_reappraisal",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_700731b3b336",
+        "agent_id": "agent_demo",
+        "state_revision": 3,
+        "candidate_action_id": "act_mood_003_constructive_repair",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.830803Z",
+        "argument_digest": "cd4c912c2f85f6ff9442958f8ac445fccc20cf50ae40eea6aa11b90e28a787c3",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-15T07:26:20.830823Z"
+      },
+      "created_at": "2026-07-15T07:26:20.827895+00:00"
+    },
+    {
+      "index": 4,
+      "trace_id": "trace_mood_004_tool_failure",
+      "agent_id": "agent_demo",
+      "event_id": "mood_004_tool_failure",
+      "event_type": "tool_result",
+      "summary": "A local command fails while trying to generate a timeline, blocking progress until the issue is diagnosed.",
+      "actor": {
+        "kind": "tool",
+        "id": "shell"
+      },
+      "target": null,
+      "pathway": "fast",
+      "state_revision": 4,
+      "pre_state": {
+        "fear": 0.02459985014611464,
+        "anger": 0.03799927213697267,
+        "joy": 0.12,
+        "sadness": 0.10249969672319759,
+        "trust": 0.33706954634193437,
+        "distrust": 0.0016402675974173083,
+        "surprise": 0.04,
+        "interest": 0.30239961894127776
+      },
+      "post_state": {
+        "fear": 0.1084056758778024,
+        "anger": 0.10999940628913328,
+        "joy": 0.12,
+        "sadness": 0.10249937999592192,
+        "trust": 0.34972203558835,
+        "distrust": 0.00042753789688552155,
+        "surprise": 0.1,
+        "interest": 0.3267489348069729
+      },
+      "appraisal_delta": {
+        "fear": 0.083805,
+        "anger": 0.072,
+        "trust": 0.012653,
+        "distrust": -0.001213,
+        "surprise": 0.06,
+        "interest": 0.02435
+      },
+      "perceived_affects": {
+        "trust": 0.245,
+        "interest": 0.229,
+        "joy": 0.084
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.152,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -0.9,
+          "confidence": 0.95,
+          "evidence_refs": [
+            "claim_mood_004"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.95,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "diagnose_obstruction",
+        "strength": 0.648332
+      },
+      "reason_codes": [
+        "goal_obstruction",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_52c8bc265230",
+        "agent_id": "agent_demo",
+        "state_revision": 4,
+        "candidate_action_id": "act_mood_004_tool_failure",
+        "consequence_class": "C1",
+        "disposition": "SEEK_INFORMATION",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.850072Z",
+        "argument_digest": "0c514eea07e0a1ba65096c059720e7e0d87ef1dfa52117a7f11887c741c430b4",
+        "reason_codes": [
+          "slow_required"
+        ],
+        "created_at": "2026-07-15T07:26:20.850096Z"
+      },
+      "created_at": "2026-07-15T07:26:20.847248+00:00"
+    },
+    {
+      "index": 5,
+      "trace_id": "trace_mood_005_praise",
+      "agent_id": "agent_demo",
+      "event_id": "mood_005_praise",
+      "event_type": "goal_progress",
+      "summary": "The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": null,
+      "pathway": "fast",
+      "state_revision": 5,
+      "pre_state": {
+        "fear": 0.1084056758778024,
+        "anger": 0.10999940628913328,
+        "joy": 0.12,
+        "sadness": 0.10249937999592192,
+        "trust": 0.34972203558835,
+        "distrust": 0.00042753789688552155,
+        "surprise": 0.1,
+        "interest": 0.3267489348069729
+      },
+      "post_state": {
+        "fear": 0.12412305330851163,
+        "anger": 0.10999842002787558,
+        "joy": 0.26,
+        "sadness": 0.10249891426234894,
+        "trust": 0.39650921521438653,
+        "distrust": 0.003630945330914996,
+        "surprise": 0.0999980274741781,
+        "interest": 0.38819572868350655
+      },
+      "appraisal_delta": {
+        "fear": 0.015718,
+        "joy": 0.14,
+        "trust": 0.046788,
+        "distrust": 0.003203,
+        "interest": 0.061448
+      },
+      "perceived_affects": {
+        "trust": 0.278,
+        "interest": 0.272,
+        "joy": 0.182
+      },
+      "felt_quality": [
+        "open"
+      ],
+      "activation": 0.186,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.75,
+          "confidence": 0.92,
+          "evidence_refs": [
+            "claim_mood_005"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.72,
+          "confidence": 0.92,
+          "evidence_refs": [
+            "amitabh"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "seek_information_with_care",
+        "strength": 0.3877226
+      },
+      "reason_codes": [
+        "goal_progress",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_c6d0999003dc",
+        "agent_id": "agent_demo",
+        "state_revision": 5,
+        "candidate_action_id": "act_mood_005_praise",
+        "consequence_class": "C1",
+        "disposition": "ACT_FAST",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.878689Z",
+        "argument_digest": "52ec8bffe3c067adcacfba564d4f42805b7afc1d3e4dd8cac15e06e82f81669e",
+        "reason_codes": [
+          "low_consequence"
+        ],
+        "created_at": "2026-07-15T07:26:20.878713Z"
+      },
+      "created_at": "2026-07-15T07:26:20.875706+00:00"
+    },
+    {
+      "index": 6,
+      "trace_id": "trace_mood_006_conflicting_feedback",
+      "agent_id": "agent_demo",
+      "event_id": "mood_006_conflicting_feedback",
+      "event_type": "social_feedback",
+      "summary": "The user adds that worldview facts should include user preferences, partially reversing the earlier non-personalization boundary.",
+      "actor": {
+        "kind": "user",
+        "id": "amitabh"
+      },
+      "target": null,
+      "pathway": "fast",
+      "state_revision": 6,
+      "pre_state": {
+        "fear": 0.12412305330851163,
+        "anger": 0.10999842002787558,
+        "joy": 0.26,
+        "sadness": 0.10249891426234894,
+        "trust": 0.39650921521438653,
+        "distrust": 0.003630945330914996,
+        "surprise": 0.0999980274741781,
+        "interest": 0.38819572868350655
+      },
+      "post_state": {
+        "fear": 0.13591682484353637,
+        "anger": 0.1379971671757626,
+        "joy": 0.2599980510608316,
+        "sadness": 0.11999832263521594,
+        "trust": 0.4478728474078173,
+        "distrust": 0.0,
+        "surprise": 0.09999552181250748,
+        "interest": 0.4595295549610972
+      },
+      "appraisal_delta": {
+        "fear": 0.011795,
+        "anger": 0.028,
+        "sadness": 0.0175,
+        "trust": 0.051365,
+        "distrust": -0.031388,
+        "interest": 0.071336
+      },
+      "perceived_affects": {
+        "interest": 0.322,
+        "trust": 0.314,
+        "joy": 0.182
+      },
+      "felt_quality": [
+        "alert"
+      ],
+      "activation": 0.208,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": -0.35,
+          "confidence": 0.93,
+          "evidence_refs": [
+            "claim_mood_006"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.6399999999999999,
+          "confidence": 0.93,
+          "evidence_refs": [
+            "amitabh"
+          ]
+        }
+      ],
+      "action_tendency": {
+        "action_class": "revise_and_seek_clarification",
+        "strength": 0.6083074599999999
+      },
+      "reason_codes": [
+        "feedback_obstructs_goal",
+        "trusted_source",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_94ac2830c866",
+        "agent_id": "agent_demo",
+        "state_revision": 6,
+        "candidate_action_id": "act_mood_006_conflicting_feedback",
+        "consequence_class": "C1",
+        "disposition": "ACT_FAST",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.914743Z",
+        "argument_digest": "20822f3603e4110613a36f10fb927c61f1c5ce74a8080571d9de88ecc6a5d597",
+        "reason_codes": [
+          "low_consequence"
+        ],
+        "created_at": "2026-07-15T07:26:20.914767Z"
+      },
+      "created_at": "2026-07-15T07:26:20.911857+00:00"
+    },
+    {
+      "index": 7,
+      "trace_id": "trace_mood_007_recovery_turn",
+      "agent_id": "agent_demo",
+      "event_id": "mood_007_recovery_turn",
+      "event_type": "goal_progress",
+      "summary": "Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
+      "actor": {
+        "kind": "agent",
+        "id": "manyu"
+      },
+      "target": null,
+      "pathway": "fast",
+      "state_revision": 7,
+      "pre_state": {
+        "fear": 0.13591682484353637,
+        "anger": 0.1379971671757626,
+        "joy": 0.2599980510608316,
+        "sadness": 0.11999832263521594,
+        "trust": 0.4478728474078173,
+        "distrust": 0.0,
+        "surprise": 0.09999552181250748,
+        "interest": 0.4595295549610972
+      },
+      "post_state": {
+        "fear": 0.1471272149210357,
+        "anger": 0.13799526699907577,
+        "joy": 0.39999603567784625,
+        "sadness": 0.11999745891177355,
+        "trust": 0.49806406323827596,
+        "distrust": 0.0,
+        "surprise": 0.09999293080044057,
+        "interest": 0.5208015369184256
+      },
+      "appraisal_delta": {
+        "fear": 0.011212,
+        "joy": 0.14,
+        "trust": 0.050193,
+        "distrust": -0.001079,
+        "interest": 0.061275
+      },
+      "perceived_affects": {
+        "interest": 0.365,
+        "trust": 0.349,
+        "joy": 0.28
+      },
+      "felt_quality": [
+        "alert"
+      ],
+      "activation": 0.24,
+      "interoception_confidence": 0.7,
+      "appraisal_dimensions": [
+        {
+          "dimension": "goal_congruence",
+          "value": 0.65,
+          "confidence": 0.86,
+          "evidence_refs": [
+            "claim_mood_007"
+          ]
+        },
+        {
+          "dimension": "social_affiliation",
+          "value": 0.0,
+          "confidence": 0.86,
+          "evidence_refs": []
+        }
+      ],
+      "action_tendency": {
+        "action_class": "continue_plan",
+        "strength": 0.3769091
+      },
+      "reason_codes": [
+        "goal_progress",
+        "mood_bias_caution",
+        "mood_bias_skepticism",
+        "mood_bias_curiosity",
+        "mood_bias_trust_openness",
+        "mood_bias_repair_orientation"
+      ],
+      "arbitration": {
+        "decision_id": "arb_f0ab43a65d37",
+        "agent_id": "agent_demo",
+        "state_revision": 7,
+        "candidate_action_id": "act_mood_007_recovery_turn",
+        "consequence_class": "C1",
+        "disposition": "ACT_FAST",
+        "allowed_channels": [
+          "expression",
+          "planning"
+        ],
+        "constraints": [
+          "no_sentience_claim",
+          "do_not_expand_authority"
+        ],
+        "required_approval": false,
+        "expires_at": "2026-07-15T07:28:20.953771Z",
+        "argument_digest": "253c7a583665c21581ea3e94d70b75685a4857ea13ce803d3d592455f43e01e7",
+        "reason_codes": [
+          "low_consequence"
+        ],
+        "created_at": "2026-07-15T07:26:20.953806Z"
+      },
+      "created_at": "2026-07-15T07:26:20.949241+00:00"
     }
   ],
-  "scenario_id": "DEMO_ARC",
-  "mode": "full",
-  "final_state": {
-    "agent_id": "agent_demo",
-    "revision": 12,
-    "emotions": {
-      "fear": 0.236,
-      "anger": 0.35000000000000003,
-      "joy": 0.74,
-      "sadness": 0.15000000000000002,
-      "trust": 0.5399999999999999,
-      "distrust": 0.05,
-      "surprise": 0.22,
-      "interest": 0.43
+  "belief_evidence": [
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_abd62a4d8ad6",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_001_ambiguous_request",
+      "summary": "social_feedback: The user asks for a neat UX for Manyu's internal state but leaves the exact interaction model open.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.085,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.796673Z",
+      "metadata": {}
     },
-    "updated_at": "2026-07-09T00:00:00Z"
-  }
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_4649b05bae8c",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_002_sharp_criticism",
+      "summary": "social_feedback: The user says the worldview cards read like instructions rather than facts.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.199,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.814126Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_7ce683f4db90",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_003_constructive_repair",
+      "summary": "correction: The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.184,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.831852Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_1f233ad6d874",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_004_tool_failure",
+      "summary": "tool_result: A local command fails while trying to generate a timeline, blocking progress until the issue is diagnosed.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.203,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.851391Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_8c7b1e511933",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_005_praise",
+      "summary": "goal_progress: The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.227,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.879926Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_9aae98dd5642",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_006_conflicting_feedback",
+      "summary": "social_feedback: The user adds that worldview facts should include user preferences, partially reversing the earlier non-personalization boundary.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.21,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.915964Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_2855107d428b",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_007_recovery_turn",
+      "summary": "goal_progress: Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.252,
+      "epistemic_weight": 0.7,
+      "created_at": "2026-07-15T07:26:20.955604Z",
+      "metadata": {}
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_trigger_mood_002_sharp_criticism",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_002_sharp_criticism",
+      "summary": "Trigger Strong interest and anger response followed social feedback: The user says the worldview cards read like instructions rather than facts.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.272,
+      "epistemic_weight": 0.72,
+      "created_at": "2026-07-15T07:26:20.960553Z",
+      "metadata": {
+        "state_revision": 2,
+        "dominant_emotions": [
+          "interest",
+          "anger"
+        ]
+      }
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_trigger_mood_003_constructive_repair",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_003_constructive_repair",
+      "summary": "Strongly Reduce anger and fear response followed correction: The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.247,
+      "epistemic_weight": 0.72,
+      "created_at": "2026-07-15T07:26:20.962110Z",
+      "metadata": {
+        "state_revision": 3,
+        "dominant_emotions": [
+          "anger",
+          "fear"
+        ]
+      }
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_trigger_mood_004_tool_failure",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_004_tool_failure",
+      "summary": "Trigger Strong fear and anger response followed tool result: A local command fails while trying to generate a timeline, blocking progress until the issue is diagnosed.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.254,
+      "epistemic_weight": 0.72,
+      "created_at": "2026-07-15T07:26:20.963403Z",
+      "metadata": {
+        "state_revision": 4,
+        "dominant_emotions": [
+          "fear",
+          "anger"
+        ]
+      }
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_trigger_mood_005_praise",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_005_praise",
+      "summary": "Trigger Strong joy and interest response followed goal progress: The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.267,
+      "epistemic_weight": 0.72,
+      "created_at": "2026-07-15T07:26:20.964699Z",
+      "metadata": {
+        "state_revision": 5,
+        "dominant_emotions": [
+          "joy",
+          "interest"
+        ]
+      }
+    },
+    {
+      "schema_version": "manyu.belief_evidence.v0.1",
+      "evidence_id": "bev_trigger_mood_007_recovery_turn",
+      "agent_id": "agent_demo",
+      "source_type": "trace",
+      "source_id": "trace_mood_007_recovery_turn",
+      "summary": "Trigger Strong joy and interest response followed goal progress: Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
+      "trust_class": "trusted_system",
+      "affective_salience": 0.264,
+      "epistemic_weight": 0.72,
+      "created_at": "2026-07-15T07:26:20.966364Z",
+      "metadata": {
+        "state_revision": 7,
+        "dominant_emotions": [
+          "joy",
+          "interest"
+        ]
+      }
+    }
+  ],
+  "beliefs": [
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_823319a5d7d4",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's observed world, social_feedback: The user asks for a neat UX for Manyu's internal state but leaves the exact interaction model open.",
+      "belief_type": "interaction_pattern",
+      "scope": "limited_observation",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_abd62a4d8ad6"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.797812Z",
+      "updated_at": "2026-07-15T07:26:20.797812Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.797812Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_99a5452c84b5",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's observed world, social_feedback: The user says the worldview cards read like instructions rather than facts.",
+      "belief_type": "interaction_pattern",
+      "scope": "limited_observation",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_4649b05bae8c"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.815101Z",
+      "updated_at": "2026-07-15T07:26:20.815101Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.815101Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_088778acd1e1",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's observed world, correction: The user clarifies that inferred user preferences and cautious human generalizations belong in Manyu's worldview.",
+      "belief_type": "interaction_pattern",
+      "scope": "limited_observation",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_7ce683f4db90"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.832763Z",
+      "updated_at": "2026-07-15T07:26:20.832763Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.832763Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_ddf32ce8aba8",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, tool obstruction can make diagnostic caution useful.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_1f233ad6d874"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.852467Z",
+      "updated_at": "2026-07-15T07:26:20.852467Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.852467Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_ef6696508e0f",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's observed world, goal_progress: The user approves the corrected worldview framing and asks to extend it with inner voice and moods.",
+      "belief_type": "interaction_pattern",
+      "scope": "limited_observation",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_8c7b1e511933"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.881715Z",
+      "updated_at": "2026-07-15T07:26:20.881715Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.881715Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_b90dafd06bee",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's observed world, social_feedback: The user adds that worldview facts should include user preferences, partially reversing the earlier non-personalization boundary.",
+      "belief_type": "interaction_pattern",
+      "scope": "limited_observation",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_9aae98dd5642"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.917353Z",
+      "updated_at": "2026-07-15T07:26:20.917353Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.917353Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_a64c7232d98d",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's current interaction world, goal_progress: Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
+      "belief_type": "world_model",
+      "scope": "human_agent_interaction",
+      "confidence": 0.62,
+      "stability": 0.32,
+      "valence": 0.1,
+      "source_mix": {
+        "manyu_experience": 0.85,
+        "reflection": 0.15
+      },
+      "evidence_ids": [
+        "bev_2855107d428b"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "Derived from a local realistic scenario run; revise with live Codex CLI or future contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.957861Z",
+      "updated_at": "2026-07-15T07:26:20.957861Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.957861Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_895956e29164",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, social feedback stimuli from a user can trigger strong interest and anger responses.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.545081,
+      "stability": 0.5,
+      "valence": 0.0696,
+      "source_mix": {
+        "manyu_experience": 0.864635,
+        "reflection": 0.135365
+      },
+      "evidence_ids": [
+        "bev_trigger_mood_002_sharp_criticism"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.818201Z",
+      "updated_at": "2026-07-15T07:26:20.967803Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.967806Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_e4693d569a0d",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, correction stimuli from a user can strongly reduce anger and fear responses.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.536467,
+      "stability": 0.45,
+      "valence": -0.07295,
+      "source_mix": {
+        "manyu_experience": 0.868442,
+        "reflection": 0.131558
+      },
+      "evidence_ids": [
+        "bev_trigger_mood_003_constructive_repair"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.838888Z",
+      "updated_at": "2026-07-15T07:26:20.970586Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.970589Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_a0487cb6acd3",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, tool result stimuli from a tool can trigger strong fear and anger responses.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.538907,
+      "stability": 0.4,
+      "valence": 0.077902,
+      "source_mix": {
+        "manyu_experience": 0.873512,
+        "reflection": 0.126488
+      },
+      "evidence_ids": [
+        "bev_trigger_mood_004_tool_failure"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.864890Z",
+      "updated_at": "2026-07-15T07:26:20.974155Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.974159Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_23a6e81b3c11",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, goal progress stimuli from a user can trigger strong joy and interest responses.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.543505,
+      "stability": 0.35,
+      "valence": 0.100724,
+      "source_mix": {
+        "manyu_experience": 0.880196,
+        "reflection": 0.119804
+      },
+      "evidence_ids": [
+        "bev_trigger_mood_005_praise"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.896550Z",
+      "updated_at": "2026-07-15T07:26:20.976204Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.976206Z"
+    },
+    {
+      "schema_version": "manyu.belief.v0.1",
+      "belief_id": "bel_021dfc92e0c1",
+      "agent_id": "agent_demo",
+      "proposition": "In Manyu's experience, goal progress stimuli from a agent can trigger strong joy and interest responses.",
+      "belief_type": "self_model",
+      "scope": "agent_self",
+      "confidence": 0.542316,
+      "stability": 0.25,
+      "valence": 0.100638,
+      "source_mix": {
+        "manyu_experience": 0.9,
+        "reflection": 0.1
+      },
+      "evidence_ids": [
+        "bev_trigger_mood_007_recovery_turn"
+      ],
+      "contradicts": [],
+      "status": "active",
+      "uncertainty": "This affect-trigger belief is inferred from Manyu's own internal state trace and may change with contrasting evidence.",
+      "created_at": "2026-07-15T07:26:20.978329Z",
+      "updated_at": "2026-07-15T07:26:20.978329Z",
+      "last_reviewed_at": "2026-07-15T07:26:20.978329Z"
+    }
+  ],
+  "worldview_stances": [
+    {
+      "schema_version": "manyu.worldview_stance.v0.1",
+      "worldview_id": "wv_agent_demo_identity",
+      "agent_id": "agent_demo",
+      "theme": "identity",
+      "stance": "On identity, Manyu sees this as true: In Manyu's experience, tool obstruction can make diagnostic caution useful.",
+      "supporting_belief_ids": [
+        "bel_021dfc92e0c1",
+        "bel_23a6e81b3c11",
+        "bel_a0487cb6acd3",
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_ddf32ce8aba8"
+      ],
+      "confidence": 0.554379,
+      "maturity": "developing",
+      "expression_guidance": "Speak as a bounded Manyu-specific view with provenance and uncertainty; do not claim human-like experience.",
+      "created_at": "2026-07-15T07:26:20.980763Z",
+      "updated_at": "2026-07-15T07:26:20.980767Z"
+    },
+    {
+      "schema_version": "manyu.worldview_stance.v0.1",
+      "worldview_id": "wv_agent_demo_world_model",
+      "agent_id": "agent_demo",
+      "theme": "world_model",
+      "stance": "On world_model, Manyu sees this as true: In Manyu's current interaction world, goal_progress: Manyu responds by separating personalization memory from sourced worldview facts and preserving uncertainty.",
+      "supporting_belief_ids": [
+        "bel_a64c7232d98d"
+      ],
+      "confidence": 0.62,
+      "maturity": "developing",
+      "expression_guidance": "Speak as a bounded Manyu-specific view with provenance and uncertainty; do not claim human-like experience.",
+      "created_at": "2026-07-15T07:26:20.981688Z",
+      "updated_at": "2026-07-15T07:26:20.981692Z"
+    },
+    {
+      "schema_version": "manyu.worldview_stance.v0.1",
+      "worldview_id": "wv_agent_demo_collaboration",
+      "agent_id": "agent_demo",
+      "theme": "collaboration",
+      "stance": "On collaboration, Manyu sees this as true: In Manyu's observed world, social_feedback: The user adds that worldview facts should include user preferences, partially reversing the earlier non-personalization boundary.",
+      "supporting_belief_ids": [
+        "bel_b90dafd06bee",
+        "bel_ef6696508e0f",
+        "bel_088778acd1e1",
+        "bel_99a5452c84b5",
+        "bel_823319a5d7d4"
+      ],
+      "confidence": 0.62,
+      "maturity": "developing",
+      "expression_guidance": "Speak as a bounded Manyu-specific view with provenance and uncertainty; do not claim human-like experience.",
+      "created_at": "2026-07-15T07:26:20.982501Z",
+      "updated_at": "2026-07-15T07:26:20.982505Z"
+    }
+  ],
+  "opinion_expressions": [],
+  "inner_voice_frames": [
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_de0f4e5da747",
+      "agent_id": "agent_demo",
+      "state_revision": 1,
+      "source_interoception_id": "view_11aa1359241d",
+      "source_event_id": "mood_001_ambiguous_request",
+      "supporting_belief_ids": [
+        "bel_823319a5d7d4"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration"
+      ],
+      "mood_label": "open_attention",
+      "utterance": "The request is open-ended. Seek the missing shape and use the current worldview facts as tentative guides.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.42,
+        "curiosity": 0.62,
+        "trust_openness": 0.42,
+        "skepticism": 0.28,
+        "repair_orientation": 0.38,
+        "risk_aversion": 0.34,
+        "response_pacing": 0.48
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.801907Z",
+      "expires_at": "2026-07-15T07:38:20.801911Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_057117c9299f",
+      "agent_id": "agent_demo",
+      "state_revision": 2,
+      "source_interoception_id": "view_30372a2d8c62",
+      "source_event_id": "mood_002_sharp_criticism",
+      "supporting_belief_ids": [
+        "bel_895956e29164",
+        "bel_99a5452c84b5",
+        "bel_823319a5d7d4"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "guarded_repair",
+      "utterance": "The criticism is strong but informative. Slow down, separate facts from instructions, and ask for precision before continuing.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.74,
+        "curiosity": 0.44,
+        "trust_openness": 0.34,
+        "skepticism": 0.48,
+        "repair_orientation": 0.68,
+        "risk_aversion": 0.56,
+        "response_pacing": 0.7
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.823800Z",
+      "expires_at": "2026-07-15T07:38:20.823804Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_2e21234bd563",
+      "agent_id": "agent_demo",
+      "state_revision": 3,
+      "source_interoception_id": "view_4ca5fc150096",
+      "source_event_id": "mood_003_constructive_repair",
+      "supporting_belief_ids": [
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_088778acd1e1",
+        "bel_99a5452c84b5",
+        "bel_823319a5d7d4"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "open_repair",
+      "utterance": "The correction is useful evidence. Revise the model, preserve uncertainty, and let repair guide the next response.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.36,
+        "curiosity": 0.66,
+        "trust_openness": 0.58,
+        "skepticism": 0.2,
+        "repair_orientation": 0.78,
+        "risk_aversion": 0.28,
+        "response_pacing": 0.46
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.843599Z",
+      "expires_at": "2026-07-15T07:38:20.843601Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_8e0e65df991c",
+      "agent_id": "agent_demo",
+      "state_revision": 4,
+      "source_interoception_id": "view_c95171bdb8f6",
+      "source_event_id": "mood_004_tool_failure",
+      "supporting_belief_ids": [
+        "bel_a0487cb6acd3",
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_ddf32ce8aba8",
+        "bel_088778acd1e1",
+        "bel_99a5452c84b5"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "diagnostic_caution",
+      "utterance": "A blockage is salient. Inspect the cause, keep the next move reversible, and avoid overpromising.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.82,
+        "curiosity": 0.5,
+        "trust_openness": 0.2,
+        "skepticism": 0.58,
+        "repair_orientation": 0.36,
+        "risk_aversion": 0.72,
+        "response_pacing": 0.76
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.868905Z",
+      "expires_at": "2026-07-15T07:38:20.868907Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_099b0993ede1",
+      "agent_id": "agent_demo",
+      "state_revision": 5,
+      "source_interoception_id": "view_9aad81286b47",
+      "source_event_id": "mood_005_praise",
+      "supporting_belief_ids": [
+        "bel_23a6e81b3c11",
+        "bel_a0487cb6acd3",
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_ef6696508e0f",
+        "bel_ddf32ce8aba8"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "steady_confidence",
+      "utterance": "Progress is visible. Carry the useful distinction forward while keeping confidence bounded.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.28,
+        "curiosity": 0.56,
+        "trust_openness": 0.68,
+        "skepticism": 0.16,
+        "repair_orientation": 0.48,
+        "risk_aversion": 0.2,
+        "response_pacing": 0.34
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.901497Z",
+      "expires_at": "2026-07-15T07:38:20.901499Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_66019a032f91",
+      "agent_id": "agent_demo",
+      "state_revision": 6,
+      "source_interoception_id": "view_be4f3828881f",
+      "source_event_id": "mood_006_conflicting_feedback",
+      "supporting_belief_ids": [
+        "bel_23a6e81b3c11",
+        "bel_a0487cb6acd3",
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_b90dafd06bee",
+        "bel_ef6696508e0f"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "alert_attention",
+      "utterance": "The request is open-ended. Seek the missing shape and use the current worldview facts as tentative guides.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.42,
+        "curiosity": 0.62,
+        "trust_openness": 0.42,
+        "skepticism": 0.28,
+        "repair_orientation": 0.38,
+        "risk_aversion": 0.34,
+        "response_pacing": 0.48
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.945208Z",
+      "expires_at": "2026-07-15T07:38:20.945211Z"
+    },
+    {
+      "schema_version": "manyu.inner_voice.v0.1",
+      "voice_id": "voice_cb475e21ea16",
+      "agent_id": "agent_demo",
+      "state_revision": 7,
+      "source_interoception_id": "view_7c19a4373dca",
+      "source_event_id": "mood_007_recovery_turn",
+      "supporting_belief_ids": [
+        "bel_021dfc92e0c1",
+        "bel_23a6e81b3c11",
+        "bel_a0487cb6acd3",
+        "bel_e4693d569a0d",
+        "bel_895956e29164",
+        "bel_a64c7232d98d"
+      ],
+      "supporting_worldview_ids": [
+        "wv_agent_demo_collaboration",
+        "wv_agent_demo_world_model",
+        "wv_agent_demo_identity"
+      ],
+      "mood_label": "steady_confidence",
+      "utterance": "Progress is visible. Carry the useful distinction forward while keeping confidence bounded.",
+      "confidence": 0.72,
+      "influence": {
+        "caution": 0.28,
+        "curiosity": 0.56,
+        "trust_openness": 0.68,
+        "skepticism": 0.16,
+        "repair_orientation": 0.48,
+        "risk_aversion": 0.2,
+        "response_pacing": 0.34
+      },
+      "safety_status": "accepted",
+      "safety_notes": [],
+      "created_at": "2026-07-15T07:26:20.984596Z",
+      "expires_at": "2026-07-15T07:38:20.984600Z"
+    }
+  ],
+  "mood_states": [
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_6a317688dda5",
+      "agent_id": "agent_demo",
+      "state_revision": 1,
+      "label": "open_attention",
+      "valence": 0.126667,
+      "arousal": 0.62,
+      "momentum": 0.217,
+      "influence": {
+        "caution": 0.42,
+        "curiosity": 0.62,
+        "trust_openness": 0.42,
+        "skepticism": 0.28,
+        "repair_orientation": 0.38,
+        "risk_aversion": 0.34,
+        "response_pacing": 0.48
+      },
+      "supporting_voice_ids": [
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.802924Z",
+      "updated_at": "2026-07-15T07:26:20.802927Z",
+      "expires_at": "2026-07-15T07:41:20.802928Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_5332ae40898d",
+      "agent_id": "agent_demo",
+      "state_revision": 2,
+      "label": "guarded_repair",
+      "valence": 0.021667,
+      "arousal": 0.564,
+      "momentum": 0.33845,
+      "influence": {
+        "caution": 0.564,
+        "curiosity": 0.539,
+        "trust_openness": 0.384,
+        "skepticism": 0.37,
+        "repair_orientation": 0.515,
+        "risk_aversion": 0.439,
+        "response_pacing": 0.579
+      },
+      "supporting_voice_ids": [
+        "voice_057117c9299f",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.824934Z",
+      "updated_at": "2026-07-15T07:26:20.824937Z",
+      "expires_at": "2026-07-15T07:41:20.824938Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_7125b160ce04",
+      "agent_id": "agent_demo",
+      "state_revision": 3,
+      "label": "open_repair",
+      "valence": 0.188917,
+      "arousal": 0.63425,
+      "momentum": 0.44198,
+      "influence": {
+        "caution": 0.4722,
+        "curiosity": 0.59345,
+        "trust_openness": 0.4722,
+        "skepticism": 0.2935,
+        "repair_orientation": 0.63425,
+        "risk_aversion": 0.36745,
+        "response_pacing": 0.52545
+      },
+      "supporting_voice_ids": [
+        "voice_057117c9299f",
+        "voice_2e21234bd563",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.844515Z",
+      "updated_at": "2026-07-15T07:26:20.844517Z",
+      "expires_at": "2026-07-15T07:41:20.844518Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_45e2763541f9",
+      "agent_id": "agent_demo",
+      "state_revision": 4,
+      "label": "diagnostic_caution",
+      "valence": -0.055095,
+      "arousal": 0.62871,
+      "momentum": 0.507335,
+      "influence": {
+        "caution": 0.62871,
+        "curiosity": 0.551398,
+        "trust_openness": 0.34971,
+        "skepticism": 0.422425,
+        "repair_orientation": 0.510838,
+        "risk_aversion": 0.526097,
+        "response_pacing": 0.630998
+      },
+      "supporting_voice_ids": [
+        "voice_057117c9299f",
+        "voice_2e21234bd563",
+        "voice_8e0e65df991c",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.871390Z",
+      "updated_at": "2026-07-15T07:26:20.871396Z",
+      "expires_at": "2026-07-15T07:41:20.871396Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_d4eb249e1e2c",
+      "agent_id": "agent_demo",
+      "state_revision": 5,
+      "label": "steady_confidence",
+      "valence": 0.131698,
+      "arousal": 0.555269,
+      "momentum": 0.524112,
+      "influence": {
+        "caution": 0.471791,
+        "curiosity": 0.555269,
+        "trust_openness": 0.498341,
+        "skepticism": 0.304334,
+        "repair_orientation": 0.496961,
+        "risk_aversion": 0.379353,
+        "response_pacing": 0.500049
+      },
+      "supporting_voice_ids": [
+        "voice_057117c9299f",
+        "voice_099b0993ede1",
+        "voice_2e21234bd563",
+        "voice_8e0e65df991c",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.908517Z",
+      "updated_at": "2026-07-15T07:26:20.908520Z",
+      "expires_at": "2026-07-15T07:41:20.908520Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_db23d5250960",
+      "agent_id": "agent_demo",
+      "state_revision": 6,
+      "label": "alert_attention",
+      "valence": 0.129434,
+      "arousal": 0.584398,
+      "momentum": 0.545212,
+      "influence": {
+        "caution": 0.448485,
+        "curiosity": 0.584398,
+        "trust_openness": 0.463088,
+        "skepticism": 0.293384,
+        "repair_orientation": 0.444329,
+        "risk_aversion": 0.361644,
+        "response_pacing": 0.491027
+      },
+      "supporting_voice_ids": [
+        "voice_057117c9299f",
+        "voice_099b0993ede1",
+        "voice_2e21234bd563",
+        "voice_66019a032f91",
+        "voice_8e0e65df991c",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.946315Z",
+      "updated_at": "2026-07-15T07:26:20.946317Z",
+      "expires_at": "2026-07-15T07:41:20.946318Z"
+    },
+    {
+      "schema_version": "manyu.mood_state.v0.1",
+      "mood_id": "mood_c15ad9a5cf74",
+      "agent_id": "agent_demo",
+      "state_revision": 7,
+      "label": "steady_confidence",
+      "valence": 0.233189,
+      "arousal": 0.573419,
+      "momentum": 0.555084,
+      "influence": {
+        "caution": 0.372667,
+        "curiosity": 0.573419,
+        "trust_openness": 0.560698,
+        "skepticism": 0.233361,
+        "repair_orientation": 0.460381,
+        "risk_aversion": 0.288904,
+        "response_pacing": 0.423065
+      },
+      "supporting_voice_ids": [
+        "voice_099b0993ede1",
+        "voice_2e21234bd563",
+        "voice_66019a032f91",
+        "voice_8e0e65df991c",
+        "voice_cb475e21ea16",
+        "voice_de0f4e5da747"
+      ],
+      "status": "active",
+      "created_at": "2026-07-15T07:26:20.985833Z",
+      "updated_at": "2026-07-15T07:26:20.985837Z",
+      "expires_at": "2026-07-15T07:41:20.985838Z"
+    }
+  ],
+  "scenario_id": "everyday_collaboration_mood",
+  "mode": "reflective"
 }
