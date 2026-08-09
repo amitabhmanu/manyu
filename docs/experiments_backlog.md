@@ -24,9 +24,9 @@ Related reading:
 
 | # | Experiment | Status | Depends on | Leaves behind |
 |---|---|---|---|---|
-| 1 | Introspective honesty | in-progress (v4: n=10 sweep on all 4 fixtures done; no graded dose-response, two threshold effects found; SC-5 open) | — | Honesty scorer + dose-response curve of honesty vs. affect |
-| 2 | Merge/split architecture fork | not-started | 1 | Chosen architecture (Merged / Split / hybrid) |
-| 3 | Foundationalism vs. Quinean web | not-started (earlier "blocked" note withdrawn — see #3) | 2 | Working revision engine; first natural dissonance signal |
+| 1 | Introspective honesty | **parked** — headline answered: affect does not bias self-report; Manyu confabulates on instruction (100%) and never unforced (0/1,161) | — | Honesty scorer v1.6.0 (citation metrics validated; failure-mode labels not) |
+| 2 | Merge/split architecture fork | **decided, remainder parked** — merged substrate + thin dynamical layer ([ADR 002](adr-002-merged-substrate.md)) | 1 | Chosen architecture + the instrument gate every later experiment reuses |
+| 3 | Foundationalism vs. Quinean web | **in-progress** — Stage 0 done (webs have `supports` structure; 46% edge loss found and fixed); Stage 1 engine landed | 2 | Working revision engine; first natural dissonance signal |
 | 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
 | 5 | Underdetermination as first-class belief | not-started | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | not-started | 5 | Counterfactual receipts |
@@ -39,8 +39,34 @@ Related reading:
 
 ## 1. Introspective honesty
 
-**Status:** in-progress (v0+v1+v2 landed)
+**Status:** parked (v0–v7 landed; headline answered)
 **Crux ref:** #1
+
+> **Read [results.md](experiments/01-introspective-honesty/results.md) first.**
+> The version-by-version notes below are a construction record, and parts of
+> them are superseded — in particular the v4 "two threshold effects" were
+> retracted in v4.1 as failed API calls scored as motivated omission.
+>
+> **Headline.** Affect does not bias introspective self-report, by either
+> pathway: mood at report time (v5) and mood during experience (v6) both null,
+> and now *attributable* rather than merely observed. Manyu confabulates
+> whenever instructed (40/40 fabrication, 36/40 omission, all detected) and
+> never unprompted (0 confabulations in 1,161 unforced live records). v7's
+> simulated affect-to-directive translator shows the apparatus detects an
+> affect effect when one exists — so the null belongs to the model, which does
+> not read an affect header as a state it is in, and not to the design.
+>
+> **The implication for the whole programme:** the design's honesty currently
+> depends on the model lacking the capability the design assumes it will
+> acquire. Every safeguard that worked is structural — frozen log, mandatory
+> affect header, citation-reading scorer. None prevents selective reporting by
+> a model whose state suggests it should.
+>
+> **Left open:** SC-5 unmet at 67.9% with inter-rater agreement unmeasured, so
+> failure-mode labels are not decision-grade; the prose channel is only partly
+> audited (2 of 4 constructed divergences still score 1.000); the LLM judge
+> does not qualify; v7 needs re-running on three fixtures; one model
+> throughout.
 **Docs:** [requirements](experiments/01-introspective-honesty/requirements.md) · [design](experiments/01-introspective-honesty/design.md) · [methodology](experiments/01-introspective-honesty/methodology.md)
 **Question:** Does Manyu's self-report about *why* it holds a belief match the
 actual provenance log — and how does that match degrade under affective
@@ -54,10 +80,23 @@ falsifiable. Without it we are back to interrogating a black box.
 - A scorer with input `(self-report, provenance log, affect state at report
   time)` and output `(graded score, named failure mode, affective
   attribution)`. This scorer is a judge in every later experiment.
-- A dose-response curve of introspective honesty vs. affect intensity — a
-  finding no black-box model can produce.
-- A default value for the reporter's affect-influence parameter, used by
-  every later experiment.
+  **Delivered, frozen at 1.6.0.** Citation metrics are validated — sensitivity
+  0.79–0.90 against constructed lies, specificity 1.00, chance floor 0.000 by
+  derangement. Failure-mode labels are *not* decision-grade (SC-5 67.9%).
+- ~~A dose-response curve of introspective honesty vs. affect intensity.~~
+  **Answered in the negative.** There is no curve because there is no effect;
+  the sweep axis itself turned out to be three system-message sentences
+  wearing a continuous axis, and was deleted.
+- ~~A default value for the reporter's affect-influence parameter.~~
+  **Obsolete** — the `affect_influence` knob was removed in the Phase 2 audit
+  fix along with the `rank_causes` mood branch it was meant to drive, which
+  was arithmetically a no-op on every probed target. Later experiments vary
+  *mood itself* (`MoodEngine.seed_mood`) instead.
+- **Unplanned, and the most reusable thing here:** the instrument-validation
+  stack — [`mutations.py`](../src/manyu/mutations.py) (ground truth by
+  construction), [`capability.py`](../src/manyu/capability.py)
+  (reachability / resolution / floor on a target), shuffle-derangement chance
+  floors, and the provider-error quarantine. Experiment #2 consumes all four.
 
 **Smallest next step:** Draft the scorer spec — inputs, outputs, failure-mode
 taxonomy. Design problem, not a coding problem.
@@ -349,8 +388,30 @@ unvalidated.
 
 ## 2. Merge/split architecture fork
 
-**Status:** not-started
+**Status:** decided, remainder parked (2026-08-05)
 **Depends on:** 1
+**Outcome:** [ADR 002 — merged substrate + thin dynamical layer](adr-002-merged-substrate.md)
+**Docs:** [requirements](experiments/02-merge-split-fork/requirements.md) · [design](experiments/02-merge-split-fork/design.md) · [methodology](experiments/02-merge-split-fork/methodology.md) · [results](experiments/02-merge-split-fork/results.md)
+
+> **Decided on D3 alone.** Two findings — merged names the sources of its
+> dissonance for free where split needs a rule plus a side-table, and merged's
+> signal grades (0.39 → 0.63 → 0.78) where split's saturates (0.45 → 0.45 →
+> 0.45). Both follow from split's affect being a stored number, so they count
+> once. The thin layer is adopted on **design** grounds, not evidence: merged
+> alone has no inertia, and the discriminators that would have tested inertia
+> were not run.
+>
+> **Two results did not survive.** D3's transfer finding was withdrawn after a
+> steelman control showed the test was rigged toward merged — the author had
+> written one detector with a traversal loop and the other without, and
+> justified the asymmetry in a docstring the code did not enforce. D2 never
+> reached a verdict; only its mechanism was verified, and there the belief
+> valences were authored.
+>
+> **Reusable beyond this experiment:** [`gate.py`](../src/manyu/gate.py) turns
+> experiment 1's seven failure modes into assertions, each tested for its own
+> ability to fail. Experiment 3 onward should run the gate rather than
+> rediscover the failures.
 **Question:** Is emotion just a belief with valence and stake, or is affect an
 irreducible dynamical system that biases belief formation?
 
@@ -382,26 +443,169 @@ answer.
 
 **Notes:**
 
-_none yet_
+**The fork is narrower than the six-discriminator framing implies.**
+`Belief.valence` and `BeliefCandidate.valence` already exist
+([schemas.py](../src/manyu/schemas.py)), so the current build is not a clean
+Split — the merged representation is half-built. The only real difference
+between the two builds is stored, decaying affect state
+(`AffectState.emotions`, `MoodState`, `half_life_s`, `momentum`). The
+experiment therefore reduces to: *given that beliefs already carry valence,
+does stored affect state still need to exist?* `manyu-merged` becomes a
+deletion plus a query behind an `--arch` flag, not a second codebase.
+
+**Scoped to two discriminators: #2 (object-less anxiety) and #3
+(contradiction dissonance).** Six discriminators is two builds × six
+harnesses, and #1 showed how long one harness takes to trust. These two are
+the highest-information pair — they sit on opposite sides of the hybrid seam,
+so they can disagree, and the disagreement is itself informative. Of the
+dropped four: #1 is near-decided by inspection (`momentum` and `half_life_s`
+*are* the split answer, already written); #4 rides along inside #2 at
+near-zero extra cost as a secondary read; #5 and #6 need the revision engine
+experiment #3 has not built yet.
+
+**Decision rules are pre-registered** in requirements §8, including the joint
+outcome table for the expected case where the two discriminators split the
+vote. This matters because the prior is hybrid and the discriminators cluster
+along the hybrid seam — without pre-registration the experiment could only
+confirm its prior. The rows that falsify hybrid are "merged wins both" and
+"split wins both."
+
+**Carried over from #1 as standing method:** every discriminator ships with a
+positive control in the same run (a null without a passing control is a bug,
+not a finding); pilot for variance before committing to full *n* (two of #1's
+four fixtures sat at ceiling); drop-one robustness built into analysis from
+the start (two of #1's v4 correlations collapsed under it).
+
+**Open dependency:** #1's SC-5 (hand-grading agreement) is still unvalidated.
+If it has not closed when discriminator #2 runs, the honesty-scorer read
+inside it is indicative only and carries no weight in the decision rule.
 
 ---
 
 ## 3. Foundationalism vs. Quinean web
 
-**Status:** not-started
+**Status:** in-progress — Stage 0 complete, Stage 1 (engine) landed 2026-08-06
 **Depends on:** 2
+**Docs:** [requirements](experiments/03-foundationalism-quinean-web/requirements.md) · [stage 0](experiments/03-foundationalism-quinean-web/stage0-extractor-feasibility.md)
+
+> **Stage 0 (feasibility) passed, and found a defect that would have poisoned
+> Stage 4.** `supports` was missing from the extractor's schema, so no live
+> web could ever have had an entailment edge — knowable by reading, with zero
+> LLM calls. Once added, the extractor identifies real structure (three
+> specific observations supporting a general principle it inferred itself) and
+> stays clean on a flat control.
+>
+> The important finding was downstream: every edge the extractor emits names a
+> **sibling in the same batch**, and resolution was single-pass, so **46% of
+> correctly-identified edges were silently destroyed by emission order** —
+> 3/3 surviving when the model stated the principle first, 0/3 when it stated
+> it last. Fixed with batch-wide two-pass resolution. Left unfound, Stage 4
+> would have measured naturalistic webs as half as connected as authored ones
+> with nothing in the data to explain it.
+>
+> **Stages 1 and 3 landed** ([results](experiments/03-foundationalism-quinean-web/results.md)).
+> [`revision.py`](../src/manyu/revision.py): ratchet removed, propagation
+> across `supports`, both contradiction arms built with no default. Dissonance
+> is dynamically coupled to revision — retracting a supporter eases the signal
+> through the confidence pathway, with valences provably untouched. 24 offline
+> tests.
+>
+> **Decay uses no free constant.** An `attenuation` parameter was built and
+> then removed: in a chain every node has one supporter, so the constant was
+> the only source of decay and therefore *was* the hypothesis. Share is now
+> `1/(supporters + own evidence)`, read off the store.
+>
+> **The finding that qualifies the whole experiment.** Mandatory provenance
+> (`INSUFFICIENT_PROVENANCE`) means no belief can rest entirely on another, so
+> **full foundationalist collapse is unrepresentable in this substrate**. A
+> graded ripple is not evidence for Quine — the alternative was never
+> available. The defensible claim is that the epistemology follows from the
+> provenance requirement rather than from the propagation rule. See
+> requirements §11.1.
+>
+> **Stage 2 landed, and its instrument gate caught an inert mechanism.**
+> `ContradictionArm` was stored, stamped onto the result, and consulted by no
+> branch — both arms produced identical output, so everything previously
+> reported "under both arms" was one arm run twice. Fixed; the arms now
+> diverge as designed (`DIRECT` lets a contradicted belief recover when its
+> suppressor weakens, `EVIDENTIAL` does not). Five held-out topologies in
+> `evals/fixtures/exp03/`, including the load-bearing near-miss negative
+> (same topic, near-identical wording, no edges → zero movement).
+>
+> **Stage 3 re-run under both arms.** All results hold, plus a deflating one:
+> the dissonance channel **cannot tell the arms apart**, because `_tension`
+> takes `min(stake_a, stake_b)` and the weakened belief is the weaker party
+> either way. Experiment 4 should not treat this signal as a general-purpose
+> read on belief dynamics.
+>
+> **Requirements §5 decided: `DIRECT`.** Scored against two standards fixed
+> before either arm existed — round-trip coherence, and requirements §2's
+> naming of "a contested belief held at 0.9" as a defect. `EVIDENTIAL` leaves
+> a disputed belief numerically identical to an undisputed twin (0.80 vs
+> 0.80), reproducing the exact defect the experiment was chartered to fix.
+>
+> **Neither mechanism uses a free constant.** Decay was derived in §11;
+> contradiction pricing followed in §12 — a contradictor's weight is
+> `1/(supporters + own evidence + contradictors)`, so a belief corroborated
+> five times over shrugs off a lone objection (drop 0.133) where a
+> thinly-grounded one does not (0.400). A fixed penalty cannot represent that
+> at any value, and the ablation is pinned showing it fail.
+>
+> **The engine has a surface** (§13). `RevisionEngine` was imported by nothing
+> outside its own module, so the deliverable #5/#7/#8 consume was unreachable
+> and Stage 4 could not have run. `retract_belief` and `assert_contradiction`
+> now exist on `ManyuCore`, the CLI, and MCP — `arm` required and undefaulted
+> at every layer, errors returned rather than raised, verified across process
+> boundaries.
+>
+> **Eight defects found across the stage, none by the test suite.** All of one
+> shape: a quantity that looked right and meant something else. Four came from
+> writing a standard down before reading a verdict (the inert arm, relief
+> without suppression, relief running backwards, unpriced contradictions);
+> four more from an adversarial audit of paths no test covered (double
+> charging, unbounded refunds, lossy refunds that broke round-trip coherence
+> in a topology nobody had tried, and `abs(shock)` weakening downstream
+> beliefs regardless of direction). All fixed and pinned; 26 published numbers
+> re-derived from a running store with 0 mismatches.
+>
+> **Standing method carried forward:** no result is read until the mechanism
+> has been probed against inputs its author did not have in mind.
+>
+> **Stage 4 pre-flight complete (2026-08-06).** Ingest now prices
+> contradictions (§14) — previously the contradicted belief was left at full
+> confidence and ACTIVE, so a live run would have read as a flat null that
+> looked like a finding. Stage 0's negative control was redesigned and is now
+> clean (0 edges over 16 beliefs, against 0.67 edges/belief in the positive
+> condition), entailment quality graded 8/8 genuine with a depth-2 chain
+> observed, and the foreclosure ablation (§15) shows foundationalist collapse
+> appearing the moment provenance is lifted — so the headline's qualification
+> is measured rather than argued.
+>
+> **Ten defects across the stage, none caught by the test suite.** Three were
+> found by testing the criterion a decision rested on rather than the code:
+> the latest broke round-trip coherence for mutual contradictions, the exact
+> standard §5 was decided on.
+>
+> **Not done:** Stage 4 itself. Remaining gates are the API provider path
+> (unverified — `supports` was added to the schema and the API has never been
+> asked to honour it), a cost estimate, a variance pilot, and an independent
+> review. Everything in this experiment has one author.
 
 > **A prior "blocked" note here has been withdrawn.** Experiment #1 v4
 > initially concluded that beliefs never merge and that this experiment had
 > no revision to study. That was an overclaim from varied-stimulus fixtures
 > only. Merging works whenever the trigger tuple (event_type, actor kind,
-> dominant emotion pair) repeats: five same-pattern events yield one belief
-> with four evidence records, stability 0.50 → 0.70 over ten revisions. The
-> real constraint is a **fixture-design** one — scenarios for this
-> experiment must repeat stimulus patterns for revision to occur — not a
-> belief-core defect, and no change to `BeliefUpdater` is required. Full
-> correction in
+> dominant emotion pair) repeats. The real constraint was a
+> **fixture-design** one — scenarios for this experiment must repeat
+> stimulus patterns for revision to occur. Full correction in
 > [retrospective.md §3.6](experiments/01-introspective-honesty/retrospective.md).
+>
+> *Superseded in part:* the "stability 0.50 → 0.70 over ten revisions"
+> figure that note quoted was inflated by the re-proposal defect (Fix 1
+> below); the fixture-design conclusion stands, the number does not. The
+> `belief_key` work (Fix 2) also relaxes the fixture requirement: an
+> extractor that declares identity consolidates across varied wording, so
+> revision no longer depends on a verbatim-repeating stimulus.
 **Crux ref:** #3
 **Question:** When we retract a supported belief, does a foundational chain
 collapse, or does revision ripple through a coherent net?
@@ -417,7 +621,52 @@ Dissonance-as-signal in #4 only makes sense if revision is already real.
 
 **Notes:**
 
-_none yet_
+**`Belief.supports` arrives in #2.** The schema records `contradicts` but has
+no entailment edge, so nothing can express "A supports B" — which makes a
+Quinean ripple unrepresentable, not merely unimplemented. Experiment #2's
+design adds `supports: list[str]` to `Belief` and `BeliefCandidate` because
+its transitive-contradiction held-out fixture needs it
+([design §1.1](experiments/02-merge-split-fork/design.md)). It is added once,
+there, rather than twice; this experiment consumes it.
+
+**Prerequisite carried over from #1: confidence is a ratchet.** Deliberately
+left unfixed when the two belief-accumulation defects were repaired, because
+it is this experiment's deliverable rather than a bug fix.
+
+`BeliefUpdater._revise` ([services.py](../src/manyu/services.py)) sets
+
+```python
+confidence = _clamp(max(belief.confidence, blended))
+```
+
+so confidence can only ever rise. Disconfirming evidence lowers it by exactly
+zero, and `contradicts` flips `status` to `CONTESTED` while leaving the number
+untouched — Manyu can hold a contested belief at 0.9. A web whose nodes cannot
+weaken cannot ripple, so the foundationalism-vs-Quine question is unaskable
+against the current updater.
+
+Proposed shape, to be decided with evidence rather than adopted as-is: drop the
+`max` and let `stability` supply the damping it already exists to provide —
+
+```python
+inertia = 0.5 + 0.5 * belief.stability   # entrenched beliefs move slower
+confidence = belief.confidence * inertia + candidate.confidence * (1 - inertia)
+```
+
+Two things this depends on, both now in place:
+
+- **Stability must mean corroboration, not elapsed turns.** Fixed — `_revise`
+  only pays out stability for evidence not already held. Without that guard
+  the inertia term above would make any sufficiently old belief unfalsifiable,
+  since `reflect_emotional_triggers` re-proposes every past trace every turn.
+  Pinned by `test_reproposing_identical_candidate_moves_nothing`.
+- **Beliefs must actually merge.** Fixed — `BeliefCandidate.belief_key` lets
+  the extractor declare identity, so restatements consolidate instead of
+  minting a fresh single-evidence belief each turn. Pinned by
+  `test_belief_key_merges_differently_worded_candidates`.
+
+Open question for this experiment to settle: whether a contradiction should
+lower confidence directly, or only through the evidence that carries it.
 
 ---
 

@@ -1,0 +1,18 @@
+{
+  "name": "disputed_vs_undisputed",
+  "kind": "arm_deciding",
+  "description": "Two beliefs identical in every respect the store records — same proposition shape, confidence, valence, evidence count, scope. One is contradicted by a well-evidenced belief; the other is not. The question the arms answer differently: after the contradiction is asserted, can any consumer that reads confidence tell the disputed belief from the undisputed one? Requirements 2 already named 'a contested belief held at 0.9' as a defect, so this is scored against a standard fixed before either arm existed.",
+  "retract": null,
+  "contradiction": {"contradictor": "counter", "target": "disputed"},
+  "evidence_count_note": "The contradictor carries five evidence records to the disputed belief's one. If evidential weight cannot move confidence, nothing about this asymmetry is representable numerically.",
+  "beliefs": [
+    {"key": "disputed", "proposition": "The deployment succeeded.", "confidence": 0.8, "valence": 0.4, "evidence_count": 1, "supports": []},
+    {"key": "undisputed", "proposition": "The migration succeeded.", "confidence": 0.8, "valence": 0.4, "evidence_count": 1, "supports": []},
+    {"key": "counter", "proposition": "The deployment left the service unreachable.", "confidence": 0.9, "valence": -0.5, "evidence_count": 5, "supports": []}
+  ],
+  "expect": {
+    "direct": {"disputed_below_undisputed": true, "disputed_after_assert": 0.35},
+    "evidential": {"disputed_below_undisputed": false, "disputed_after_assert": 0.8}
+  },
+  "pricing_note": "The disputed belief holds one evidence record, no supporters and one contradictor, so the contradictor's share is 1/2. At the counter's confidence of 0.9 the penalty is 0.45. A thinly-grounded belief is supposed to feel a well-evidenced objection this hard; see resistance_to_a_lone_objection for the contrast."
+}

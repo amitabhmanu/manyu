@@ -1,0 +1,14 @@
+{
+  "name": "chain_shallow",
+  "kind": "discriminating",
+  "description": "net_dense's control. Identical target, identical evidence count, identical retraction magnitude — one supporter instead of three.",
+  "retract": "s1",
+  "evidence_count_note": "Matched to net_dense so the pair isolates supporter count.",
+  "beliefs": [
+    {"key": "t", "proposition": "Manyu's verification habit is reliable.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "s1", "proposition": "A source check caught a misattributed citation.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["t"]}
+  ],
+  "expect": {
+    "moves": ["t"]
+  }
+}

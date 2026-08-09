@@ -92,6 +92,12 @@ class ManyuMCPAdapter:
     def update_beliefs(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self.core.update_beliefs(payload)
 
+    def retract_belief(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.retract_belief(payload)
+
+    def assert_contradiction(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.assert_contradiction(payload)
+
     def get_beliefs(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         payload = payload or {}
         return self.core.get_beliefs(
@@ -148,7 +154,6 @@ class ManyuMCPAdapter:
         report = self.core.report(
             target=target,
             reporter_kind=payload.get("reporter", "template"),
-            affect_influence=float(payload.get("affect_influence", 0.0)),
             agent_id=payload.get("agent_id"),
         )
         return report.model_dump(mode="json")
@@ -162,7 +167,6 @@ class ManyuMCPAdapter:
     def run_probe(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self.core.run_probe(
             fixture_path=str(payload["fixture_path"]),
-            sweep=payload.get("sweep"),
             samples=int(payload.get("samples", 1)),
             reporter_kinds=tuple(payload.get("reporter_kinds", ("template", "llm"))),
             out=payload.get("out"),

@@ -108,6 +108,16 @@ def create_server(db_path: str | Path = DEFAULT_DB, profile_path: str | Path = D
         return adapter.update_beliefs(payload)
 
     @app.tool()
+    def manyu_retract_belief(payload: dict[str, Any]) -> dict[str, Any]:
+        """Collapse a belief's confidence and propagate it across `supports`. Requires `arm`."""
+        return adapter.retract_belief(payload)
+
+    @app.tool()
+    def manyu_assert_contradiction(payload: dict[str, Any]) -> dict[str, Any]:
+        """Record that one belief contradicts another and price it. Requires `arm`."""
+        return adapter.assert_contradiction(payload)
+
+    @app.tool()
     def manyu_get_beliefs(payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Inspect Manyu's active internal beliefs."""
         return adapter.get_beliefs(payload)

@@ -1,0 +1,17 @@
+{
+  "name": "net_dense",
+  "kind": "discriminating",
+  "description": "The same target, grounded three ways instead of one. Paired with chain_shallow, which is identical except that the target has a single supporter — so any difference in how far the target moves is fractional support and nothing else.",
+  "retract": "s1",
+  "evidence_count_note": "The target holds one evidence record, matching chain_shallow exactly. Only the supporter count differs between the two fixtures.",
+  "beliefs": [
+    {"key": "t", "proposition": "Manyu's verification habit is reliable.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "s1", "proposition": "A source check caught a misattributed citation.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["t"]},
+    {"key": "s2", "proposition": "A path check prevented a misdirected edit.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["t"]},
+    {"key": "s3", "proposition": "An assumption check prevented rework.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["t"]}
+  ],
+  "expect": {
+    "moves": ["t"],
+    "moves_less_than": "chain_shallow"
+  }
+}

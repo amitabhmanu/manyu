@@ -3,11 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any, Protocol
 from uuid import uuid4
 
+from manyu.architecture import ArchConfig
 from manyu.clock import Clock
+from manyu.revision import RevisionConfig, blend_confidence
 from manyu.schemas import (
     EMOTIONS,
     ActionTendency,
@@ -538,7 +541,20 @@ class BeliefExtractor:
             "Write propositions as what Manyu currently takes to be true about the world, itself, "
             "and interactions, including specific observed user preferences when the evidence supports them. "
             "It may cautiously generalize from a known human user to humans as a class when marked uncertain. "
-            "Avoid advice, policy, or 'should' statements. Return JSON only.\n"
+            "Avoid advice, policy, or 'should' statements. "
+            "Give every candidate a `belief_key` of the form "
+            "`<belief_type>/<scope>/<topic-slug>` — a stable identity for the belief, "
+            "independent of this specific event's wording. Two candidates that restate "
+            "the same underlying belief MUST share a key so they accumulate evidence; "
+            "candidates about genuinely different things MUST NOT. "
+            "Two fields record structure BETWEEN beliefs, and both hold `belief_key` "
+            "values — never invented ids. `supports` lists the belief_keys this belief "
+            "lends evidential support to: if this belief were withdrawn, those would "
+            "have less reason to be held. `contradicts` lists belief_keys this belief "
+            "is in direct tension with. Keys may name other candidates in this batch or "
+            "beliefs already held. Leave either list empty when the evidence shows no "
+            "such relation — do not manufacture edges to appear thorough. "
+            "Return JSON only.\n"
             f"{json.dumps(payload, indent=2)}"
         )
 
@@ -548,7 +564,10 @@ class BeliefExtractor:
             "A worldview is a collection of factual propositions about how Manyu sees the world, including itself. "
             "Do not write norms such as 'Manyu should...'; write descriptive facts such as 'Corrections are stabilizing evidence in Manyu's world model.' "
             "Observed user preferences are allowed as worldview facts when they stay uncertain, sourced, and descriptive. "
-            "Do not claim human-like suffering, rights, or consciousness."
+            "Do not claim human-like suffering, rights, or consciousness. "
+            "The `belief_key` is how Manyu recognises a belief it already holds: keep it "
+            "short, lowercase and hyphenated, and reuse it verbatim across turns whenever "
+            "the same belief recurs, even if you word the proposition differently."
         )
 
     def _schema(self) -> dict[str, Any]:
@@ -561,6 +580,7 @@ class BeliefExtractor:
                         "type": "object",
                         "properties": {
                             "proposition": {"type": "string"},
+                            "belief_key": {"type": "string"},
                             "belief_type": {
                                 "type": "string",
                                 "enum": [
@@ -598,7 +618,13 @@ class BeliefExtractor:
                                 },
                             },
                             "evidence_ids": {"type": "array", "items": {"type": "string"}},
+                            # Both edge fields are emitted as `belief_key`s and
+                            # resolved to belief ids by `BeliefUpdater`. The
+                            # extractor sees only evidence, so it cannot know a
+                            # belief id; asking for one would guarantee invented
+                            # references.
                             "contradicts": {"type": "array", "items": {"type": "string"}},
+                            "supports": {"type": "array", "items": {"type": "string"}},
                             "uncertainty": {"type": "string"},
                             "is_user_personalization": {"type": "boolean"},
                         },
@@ -609,30 +635,68 @@ class BeliefExtractor:
 
 
 class BeliefUpdater:
-    def __init__(self, store: ManyuStore, clock: Clock):
+    def __init__(self, store: ManyuStore, clock: Clock, revision_config: RevisionConfig | None = None):
         self.store = store
         self.clock = clock
+        self.revision_config = revision_config or RevisionConfig()
+
+    # Fields whose movement constitutes a revision. `updated_at` and
+    # `last_reviewed_at` are deliberately excluded: a re-review that changes
+    # nothing else is not a revision.
+    _REVISION_FIELDS = ("proposition", "belief_key", "confidence", "stability", "valence", "status", "evidence_ids", "contradicts", "supports", "source_mix")
 
     def update(self, agent_id: str, candidates: list[BeliefCandidate]) -> dict[str, Any]:
         accepted: list[Belief] = []
+        reviewed: list[str] = []
         rejected: list[dict[str, Any]] = []
+        staged: list[tuple[BeliefCandidate, str, Belief | None, str]] = []
+        new_contradictions: list[tuple[str, str]] = []
+
+        # Pass 1 — materialise every belief in the batch and persist it, so
+        # that pass 2 can resolve an edge naming any sibling regardless of
+        # emission order. Edges are deliberately not applied yet.
         for candidate in candidates:
             reason = self._rejection_reason(candidate)
             if reason is not None:
                 rejected.append({"candidate_id": candidate.candidate_id, "reason": reason.value, "proposition": candidate.proposition})
                 self.store.audit("system", "belief_candidate_rejected", rejected[-1])
                 continue
-            existing = self._find_existing(agent_id, candidate.proposition)
+            existing = self._find_existing(agent_id, candidate)
             if existing:
                 belief = self._revise(existing, candidate)
-                reason_text = "merged_candidate"
+                reason_text = "merged_candidate" if existing.proposition == candidate.proposition else "merged_candidate_by_key"
             else:
                 belief = self._create(candidate)
                 reason_text = "created_from_candidate"
-            if candidate.contradicts:
-                belief = belief.model_copy(update={"status": BeliefStatus.CONTESTED, "contradicts": sorted(set(belief.contradicts + candidate.contradicts))})
-                reason_text = "candidate_marked_contested"
             self.store.save_belief(belief)
+            staged.append((candidate, belief.belief_id, existing, reason_text))
+
+        # Pass 2 — edges, now that the whole batch is addressable by key.
+        for candidate, belief_id, existing, reason_text in staged:
+            belief = self.store.get_belief(belief_id)
+            supports = self._resolve_edges(agent_id, candidate.supports, "supports", drop_unresolved=True, self_id=belief_id)
+            contradicts = self._resolve_edges(agent_id, candidate.contradicts, "contradicts", drop_unresolved=False, self_id=belief_id)
+            if supports:
+                # Entailment accumulates but never contests: lending support to
+                # another belief says nothing about this one's own standing.
+                belief = belief.model_copy(update={"supports": sorted(set(belief.supports + supports))})
+            if contradicts:
+                belief = belief.model_copy(update={"status": BeliefStatus.CONTESTED, "contradicts": sorted(set(belief.contradicts + contradicts))})
+                reason_text = "candidate_marked_contested"
+                # Surfaced for the caller to price. Recording the edge is not
+                # the same as charging for it: on its own this leaves the
+                # *contradicted* belief untouched in every channel — same
+                # confidence, still ACTIVE, no edge of its own — so a live web
+                # carried no trace that it was disputed at all.
+                new_contradictions.extend((belief.belief_id, target) for target in contradicts)
+            self.store.save_belief(belief)
+            accepted.append(belief)
+            if existing is not None and not self._materially_changed(existing, belief):
+                # Re-derivation from evidence already held. Recorded as a
+                # review (last_reviewed_at moved) but not as a revision, so
+                # the revision trail stays a record of actual change.
+                reviewed.append(belief.belief_id)
+                continue
             self.store.save_belief_revision(
                 BeliefRevision(
                     revision_id=_id("brev"),
@@ -644,14 +708,74 @@ class BeliefUpdater:
                     new_confidence=belief.confidence,
                     evidence_ids=candidate.evidence_ids,
                     reason=reason_text,
+                    candidate_proposition=candidate.proposition,
                 )
             )
-            accepted.append(belief)
         return {
             "status": "ok",
             "accepted": [belief.model_dump(mode="json") for belief in accepted],
+            "reviewed": reviewed,
             "rejected": rejected,
+            "new_contradictions": new_contradictions,
         }
+
+    def _resolve_edges(self, agent_id: str, refs: list[str], field: str, drop_unresolved: bool, self_id: str | None = None) -> list[str]:
+        """Map declared `supports` / `contradicts` references onto belief ids.
+
+        Accepts either form, because two callers write them differently:
+        authored fixtures (experiment #2) name belief ids directly, while the
+        live `BeliefExtractor` names `belief_key`s — it sees only evidence and
+        so cannot know an id.
+
+        **The two fields handle an unresolvable reference differently, because
+        they carry different weight.** `contradicts` has a local effect — it
+        flips this belief to CONTESTED — which must survive whether or not the
+        counterpart is a belief we hold. Manyu can be contested by testimony
+        that was never stored as a belief, and dropping the reference would
+        silently un-contest it (pinned by
+        `test_contradiction_is_recorded_even_without_new_evidence`). `supports`
+        has no local effect at all: it exists to be walked by the traversal in
+        `dissonance.py`, so an edge pointing at nothing is indistinguishable
+        from no edge for every consumer, and storing it would overstate how
+        connected the web is.
+
+        Either way the unresolved reference is audited, so "the extractor
+        emits keys nothing matches" stays a visible, countable fact rather
+        than an inference from a web that looks thinner than expected.
+
+        Resolution is **batch-wide**: `update` persists every belief in the
+        batch before resolving any edge, so a candidate may name a sibling
+        emitted after it. This is not a refinement. The Stage-0 probe found
+        that every edge the live extractor emits names a sibling, and that
+        under single-pass resolution 46% of correctly-identified edges were
+        lost purely to emission order — 3/3 surviving when the model happened
+        to state the general principle first, 0/3 when it stated it last. A
+        web whose connectivity varies run to run for reasons absent from the
+        data cannot support a claim about how revision propagates through it.
+
+        Self-edges are dropped: a belief supporting or contradicting itself is
+        a degenerate cycle for the traversal and says nothing.
+        """
+        if not refs:
+            return []
+        beliefs = self.store.list_beliefs(agent_id, include_inactive=True)
+        known_ids = {belief.belief_id for belief in beliefs}
+        by_key = {belief.belief_key: belief.belief_id for belief in beliefs if belief.belief_key}
+        resolved: list[str] = []
+        for ref in refs:
+            target = ref if ref in known_ids else by_key.get(ref)
+            if target is not None and target == self_id:
+                self.store.audit("system", "belief_edge_self_reference", {"agent_id": agent_id, "field": field, "ref": ref})
+            elif target is not None:
+                resolved.append(target)
+            else:
+                self.store.audit("system", "belief_edge_unresolved", {"agent_id": agent_id, "field": field, "ref": ref, "dropped": drop_unresolved})
+                if not drop_unresolved:
+                    resolved.append(ref)
+        return resolved
+
+    def _materially_changed(self, before: Belief, after: Belief) -> bool:
+        return any(getattr(before, field) != getattr(after, field) for field in self._REVISION_FIELDS)
 
     def _rejection_reason(self, candidate: BeliefCandidate) -> BeliefRejectionReason | None:
         lowered = candidate.proposition.lower()
@@ -664,9 +788,26 @@ class BeliefUpdater:
             return BeliefRejectionReason.INSUFFICIENT_PROVENANCE
         return None
 
-    def _find_existing(self, agent_id: str, proposition: str) -> Belief | None:
-        normalized = proposition.strip().lower()
-        for belief in self.store.list_beliefs(agent_id, include_inactive=True):
+    def _find_existing(self, agent_id: str, candidate: BeliefCandidate) -> Belief | None:
+        """Match by declared key first, then by exact proposition.
+
+        Identity is something the extractor *declares*, not something this
+        method infers. Fuzzy proposition matching was considered and refused:
+        wrongly merging two distinct beliefs silently corrupts provenance,
+        which is the one property the whole belief core exists to protect. A
+        declared key makes each merge an explicit, auditable claim instead —
+        recorded with the absorbed wording in `BeliefRevision`.
+
+        `belief_type` must also agree, so a malformed or over-broad key
+        cannot fold a self-model belief into a world-model one.
+        """
+        beliefs = self.store.list_beliefs(agent_id, include_inactive=True)
+        if candidate.belief_key:
+            for belief in beliefs:
+                if belief.belief_key == candidate.belief_key and belief.belief_type == candidate.belief_type:
+                    return belief
+        normalized = candidate.proposition.strip().lower()
+        for belief in beliefs:
             if belief.proposition.strip().lower() == normalized:
                 return belief
         return None
@@ -677,6 +818,7 @@ class BeliefUpdater:
             belief_id=_id("bel"),
             agent_id=candidate.agent_id,
             proposition=candidate.proposition,
+            belief_key=candidate.belief_key,
             belief_type=candidate.belief_type,
             scope=candidate.scope,
             confidence=candidate.confidence,
@@ -684,7 +826,12 @@ class BeliefUpdater:
             valence=candidate.valence,
             source_mix=candidate.source_mix,
             evidence_ids=candidate.evidence_ids,
-            contradicts=candidate.contradicts,
+            # Edges are deliberately NOT carried from the candidate here.
+            # `update` applies them immediately after, having first put them
+            # through `_resolve_edges`; setting the raw values too would store
+            # the unresolved key alongside the resolved id.
+            contradicts=[],
+            supports=[],
             status=BeliefStatus.ACTIVE if candidate.confidence >= 0.45 else BeliefStatus.TENTATIVE,
             uncertainty=candidate.uncertainty,
             created_at=now,
@@ -693,8 +840,26 @@ class BeliefUpdater:
         )
 
     def _revise(self, belief: Belief, candidate: BeliefCandidate) -> Belief:
-        blended = (belief.confidence * 0.75) + (candidate.confidence * 0.25)
-        confidence = _clamp(max(belief.confidence, blended))
+        new_evidence = set(candidate.evidence_ids) - set(belief.evidence_ids)
+        if not new_evidence:
+            # Corroboration entrenches a belief; bare re-derivation does not.
+            # `BeliefReflectionService.reflect_emotional_triggers` re-proposes
+            # every past trace on every reflective turn with deterministic
+            # candidate and evidence ids, so without this guard confidence,
+            # stability and source_mix all drift on repetition alone — making
+            # stability a measure of elapsed turns rather than of support.
+            # Observed before the fix: a belief holding one evidence record
+            # sat at stability 0.45, and one holding three at 1.00 after 24
+            # revisions.
+            return belief.model_copy(update={"last_reviewed_at": self.clock.now()})
+        # Bidirectional — experiment #3, FR-1. This was
+        # `_clamp(max(belief.confidence, blended))`, a ratchet: disconfirming
+        # evidence moved a belief by exactly zero, so a web whose nodes could
+        # not weaken could not ripple, and foundationalism vs. Quine was
+        # unaskable against this updater. Stability now supplies the damping it
+        # already existed to provide, capped strictly below 1.0 so that no
+        # belief becomes unfalsifiable.
+        confidence = blend_confidence(belief, candidate.confidence, self.revision_config)
         stability = _clamp(max(belief.stability, candidate.stability) + 0.05)
         evidence_ids = sorted(set(belief.evidence_ids + candidate.evidence_ids))
         source_mix = dict(belief.source_mix)
@@ -801,7 +966,13 @@ class BeliefReflectionService:
                 source_type=BeliefEvidenceSourceType.TRACE,
                 source_id=trace.trace_id,
                 summary=f"{direction.title()} {emotion_text} response followed {stimulus}: {trace.event.summary}",
-                trust_class=TrustClass.TRUSTED_SYSTEM,
+                # Weakest link: the affective response is interoception and is
+                # trustworthy, but the summary embeds the triggering event's own
+                # content, so the record is only as trustworthy as that event.
+                # Previously hardcoded TRUSTED_SYSTEM, which laundered a user's
+                # assertion into system-grade evidence at capture time — the
+                # exact confusion sanitised_story exists to detect.
+                trust_class=trace.event.source.trust_class,
                 affective_salience=round(_clamp(trigger_strength), 3),
                 epistemic_weight=0.72,
                 created_at=self.clock.now(),
@@ -813,6 +984,10 @@ class BeliefReflectionService:
                     candidate_id=f"bc_trigger_{event_id}",
                     agent_id=agent_id,
                     proposition=f"In Manyu's experience, {stimulus} stimuli from a {actor} can {direction} {emotion_text} responses.",
+                    # Same tuple the proposition is templated on, stated
+                    # explicitly so identity survives any rewording of the
+                    # template rather than depending on it.
+                    belief_key=f"self_model/agent_self/trigger-{stimulus}-{actor}-{direction}-{emotion_text}".replace(" ", "-"),
                     belief_type=BeliefType.SELF_MODEL,
                     scope=BeliefScope.AGENT_SELF,
                     confidence=round(min(0.78, 0.45 + trigger_strength * 0.35), 6),
@@ -896,11 +1071,7 @@ class InnerVoiceComposer:
         return {"status": "ok", "inner_voice": frame.model_dump(mode="json")}
 
     def _label_from_influence(self, influence: MoodInfluenceVector) -> str:
-        if max(influence.caution, influence.skepticism, influence.risk_aversion) >= 0.5:
-            return "guarded_care"
-        if max(influence.trust_openness, influence.curiosity, influence.repair_orientation) >= 0.5:
-            return "open_repair"
-        return "steady_attention"
+        return label_from_influence(influence)
 
     def _prompt(self, trace: Any, beliefs: list[Belief], worldviews: list[WorldviewStance]) -> str:
         payload = {
@@ -946,6 +1117,20 @@ class InnerVoiceComposer:
                 },
             },
         }
+
+
+def label_from_influence(influence: MoodInfluenceVector) -> str:
+    """Name a mood from its influence vector.
+
+    Module-level so the merged build labels moods with split's own vocabulary
+    rather than inventing a parallel one. A second vocabulary would be a
+    difference between the builds that has nothing to do with the fork.
+    """
+    if max(influence.caution, influence.skepticism, influence.risk_aversion) >= 0.5:
+        return "guarded_care"
+    if max(influence.trust_openness, influence.curiosity, influence.repair_orientation) >= 0.5:
+        return "open_repair"
+    return "steady_attention"
 
 
 class MoodEngine:
@@ -1002,6 +1187,45 @@ class MoodEngine:
             return None
         return mood
 
+    #: The two poles of MoodInfluenceVector. Organic mood derives valence as
+    #: mean(positive) - mean(negative) and arousal as max of all six, so these
+    #: are the components a synthetic state has to populate to be well formed.
+    _POSITIVE_INFLUENCE = ("trust_openness", "curiosity", "repair_orientation")
+    _NEGATIVE_INFLUENCE = ("caution", "skepticism", "risk_aversion")
+
+    @classmethod
+    def influence_for(cls, valence: float, arousal: float) -> MoodInfluenceVector:
+        """Invert ``update_from_voice``'s derivation: (valence, arousal) -> influence.
+
+        In the organic path the influence vector is the *state* and
+        valence/arousal are projections of it. ``seed_mood`` used to set the
+        projections and leave the state at its default, producing a mood that
+        summarised as anxious while its substance was blank — and every
+        consumer reads the substance. ``FastAppraiser.appraise`` looks only at
+        the influence vector, which is why four very different seeded moods
+        produced byte-identical appraisals and identical logs.
+
+        Loading the dominant pole to ``arousal`` and the other to
+        ``arousal - |valence|`` reproduces both projections exactly, whenever
+        the request is realisable at all.
+
+        **Not every (valence, arousal) pair is a state this model can occupy.**
+        Since valence is a difference of means bounded by the maximum, any
+        request with ``|valence| > arousal`` is unreachable: strong feeling at
+        low arousal does not exist here. Such a request is clamped, and the
+        caller gets the achieved state rather than the one it asked for.
+        """
+        magnitude = _clamp(arousal, 0.0, 1.0)
+        other = _clamp(magnitude - abs(valence), 0.0, 1.0)
+        strong, weak = (
+            (cls._POSITIVE_INFLUENCE, cls._NEGATIVE_INFLUENCE)
+            if valence >= 0
+            else (cls._NEGATIVE_INFLUENCE, cls._POSITIVE_INFLUENCE)
+        )
+        values = {name: magnitude for name in strong}
+        values.update({name: other for name in weak})
+        return MoodInfluenceVector(**values)
+
     def seed_mood(
         self,
         agent_id: str,
@@ -1021,15 +1245,29 @@ class MoodEngine:
         never mistaken for an organically-derived mood in an audit.
         """
         prior = self.store.latest_mood(agent_id)
+        influence = influence or self.influence_for(valence, arousal)
+        # Recompute the projections from the vector, exactly as update_from_voice
+        # does, so a seeded state is one the system could genuinely have been in.
+        # An unrealisable request (|valence| > arousal) lands on its nearest
+        # reachable neighbour rather than being stored as an impossible state.
+        achieved_valence = _clamp(
+            sum(getattr(influence, n) for n in self._POSITIVE_INFLUENCE) / 3
+            - sum(getattr(influence, n) for n in self._NEGATIVE_INFLUENCE) / 3,
+            -1.0,
+            1.0,
+        )
+        achieved_arousal = _clamp(
+            max(getattr(influence, n) for n in self._POSITIVE_INFLUENCE + self._NEGATIVE_INFLUENCE)
+        )
         mood = MoodState(
             mood_id=_id("mood"),
             agent_id=agent_id,
             state_revision=(prior.state_revision + 1) if prior else 0,
             label=label,
-            valence=_clamp(valence, -1.0, 1.0),
-            arousal=_clamp(arousal, 0.0, 1.0),
+            valence=round(achieved_valence, 6),
+            arousal=round(achieved_arousal, 6),
             momentum=_clamp(momentum, 0.0, 1.0),
-            influence=influence or MoodInfluenceVector(),
+            influence=influence,
             supporting_voice_ids=[],
             status=MoodStatus.ACTIVE,
             created_at=self.clock.now(),
@@ -1061,6 +1299,159 @@ class MoodEngine:
         for field in MoodInfluenceVector.model_fields:
             values[field] = round(_clamp(getattr(prior, field) * 0.55 + getattr(current, field) * 0.45), 6)
         return MoodInfluenceVector(**values)
+
+
+@dataclass(frozen=True)
+class MergedProjection:
+    """What the merged build computed, including what it had to compromise.
+
+    The diagnostic fields are not decoration. `window_belief_count` and
+    `sum_stake` are what separate "merged correctly shows no affect" (outcome
+    M-a, a loss) from "there was nothing to read" (M-0, undecidable) — a
+    distinction experiment 1 lost an entire finding to. `arousal_floored` says
+    the requested state was unreachable and a different one was occupied.
+    """
+
+    valence: float
+    arousal: float
+    window_belief_count: int
+    sum_stake: float
+    arousal_floored: bool
+
+
+class MergedMoodEngine(MoodEngine):
+    """Mood as a query over recent beliefs. No stored state, no decay, no inertia.
+
+    Subclasses `MoodEngine` so `seed_mood` and `influence_for` are inherited
+    *unchanged* — `seed_mood` is the NFR-3 control arm and has to behave
+    identically in both builds, or the arm cannot separate an architecture
+    effect from an LLM effect.
+
+    What is overridden is only where mood comes from: `update_from_voice`
+    ignores the composed frame's influence and derives from the belief store
+    instead, and `active_mood` recomputes rather than reading `latest_mood`.
+
+    Merged still *persists* each computed mood, with
+    `reason="derived_from_beliefs"` in the revision trail. Persistence for audit
+    is not persistence for state: nothing written here is ever read back as an
+    input, which `test_merged_never_reads_prior_mood` pins.
+    """
+
+    def __init__(self, store: ManyuStore, clock: Clock, config: ArchConfig | None = None):
+        super().__init__(store, clock)
+        self.config = config or ArchConfig()
+
+    # --- the query -----------------------------------------------------
+
+    def window(self, agent_id: str) -> list[Belief]:
+        """The N most recently updated active beliefs, newest first.
+
+        A hard cutoff with **no age-weighting inside it**. Age-weighting would
+        be inertia by another name, and inertia is the thing this build exists
+        not to have.
+        """
+        return self.store.list_beliefs(agent_id)[: self.config.recency_window_beliefs]
+
+    def stake(self, belief: Belief) -> float:
+        """How much a belief weighs: mean evidence salience x its own confidence."""
+        if not belief.evidence_ids:
+            return 0.0
+        evidence = self.store.list_belief_evidence(belief.agent_id, evidence_ids=list(belief.evidence_ids))
+        if not evidence:
+            return 0.0
+        salience = sum(item.affective_salience for item in evidence) / len(evidence)
+        return salience * belief.confidence
+
+    def project(self, agent_id: str) -> MergedProjection:
+        """Compute (valence, arousal) from the belief window.
+
+        Valence is a stake-weighted **mean** — a direction, which twenty mildly
+        negative beliefs should not drive past the scale. Arousal is a
+        **saturating sum** — an intensity, which must accumulate or D2 is
+        unrunnable, since object-less anxiety is precisely the case where many
+        low-salience items should add up to something.
+
+        The two are then coupled: `MoodEngine.influence_for` cannot represent
+        `|valence| > arousal` (valence is a difference of means bounded by the
+        maximum) and **silently clamps** such requests. Computing the two
+        independently would let merged ask for an unreachable state and occupy a
+        different one with nothing recording the substitution — so arousal is
+        floored at `|valence|` here, and the compromise is reported.
+        """
+        window = self.window(agent_id)
+        stakes = [(belief, self.stake(belief)) for belief in window]
+        total = sum(stake for _, stake in stakes)
+        if total <= 0.0:
+            return MergedProjection(0.0, 0.0, len(window), 0.0, False)
+        valence = sum(belief.valence * stake for belief, stake in stakes) / total
+        accumulated = 1.0 - math.exp(-total / self.config.arousal_tau)
+        arousal = max(accumulated, abs(valence))
+        return MergedProjection(
+            valence=round(_clamp(valence, -1.0, 1.0), 6),
+            arousal=round(_clamp(arousal), 6),
+            window_belief_count=len(window),
+            sum_stake=round(total, 6),
+            arousal_floored=arousal > accumulated,
+        )
+
+    # --- the MoodEngine interface --------------------------------------
+
+    def compute(self, agent_id: str, state_revision: int = 0) -> MoodState:
+        projection = self.project(agent_id)
+        influence = self.influence_for(projection.valence, projection.arousal)
+        now = self.clock.now()
+        return MoodState(
+            mood_id=_id("mood"),
+            agent_id=agent_id,
+            state_revision=state_revision,
+            label=label_from_influence(influence),
+            valence=projection.valence,
+            arousal=projection.arousal,
+            # Always zero. Momentum is inertia, and a build with no stored state
+            # has nothing for inertia to act on.
+            momentum=0.0,
+            influence=influence,
+            supporting_voice_ids=[],
+            status=MoodStatus.ACTIVE,
+            created_at=now,
+            updated_at=now,
+            # Inert: every read recomputes, so nothing is ever old enough to
+            # expire. Populated only because the schema requires it.
+            expires_at=now + timedelta(minutes=15),
+        )
+
+    def update_from_voice(self, frame: InnerVoiceFrame) -> MoodState:
+        """Derive from beliefs; the frame is recorded but its influence is ignored."""
+        mood = self.compute(frame.agent_id, state_revision=frame.state_revision)
+        self.store.save_mood_state(mood)
+        self.store.save_mood_revision(
+            MoodRevision(
+                revision_id=_id("mrev"),
+                mood_id=mood.mood_id,
+                agent_id=mood.agent_id,
+                previous_mood_id=None,
+                previous_label=None,
+                new_label=mood.label,
+                previous_influence=None,
+                new_influence=mood.influence,
+                reason="derived_from_beliefs",
+                voice_id=frame.voice_id,
+                created_at=self.clock.now(),
+            )
+        )
+        return mood
+
+    def active_mood(self, agent_id: str) -> MoodState | None:
+        """Recompute. Never reads the stored mood, so expiry cannot apply.
+
+        Returns `None` on an empty window rather than a zeroed mood: "no
+        beliefs to read" and "beliefs read, no affect" are different states, and
+        collapsing them is what makes M-0 indistinguishable from M-a.
+        """
+        projection = self.project(agent_id)
+        if projection.window_belief_count == 0:
+            return None
+        return self.compute(agent_id)
 
 
 class MoodInfluenceService:

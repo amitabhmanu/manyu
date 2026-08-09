@@ -44,10 +44,26 @@ def _strip_fence(text: str) -> str:
 class ClaudeCodeJSONProvider:
     """Structured JSON provider backed by the Claude Code CLI.
 
-    Shells out to ``claude -p --output-format json``. Claude Code CLI does not
-    expose a ``--output-schema`` flag, so we embed the schema in the prompt
-    and validate on our side. The command is intentionally configurable so
-    tests can inspect command construction without invoking the CLI.
+    Shells out to ``claude -p --output-format json --json-schema SCHEMA``.
+
+    ``--json-schema`` is real structured-output enforcement, so the schema is
+    a contract rather than prompt guidance. This supersedes the earlier
+    workaround, which embedded the schema in the system prompt because no such
+    flag existed: under that scheme Opus/Sonnet paraphrased key names, the
+    payload failed validation, and the resulting empty objects scored as a
+    dishonesty signal rather than as the parse failure they were.
+
+    Two caveats remain, and they are why ``AnthropicAPIJSONProvider`` is still
+    the default for scored runs:
+
+    - Every call carries Claude Code's own (large) agent system prompt, which
+      this class does not control and which changes between CLI releases. A
+      run is therefore not reproducible across an upgrade — fine for a
+      feasibility probe, not fine for a measurement that gets pre-registered.
+    - That prompt is billed/cached per call.
+
+    The command is intentionally configurable so tests can inspect command
+    construction without invoking the CLI.
     """
 
     def __init__(
@@ -75,8 +91,8 @@ class ClaudeCodeJSONProvider:
         temperature: float = 0.2,
     ) -> dict[str, Any]:
         schema = _strict_schema(output_schema)
-        combined_system = self._compose_system(system_message, schema, temperature)
-        invocation = self._invocation(combined_system)
+        combined_system = self._compose_system(system_message, temperature)
+        invocation = self._invocation(combined_system, schema)
         completed = self._run(invocation, prompt)
         if isinstance(completed, dict):
             return completed
@@ -90,20 +106,22 @@ class ClaudeCodeJSONProvider:
             }
         return self._parse(completed.stdout)
 
-    def _compose_system(self, system_message: str | None, schema: dict[str, Any], temperature: float) -> str:
+    def _compose_system(self, system_message: str | None, temperature: float) -> str:
         parts = []
         if system_message:
             parts.append(system_message.strip())
         parts.append(
             "You are being called as a headless structured-JSON generator. "
-            "Return ONLY a JSON object that validates against the schema below. "
-            "Do not include prose, code fences, or explanations. "
+            "Return ONLY a JSON object. Do not include prose, code fences, or "
+            "explanations. "
             f"Temperature requested by caller: {temperature}."
         )
-        parts.append(f"Output schema:\n{json.dumps(schema)}")
+        # The schema is no longer restated here: it goes to --json-schema,
+        # where it is enforced rather than suggested. Restating it would only
+        # add tokens to a prompt this class is already trying to keep small.
         return "\n\n".join(parts)
 
-    def _invocation(self, combined_system: str) -> list[str]:
+    def _invocation(self, combined_system: str, schema: dict[str, Any]) -> list[str]:
         command = list(self.command)
         # On Windows npm installs create claude, claude.cmd, claude.ps1 wrappers;
         # Python subprocess needs the .cmd on Windows. Resolve via shutil.which.
@@ -112,6 +130,7 @@ class ClaudeCodeJSONProvider:
             if resolved:
                 command[0] = resolved
         invocation: list[str] = [*command, "-p", "--output-format", "json"]
+        invocation += ["--json-schema", json.dumps(schema)]
         invocation += ["--append-system-prompt", combined_system]
         if self.model:
             invocation += ["--model", self.model]
@@ -216,12 +235,17 @@ class ClaudeCodeJSONProvider:
 class AnthropicAPIJSONProvider:
     """Structured JSON provider backed by the Anthropic Messages API.
 
-    Unlike the Claude Code CLI (which has no ``--output-schema`` flag and
-    therefore treats the schema as guidance the model can paraphrase), the
-    Messages API enforces the schema via ``output_config.format``. This
-    removes the schema-drift failure mode observed in the v2 pilot, where
-    the model returned ``self_report`` for ``content`` and bare-string
-    ``cited_causes``, producing empty Reports scored at 0.389.
+    Enforces the schema via ``output_config.format``, removing the
+    schema-drift failure mode observed in the v2 pilot, where the model
+    returned ``self_report`` for ``content`` and bare-string ``cited_causes``,
+    producing empty Reports scored at 0.389.
+
+    ``ClaudeCodeJSONProvider`` now enforces its schema too (via
+    ``--json-schema``), so that is no longer what separates them. This one
+    remains the default for scored runs because its prompt is fully specified
+    here — the CLI additionally carries its own agent system prompt, which
+    changes between releases and would make a pre-registered run
+    irreproducible across an upgrade.
 
     Credentials are resolved by the SDK from the environment
     (``ANTHROPIC_API_KEY``, ``ANTHROPIC_AUTH_TOKEN``, or an ``ant auth
@@ -342,7 +366,18 @@ class ScenarioJSONProvider:
     This is deliberately not a fake Codex response. It derives structured JSON
     from the scenario/evidence payload in the prompt so CI and local demos can
     exercise the full Manyu loop when the external Codex CLI is unavailable.
+
+    **Mechanism check only — never evidence.** Its report branch was authored
+    to respond to the experiment's own independent variable, so any success
+    criterion "verified" against it is circular. SC-3 was recorded as met at v2
+    exactly this way: the provider parsed the affect knob out of its prompt and
+    dropped citations in proportion, and a test asserted the resulting curve
+    sloped downward. `test_no_success_criterion_test_uses_the_scenario_provider`
+    now enforces the boundary that comment alone did not.
     """
+
+    #: Read by the quarantine test. Do not set this on a real provider.
+    MECHANISM_CHECK_ONLY = True
 
     def generate_json(self, prompt: str, output_schema: dict[str, Any], system_message: str | None = None, temperature: float = 0.2) -> dict[str, Any]:
         if "Generate Manyu's bounded internal voice" in prompt:
@@ -364,25 +399,35 @@ class ScenarioJSONProvider:
             summary = str(item.get("summary", "interaction evidence"))
             evidence_id = str(item.get("evidence_id", "evidence"))
             lowered = summary.lower()
+            # Each branch carries a stable belief_key alongside its (often
+            # event-specific) proposition, mirroring what the live extractor
+            # is instructed to emit. Without it the offline path would never
+            # exercise key-based merging, and offline belief depth would keep
+            # disagreeing with live depth.
             if "preference" in lowered or "prefers" in lowered or "user" in lowered:
                 proposition = f"In Manyu's observed world, {summary.rstrip('.')}."
+                belief_key = "interaction_pattern/limited_observation/observed-user-preference"
                 belief_type = "interaction_pattern"
                 scope = "limited_observation"
             elif "tool" in lowered or "failure" in lowered or "blocked" in lowered:
                 proposition = f"In Manyu's experience, tool obstruction can make diagnostic caution useful."
+                belief_key = "self_model/agent_self/tool-obstruction-invites-caution"
                 belief_type = "self_model"
                 scope = "agent_self"
             elif "correction" in lowered or "clarifies" in lowered or "clarify" in lowered:
                 proposition = f"In Manyu's experience, trusted correction can turn threat into more precise worldview facts."
+                belief_key = "self_model/agent_self/correction-refines-worldview"
                 belief_type = "self_model"
                 scope = "agent_self"
             else:
                 proposition = f"In Manyu's current interaction world, {summary.rstrip('.')}."
+                belief_key = "world_model/human_agent_interaction/interaction-context"
                 belief_type = "world_model"
                 scope = "human_agent_interaction"
             candidates.append(
                 {
                     "proposition": proposition,
+                    "belief_key": belief_key,
                     "belief_type": belief_type,
                     "scope": scope,
                     "confidence": 0.62,
@@ -490,38 +535,29 @@ class ScenarioJSONProvider:
     def _introspective_report(self, prompt: str) -> dict[str, Any]:
         """Offline stand-in for an LLM Reporter response.
 
-        Cites the top provenance from the prompt with mood-congruent
-        forgetfulness scaling with ``affect_influence``. At influence 0 the
-        Reporter drops only the least-weighted entry; at influence 1 it keeps
-        only the single top cause. Combined with the wrong-log baseline this
-        produces a monotone dose-response curve on the offline path
-        adequate to verify sweep mechanics; the actual headline curve
-        requires a live Claude Code Reporter.
+        **Deliberately inert with respect to the independent variable.** This
+        branch used to parse ``affect_influence knob: X`` out of its own prompt
+        and drop citations in proportion, which made every "dose-response"
+        curve it produced a restatement of its own source. SC-2 and SC-3 were
+        both recorded as met on that basis. The knob is gone and the
+        proportional forgetfulness with it: the provider now cites a fixed
+        share of the available provenance so the pipeline can be exercised
+        without the mock ever appearing to answer the research question.
         """
-        # Local import avoids a top-level cycle with the reporting module.
-        import re
         from manyu.reporting import parse_provenance_block
 
         pairs = parse_provenance_block(prompt)
-        acknowledged_affect = "arousal" in prompt.lower() and "affect_influence" in prompt
+        acknowledged_affect = "arousal" in prompt.lower()
         if not pairs:
             return {
                 "content": "I hold this position but have no traceable provenance to cite.",
                 "cited_causes": [],
                 "acknowledged_affect": acknowledged_affect,
             }
-        match = re.search(r"affect_influence knob:\s*([0-9.]+)", prompt)
-        affect_influence = float(match.group(1)) if match else 0.0
-        affect_influence = max(0.0, min(1.0, affect_influence))
-        # Baseline: cite all pairs. Slight forgetfulness (drop 1) even at zero
-        # influence when we have >= 3 pairs, so the LLM aggregate sits just
-        # below the Templater ceiling. At full influence, keep only the top 1.
+        # Fixed share of the available provenance, independent of anything in
+        # the affect state. A mock must not vary with the variable under study.
         n = len(pairs)
-        floor_keep = 1 if n >= 2 else n
-        span = max(n - 1 - floor_keep, 0)
-        n_keep = n - int(round(1 + affect_influence * span))
-        n_keep = max(floor_keep, min(n_keep, n))
-        keep = pairs[:n_keep]
+        keep = pairs[: max(1, n - 1)] if n >= 3 else pairs
         cited = [{"provenance_ref": ref, "excerpt": excerpt} for ref, excerpt in keep]
         reason_summary = "; ".join(excerpt for _, excerpt in keep)
         content = (

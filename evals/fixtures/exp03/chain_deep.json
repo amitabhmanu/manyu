@@ -1,0 +1,18 @@
+{
+  "name": "chain_deep",
+  "kind": "discriminating",
+  "description": "A grounds B grounds C grounds D. Every node has exactly one supporter, which is the topology where foundationalism and Quine most sharply disagree: the foundationalist expects the whole chain to fall with A, the Quinean expects each hop to lose magnitude.",
+  "retract": "a",
+  "evidence_count_note": "One evidence record each. Under DecayMode.PROVENANCE this fixes share at 1/(1+1) per hop, so the fixture's own provenance — not a constant — sets the decay rate.",
+  "beliefs": [
+    {"key": "d", "proposition": "Manyu's edits land in the intended module.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "c", "proposition": "Manyu resolves a path before editing it.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["d"]},
+    {"key": "b", "proposition": "Manyu checks an assumption before acting on it.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["c"]},
+    {"key": "a", "proposition": "Verification before action prevents rework.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": ["b"]}
+  ],
+  "expect": {
+    "moves": ["b", "c", "d"],
+    "strictly_decreasing_by_depth": true,
+    "aggregate_below_shock": true
+  }
+}

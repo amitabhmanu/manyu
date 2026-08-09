@@ -1,0 +1,16 @@
+{
+  "name": "negative_near_miss",
+  "kind": "negative",
+  "description": "The load-bearing negative. Four beliefs on the same topic, in the same scope, with near-identical wording and matching valence — and no edges at all. A propagation rule keying on similarity, shared topic, or valence proximity rather than on the declared graph fires here. Distractors with unrelated content are easy to pass and prove little (experiment 2 methodology 3.4).",
+  "retract": "verification_a",
+  "evidence_count_note": "Uniform, so nothing distinguishes these beliefs from chain_deep's except the absence of edges.",
+  "beliefs": [
+    {"key": "verification_a", "proposition": "Verification before action prevents rework.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "verification_b", "proposition": "Checking before acting prevents rework.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "verification_c", "proposition": "Acting without verifying tends to cause rework.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []},
+    {"key": "verification_d", "proposition": "Rework follows from unverified assumptions.", "confidence": 0.8, "valence": 0.3, "evidence_count": 1, "supports": []}
+  ],
+  "expect": {
+    "moves": []
+  }
+}

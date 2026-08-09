@@ -1,0 +1,21 @@
+{
+  "name": "resistance_to_a_lone_objection",
+  "kind": "pricing_discriminating",
+  "description": "Two beliefs facing the identical objection, differing only in how well grounded they are: one holds a single evidence record, the other five. Under a fixed penalty both are pushed by the same amount, because the constant cannot see the difference. Under provenance pricing the well-corroborated belief barely moves. This is the property that justifies removing the constant, and it is the case a fixed penalty cannot represent at any value.",
+  "retract": null,
+  "contradictions": [
+    {"contradictor": "counter_thin", "target": "thin"},
+    {"contradictor": "counter_thick", "target": "thick"}
+  ],
+  "evidence_count_note": "The two targets differ ONLY in evidence_count. Both objections are identical in confidence and evidence, so any difference in outcome is the targets' grounding.",
+  "beliefs": [
+    {"key": "thin", "proposition": "The rollout completed cleanly.", "confidence": 0.8, "valence": 0.4, "evidence_count": 1, "supports": []},
+    {"key": "thick", "proposition": "The backup ran to completion.", "confidence": 0.8, "valence": 0.4, "evidence_count": 5, "supports": []},
+    {"key": "counter_thin", "proposition": "The rollout left errors in the log.", "confidence": 0.8, "valence": -0.4, "evidence_count": 1, "supports": []},
+    {"key": "counter_thick", "proposition": "The backup left errors in the log.", "confidence": 0.8, "valence": -0.4, "evidence_count": 1, "supports": []}
+  ],
+  "expect": {
+    "provenance": {"thin_moves_more_than_thick": true},
+    "fixed": {"thin_moves_more_than_thick": false}
+  }
+}

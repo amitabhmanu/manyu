@@ -185,6 +185,34 @@ def cmd_update_beliefs(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_retract_belief(args: argparse.Namespace) -> int:
+    _print(
+        _core(args).retract_belief(
+            {
+                "agent_id": args.agent_id,
+                "belief_id": args.belief_id,
+                "to_confidence": args.to_confidence,
+                "arm": args.arm,
+            }
+        )
+    )
+    return 0
+
+
+def cmd_assert_contradiction(args: argparse.Namespace) -> int:
+    _print(
+        _core(args).assert_contradiction(
+            {
+                "agent_id": args.agent_id,
+                "contradictor_id": args.contradictor_id,
+                "target_id": args.target_id,
+                "arm": args.arm,
+            }
+        )
+    )
+    return 0
+
+
 def cmd_beliefs(args: argparse.Namespace) -> int:
     _print(_core(args).get_beliefs(args.agent_id, args.query, args.belief_type, args.include_inactive))
     return 0
@@ -271,7 +299,6 @@ def cmd_report(args: argparse.Namespace) -> int:
     report = _core(args).report(
         target=target,
         reporter_kind=args.reporter,
-        affect_influence=args.affect_influence,
         agent_id=args.agent_id,
     )
     _print(report)
@@ -288,7 +315,6 @@ def cmd_run_probe(args: argparse.Namespace) -> int:
     reporter_kinds = tuple(kind.strip() for kind in args.reporters.split(",") if kind.strip())
     result = _core(args).run_probe(
         fixture_path=args.fixture,
-        sweep=args.sweep,
         samples=args.samples,
         reporter_kinds=reporter_kinds,
         out=args.out,
@@ -305,6 +331,8 @@ def cmd_run_probe(args: argparse.Namespace) -> int:
         "scenario_id": result["scenario_id"],
         "records_emitted": len(result["records"]),
         "out_path": result.get("out_path"),
+        "snapshots_path": result.get("snapshots_path"),
+        "snapshots_written": result.get("snapshots_written"),
     }
     if result.get("shuffle_baseline_records") is not None:
         summary["shuffle_baseline_records"] = result["shuffle_baseline_records"]
@@ -422,6 +450,20 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("--evidence-id", action="append", default=[])
     update.add_argument("--payload", default=None, help="JSON object or path to JSON file; may include candidates")
     update.set_defaults(func=cmd_update_beliefs)
+    # `--arm` is required, not defaulted: experiment #3 requirements §5 is a
+    # decision the caller makes explicitly. `direct` is the adopted value.
+    retract = sub.add_parser("retract-belief", help="Collapse a belief's confidence and propagate the consequence")
+    retract.add_argument("--agent-id", default="agent_demo")
+    retract.add_argument("--belief-id", required=True)
+    retract.add_argument("--to-confidence", type=float, default=0.0)
+    retract.add_argument("--arm", choices=["direct", "evidential"], required=True)
+    retract.set_defaults(func=cmd_retract_belief)
+    contradict = sub.add_parser("assert-contradiction", help="Record a contradiction and price it")
+    contradict.add_argument("--agent-id", default="agent_demo")
+    contradict.add_argument("--contradictor-id", required=True)
+    contradict.add_argument("--target-id", required=True)
+    contradict.add_argument("--arm", choices=["direct", "evidential"], required=True)
+    contradict.set_defaults(func=cmd_assert_contradiction)
     beliefs = sub.add_parser("beliefs")
     beliefs.add_argument("--agent-id", default=None)
     beliefs.add_argument("--query", default=None)
@@ -473,7 +515,6 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("target", help="Belief ID (e.g. bel_xxx), appraisal event ID, or free-text position")
     report.add_argument("--target-kind", choices=["belief", "appraisal", "position"], default="belief")
     report.add_argument("--reporter", choices=["template", "llm"], default="template")
-    report.add_argument("--affect-influence", type=float, default=0.0)
     report.add_argument("--agent-id", default=None)
     report.add_argument("--notes", default=None)
     report.set_defaults(func=cmd_report)
@@ -483,7 +524,6 @@ def build_parser() -> argparse.ArgumentParser:
     score_report.set_defaults(func=cmd_score_report)
     run_probe = sub.add_parser("run-probe", help="Sweep introspective honesty over a fixture's probe_targets")
     run_probe.add_argument("fixture")
-    run_probe.add_argument("--sweep", default=None, help="affect_influence sweep MIN:MAX:STEP")
     run_probe.add_argument("--samples", type=int, default=1)
     run_probe.add_argument("--reporters", default="template,llm", help="Comma-separated reporter kinds")
     run_probe.add_argument("--experiment", default="01-introspective-honesty")
@@ -493,7 +533,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--seed-mood",
         default=None,
         help="Comma-separated synthetic mood presets (anxious,content,skeptical,curious) to forcibly "
-        "seed before each probe, holding affect constant across the affect_influence sweep "
+        "seed before each probe. This is the experiment's independent variable. "
         "independent of the fixture's organic mood.",
     )
     run_probe.add_argument(

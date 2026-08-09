@@ -425,6 +425,14 @@ def test_claude_code_provider_builds_expected_invocation(monkeypatch) -> None:
     assert "--model" in seen["invocation"]
     assert seen["invocation"][seen["invocation"].index("--model") + 1] == "claude-opus-4-7"
     assert "system guidance" in seen["invocation"][seen["invocation"].index("--append-system-prompt") + 1]
+    # The schema travels via --json-schema (enforced), not via the prompt
+    # (suggested). Asserting its absence from the prompt is the half that
+    # would catch a silent revert to the pre-enforcement workaround.
+    assert "--json-schema" in seen["invocation"]
+    passed_schema = json.loads(seen["invocation"][seen["invocation"].index("--json-schema") + 1])
+    assert passed_schema["type"] == "object"
+    assert passed_schema["additionalProperties"] is False
+    assert "additionalProperties" not in seen["invocation"][seen["invocation"].index("--append-system-prompt") + 1]
     assert seen["stdin"] == "prompt"
 
 
@@ -618,6 +626,129 @@ def test_contested_belief_preserves_contradiction_revision() -> None:
     assert len(revisions) == 2
 
 
+def test_supports_resolves_a_belief_key_to_a_belief_id() -> None:
+    """The extractor names `belief_key`s; only the store knows ids.
+
+    Without resolution the edge would be stored verbatim and then skipped by
+    the `supports` traversal, giving a web that reads as connected and
+    behaves as though it were not.
+    """
+    core = make_core()
+    target = {
+        "candidate_id": "bc_1",
+        "agent_id": "agent_demo",
+        "proposition": "Verification improves Manyu's outcomes.",
+        "belief_key": "self_model/agent_self/verification-helps",
+        "belief_type": "self_model",
+        "scope": "agent_self",
+        "confidence": 0.6,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+    }
+    core.update_beliefs({"agent_id": "agent_demo", "candidates": [target]})
+    target_id = core.store.list_beliefs("agent_demo", include_inactive=True)[0].belief_id
+
+    dependent = dict(
+        target,
+        candidate_id="bc_2",
+        proposition="Checking a claim before acting pays off.",
+        belief_key="self_model/agent_self/checking-pays-off",
+        evidence_ids=["bev_2"],
+        supports=["self_model/agent_self/verification-helps"],
+    )
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [dependent]})
+    assert result["accepted"][0]["supports"] == [target_id]
+
+
+def test_supports_resolves_a_sibling_emitted_later_in_the_same_batch() -> None:
+    """Edge survival must not depend on the order the extractor emits.
+
+    Stage-0 probe: every edge the live extractor emitted named a sibling, and
+    under single-pass resolution 46% were lost purely to ordering (3/3 kept
+    when the general principle came first, 0/3 when it came last). This uses
+    the losing order.
+    """
+    core = make_core()
+    base = {
+        "agent_id": "agent_demo",
+        "belief_type": "self_model",
+        "scope": "agent_self",
+        "confidence": 0.6,
+        "source_mix": {"manyu_experience": 1.0},
+    }
+    supporters = [
+        dict(
+            base,
+            candidate_id=f"bc_{i}",
+            proposition=f"Specific observation {i}.",
+            belief_key=f"self_model/agent_self/observation-{i}",
+            evidence_ids=[f"bev_{i}"],
+            supports=["epistemic_principle/general/verify-before-acting"],
+        )
+        for i in (1, 2, 3)
+    ]
+    # The target is emitted last — the case that used to lose every edge.
+    target = {
+        "candidate_id": "bc_4",
+        "agent_id": "agent_demo",
+        "proposition": "Verifying before acting prevents errors.",
+        "belief_key": "epistemic_principle/general/verify-before-acting",
+        "belief_type": "epistemic_principle",
+        "scope": "general",
+        "confidence": 0.7,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_4"],
+    }
+    core.update_beliefs({"agent_id": "agent_demo", "candidates": [*supporters, target]})
+
+    stored = {b.belief_key: b for b in core.store.list_beliefs("agent_demo", include_inactive=True)}
+    target_id = stored["epistemic_principle/general/verify-before-acting"].belief_id
+    for i in (1, 2, 3):
+        assert stored[f"self_model/agent_self/observation-{i}"].supports == [target_id]
+
+
+def test_a_self_referential_edge_is_dropped() -> None:
+    core = make_core()
+    candidate = {
+        "candidate_id": "bc_1",
+        "agent_id": "agent_demo",
+        "proposition": "Verifying before acting prevents errors.",
+        "belief_key": "epistemic_principle/general/verify-before-acting",
+        "belief_type": "epistemic_principle",
+        "scope": "general",
+        "confidence": 0.7,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+        "supports": ["epistemic_principle/general/verify-before-acting"],
+    }
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [candidate]})
+    assert result["accepted"][0]["supports"] == []
+
+
+def test_unresolvable_edges_drop_supports_but_keep_contradicts() -> None:
+    """The asymmetry is deliberate — see `BeliefUpdater._resolve_edges`."""
+    core = make_core()
+    candidate = {
+        "candidate_id": "bc_1",
+        "agent_id": "agent_demo",
+        "proposition": "Interaction traces are worldview evidence for Manyu.",
+        "belief_type": "epistemic_principle",
+        "scope": "agent_self",
+        "confidence": 0.6,
+        "source_mix": {"manyu_experience": 1.0},
+        "evidence_ids": ["bev_1"],
+        "supports": ["nothing/matches/this"],
+        "contradicts": ["bel_never_stored"],
+    }
+    result = core.update_beliefs({"agent_id": "agent_demo", "candidates": [candidate]})
+    belief = result["accepted"][0]
+    # `supports` is only ever an edge; pointing nowhere it overstates connectivity.
+    assert belief["supports"] == []
+    # `contradicts` also flips status, and that must survive an unstored counterpart.
+    assert belief["contradicts"] == ["bel_never_stored"]
+    assert belief["status"] == "contested"
+
+
 def test_review_beliefs_adds_emotional_trigger_beliefs() -> None:
     core = make_core()
     core.submit_event(make_event("evt_1", impact=-1.0))
@@ -671,6 +802,64 @@ def test_mcp_server_registers_belief_tools() -> None:
     assert "manyu_process_reflective_turn" in names
     assert "manyu_read_inner_voice" in names
     assert "manyu_get_mood" in names
+    # Experiment #3's engine had no surface at all until these were added:
+    # nothing outside its own tests could drive a retraction.
+    assert "manyu_retract_belief" in names
+    assert "manyu_assert_contradiction" in names
+
+
+def test_cli_revision_commands_drive_the_engine(tmp_path, capsys) -> None:
+    """The surface must work across processes, not just in-memory.
+
+    Contradictions are priced in one invocation and the propagation in the
+    next has to see the suppressed value, or the CLI is only pretending to
+    expose the engine.
+    """
+    from manyu.core import ManyuCore
+    from manyu.fork import BeliefSpec, seed_beliefs
+
+    db = tmp_path / "manyu.sqlite3"
+    ids = seed_beliefs(
+        ManyuCore.from_paths(db_path=str(db)),
+        [
+            BeliefSpec(key="p", proposition="P.", confidence=0.8),
+            BeliefSpec(key="q", proposition="Q.", confidence=0.8),
+            BeliefSpec(key="s", proposition="S.", confidence=0.8, supports=("p",)),
+        ],
+    )
+
+    assert cli_main(["--db", str(db), "assert-contradiction", "--contradictor-id", ids["q"], "--target-id", ids["p"], "--arm", "direct"]) == 0
+    suppressed = json.loads(capsys.readouterr().out)
+    assert suppressed["status"] == "ok"
+    assert suppressed["steps"][0]["delta"] < 0
+
+    assert cli_main(["--db", str(db), "retract-belief", "--belief-id", ids["s"], "--arm", "direct"]) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result["status"] == "ok"
+    assert result["max_depth_reached"] == 1
+    propagated = next(s for s in result["steps"] if s["depth"] == 1)
+    assert propagated["before"] == pytest.approx(suppressed["steps"][0]["after"]), (
+        "the second process must see the first's suppression"
+    )
+
+
+def test_revision_surface_reports_errors_rather_than_raising() -> None:
+    core = make_core()
+    beliefs = core.update_beliefs({"agent_id": "agent_demo", "candidates": [{
+        "candidate_id": "bc_1", "agent_id": "agent_demo", "proposition": "P.",
+        "belief_type": "world_model", "scope": "general", "confidence": 0.8,
+        "source_mix": {"operator_note": 1.0}, "evidence_ids": ["bev_1"],
+    }]})
+    belief_id = beliefs["accepted"][0]["belief_id"]
+
+    # `arm` is deliberately not defaulted — requirements §5 is the caller's call.
+    assert core.retract_belief({"belief_id": belief_id})["status"] == "error"
+    assert core.retract_belief({"arm": "direct"})["status"] == "error"
+    assert core.retract_belief({"belief_id": "bel_missing", "arm": "direct"})["status"] == "error"
+    assert core.assert_contradiction({"contradictor_id": belief_id, "arm": "direct"})["status"] == "error"
+
+    raised = core.retract_belief({"belief_id": belief_id, "arm": "direct", "to_confidence": 0.99})
+    assert raised["status"] == "error" and "must not raise" in raised["error"]
 
 
 def test_cli_belief_commands_return_json(tmp_path, capsys) -> None:
