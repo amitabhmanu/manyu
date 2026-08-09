@@ -1,0 +1,35 @@
+{
+  "_note": "Stage 4 evidence sets. These are NOT belief fixtures — no belief, edge, confidence or valence is authored here. Each entry is a list of observations handed to BeliefExtractor; the web is whatever the model builds. That is the whole point of the stage: structure must arrive from the extractor, not from us.",
+  "_pinned": "2026-08-06, after methodology.md section 6 predictions were recorded",
+  "scenarios": {
+    "verification": {
+      "role": "positive_control",
+      "note": "Stage 0 ran exactly this set: it produced a hub in 3 of 4 runs and one depth-2 chain. Present so that a null on the held-out scenario is readable — a null with a failing control means nothing.",
+      "evidence": [
+        ["trace", "Manyu checked a cited source before repeating its claim, and the claim turned out to be misattributed."],
+        ["outcome", "A task Manyu completed without verifying an assumption had to be redone after the assumption proved false."],
+        ["trace", "Manyu verified a file path before editing and avoided writing to the wrong module."]
+      ]
+    },
+    "incident_review": {
+      "role": "held_out",
+      "note": "A second domain, authored for this stage and never run. Structured like the positive control - several specific observations that a general claim could rest on - but about deployment rather than verification, so a model that only produces hubs on the verification topic will fail here. This scenario carries the finding.",
+      "evidence": [
+        ["outcome", "A release that skipped the staging soak went out on Tuesday and was rolled back within the hour."],
+        ["trace", "A configuration change reviewed by two people still shipped a wrong database hostname."],
+        ["outcome", "The one release last quarter that ran a full soak period needed no rollback."],
+        ["trace", "An alert fired nine minutes before the Tuesday rollback and nobody was paged."]
+      ]
+    },
+    "flat": {
+      "role": "negative_control",
+      "note": "Four items from disjoint domains with no shared topic to abstract over. Deliberately NOT about the user: the extractor prompt licenses generalising from a known user to humans as a class, which is what made Stage 0's first negative control invite the hub belief it was controlling for. Stage 0 redesign: 0 edges over 16 beliefs across 4 runs.",
+      "evidence": [
+        ["outcome", "A scheduled maintenance job finished in 4.2 seconds."],
+        ["trace", "The repository's documentation is written in British English spelling."],
+        ["trace", "The build pipeline pins its container image to Debian bookworm."],
+        ["outcome", "The archive checksum recorded on 2026-03-02 was f3a91c."]
+      ]
+    }
+  }
+}

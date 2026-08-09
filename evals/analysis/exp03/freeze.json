@@ -1,0 +1,19 @@
+{
+  "_note": "Stage 4 pre-registration. methodology.md section 6 predictions were written BEFORE incident_review was authored and before any live call. No API key was present in the environment when these hashes were taken.",
+  "frozen_at": "2026-08-09T08:05:06.791825+00:00",
+  "git_commit_at_freeze": "f82565ebe2f0c3a250318d3b8a669a52e2cade38",
+  "files": {
+    "evals/fixtures/exp03/scenarios.json": {
+      "sha256": "ce0f3beb5bc52d9daf5b5c7119379cf738f6333663303a82f3e6968366dc46d0",
+      "role": "stage4 evidence sets"
+    },
+    "docs/experiments/03-foundationalism-quinean-web/methodology.md": {
+      "sha256": "d4f21aa01721c026ed049bd8e7a44b4f177c90030f41a89dbb830c1fb2ac8ee1",
+      "role": "pinned constants + predictions"
+    },
+    "evals/analysis/exp03/run_stage4.py": {
+      "sha256": "2458cb9c940702fd0dc287a656b3d121396a17356a7d289d05440918f3ba5042",
+      "role": "runner"
+    }
+  }
+}
