@@ -26,7 +26,7 @@ Related reading:
 |---|---|---|---|---|
 | 1 | Introspective honesty | **parked** — headline answered: affect does not bias self-report; Manyu confabulates on instruction (100%) and never unforced (0/1,161) | — | Honesty scorer v1.6.0 (citation metrics validated; failure-mode labels not) |
 | 2 | Merge/split architecture fork | **decided, remainder parked** — merged substrate + thin dynamical layer ([ADR 002](adr-002-merged-substrate.md)) | 1 | Chosen architecture + the instrument gate every later experiment reuses |
-| 3 | Foundationalism vs. Quinean web | **in-progress** — Stage 0 done (webs have `supports` structure; 46% edge loss found and fixed); Stage 1 engine landed | 2 | Working revision engine; first natural dissonance signal |
+| 3 | Foundationalism vs. Quinean web | **closed** — revision engine delivered and live-confirmed; the epistemology turned out to be settled by mandatory provenance, not by the run | 2 | Revision engine (surfaced on core/CLI/MCP); dissonance coupled to revision |
 | 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
 | 5 | Underdetermination as first-class belief | not-started | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | not-started | 5 | Counterfactual receipts |
@@ -484,9 +484,35 @@ inside it is indicative only and carries no weight in the decision rule.
 
 ## 3. Foundationalism vs. Quinean web
 
-**Status:** in-progress — Stage 0 complete, Stage 1 (engine) landed 2026-08-06
+**Status:** closed 2026-08-09 (stages 0–4 complete)
 **Depends on:** 2
-**Docs:** [requirements](experiments/03-foundationalism-quinean-web/requirements.md) · [stage 0](experiments/03-foundationalism-quinean-web/stage0-extractor-feasibility.md)
+**Docs:** [requirements](experiments/03-foundationalism-quinean-web/requirements.md) · [methodology](experiments/03-foundationalism-quinean-web/methodology.md) · [results](experiments/03-foundationalism-quinean-web/results.md) · [retrospective](experiments/03-foundationalism-quinean-web/retrospective.md) · [stage 0](experiments/03-foundationalism-quinean-web/stage0-extractor-feasibility.md)
+
+> **Read [retrospective.md](experiments/03-foundationalism-quinean-web/retrospective.md)
+> first.** The notes below are a construction record.
+>
+> **Headline.** Revision ripples rather than collapses — **but that follows
+> from mandatory provenance, not from anything the experiment discovered.**
+> Because no belief may be stored without evidence of its own, none rests
+> entirely on another, and total collapse is unrepresentable. The
+> `ignore_own_evidence` ablation confirms the counterfactual: lift the rule and
+> collapse appears immediately, undiminished. The defensible claim is that
+> *what a belief is grounded in* decides whether it bends or falls, and Manyu's
+> substrate fixes that choice. Do not write this up as an empirical finding
+> about revision; the alternative was never available to observe.
+>
+> **Stage 4 live** (`claude-opus-5`, n=10 × 3 scenarios, 0 provider errors):
+> all seven predictions pass, five of them blind. Propagation reaches depth ≥2
+> in 7 of 20 structured runs — real, but **not typical**; most live webs are
+> one hop deep. `share` varies across seven distinct values, and its maximum
+> across all structured runs is exactly 0.5, the cap mandatory provenance
+> implies. One earlier live run was voided (results §3.6).
+>
+> **Sixteen defects, none caught by the test suite.** Four from writing a
+> standard down before reading a verdict, four from adversarial probing, four
+> from reading the diff, two from pre-flight, two from noticing an impossible
+> number. Retrospective §3.1 records the method that worked; it is the most
+> transferable output of this experiment.
 
 > **Stage 0 (feasibility) passed, and found a defect that would have poisoned
 > Stage 4.** `supports` was missing from the extractor's schema, so no live
@@ -691,6 +717,34 @@ alongside #1–#3.
 paper. Resist the temptation to publish #1 alone.
 
 **Notes:**
+
+**Its precondition is met, with a constraint attached.** #3 showed dissonance
+is dynamically coupled to revision: retracting a supporter eases the signal
+through the confidence pathway, with valences provably untouched. That is what
+this experiment needed before it could ask whether the signal *controls*
+anything.
+
+**Do not read `DissonanceSignal.magnitude` as a measure of belief dynamics.**
+Two independent problems, both measured in #3 (retrospective §3.3):
+
+- `_tension` takes `min(stake_a, stake_b)`, so it reads the *weaker* party and
+  is blind above that floor. Raw tension moved **identically** under both
+  contradiction arms while the underlying beliefs sat at materially different
+  confidences.
+- `magnitude` is concave in raw tension, so the same raw change reads larger
+  from a lower baseline. A magnitude delta therefore confounds *how much
+  tension changed* with *where on the saturation curve the web was sitting* —
+  experiment 1's gate #3 (a truncation constant read as a curve) in a new
+  place.
+
+Read `magnitude_raw` and `DissonanceCarrier`s, and report the saturation
+baseline alongside any delta.
+
+**Carried over as standing method** (retrospective §3.1): sixteen defects
+landed in #3 and the test suite caught none. Write the criterion a decision
+rests on *before* running what could settle it; probe inputs the author did
+not have in mind; treat an impossible value as a defect report; and assert a
+mechanism can change its output before reading what it says.
 
 _none yet_
 
