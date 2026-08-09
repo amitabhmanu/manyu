@@ -44,5 +44,5 @@ referenced from later ones — do not duplicate.
 | # | Experiment | Requirements | Design | Methodology | Results |
 |---|---|---|---|---|---|
 | 1 | Introspective honesty | [requirements](01-introspective-honesty/requirements.md) | [design](01-introspective-honesty/design.md) | [methodology](01-introspective-honesty/methodology.md) | [results](01-introspective-honesty/results.md) · [retrospective](01-introspective-honesty/retrospective.md) |
-| 2 | Merge/split architecture fork | [requirements](02-merge-split-fork/requirements.md) | [design](02-merge-split-fork/design.md) | [methodology](02-merge-split-fork/methodology.md) | — |
+| 2 | Merge/split architecture fork | [requirements](02-merge-split-fork/requirements.md) | [design](02-merge-split-fork/design.md) | [methodology](02-merge-split-fork/methodology.md) | [results](02-merge-split-fork/results.md) |
 | 3 | Foundationalism vs. Quinean web | [requirements](03-foundationalism-quinean-web/requirements.md) | — | [methodology](03-foundationalism-quinean-web/methodology.md) | [results](03-foundationalism-quinean-web/results.md) · [retrospective](03-foundationalism-quinean-web/retrospective.md) · [stage 0](03-foundationalism-quinean-web/stage0-extractor-feasibility.md) |

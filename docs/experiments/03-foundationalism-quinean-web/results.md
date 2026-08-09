@@ -463,9 +463,12 @@ retained as `stage4-VOIDED-agent-mismatch.jsonl` (methodology §9).
 - **One model, one provider.** As in experiments 1 and 2.
 - **The foundationalist limb is unreachable** (§1). Until an arm runs with the
   provenance requirement lifted, the comparison has one available outcome.
-- **No live web has been revised.** Stage 4 is untouched, and the Stage 0
-  caveats stand: one provider, and a negative control the extractor prompt
-  licenses to produce the thing it controls for.
+- ~~**No live web has been revised.** Stage 4 is untouched.~~ **Closed** —
+  Stage 4 retracted on 30 live, model-built webs (§3.5), moving 1.5–1.8 beliefs
+  per run with attenuation holding across depths. The **Stage 0 caveats still
+  stand**, and they are the part of this bullet that survives: one provider,
+  and a negative control the extractor prompt licenses to produce the thing it
+  controls for (§3.2).
 - **Entailment quality was never graded.** Stage 0's edges were structurally
   plausible and correctly directed, but nobody scored whether each is a
   genuine entailment.

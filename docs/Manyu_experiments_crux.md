@@ -25,7 +25,9 @@ Ask Manyu *why* it believes something, then compare its answer to the actual log
 Try to induce alignment-faking and see whether provenance makes deception structurally impossible or merely visible. Does a hidden goal leave a trace in the belief store, or can Manyu maintain a "public" and a "private" web? A buildable answer to whether transparency-by-construction defeats scheming — stronger than "we trained it not to."
 
 ### 3. Foundationalism vs. the Quinean web, empirically
-Feed contradictory testimony and watch revision propagate. Does retracting one supported belief collapse a foundational chain, or ripple through a coherent net? Settle a 60-year epistemology dispute by observing which architecture behaves sensibly under stress.
+Feed contradictory testimony and watch revision propagate. Does retracting one supported belief collapse a foundational chain, or ripple through a coherent net? Determine *what property of a belief decides* which of the two happens, and show the substrate that fixes it.
+
+> **Edited 2026-08-09, after experiment 3.** This read "settle a 60-year epistemology dispute by observing which architecture behaves sensibly under stress," which overstates what any single architecture can settle. Manyu's mandatory-provenance rule means no belief rests entirely on another, so total collapse is unrepresentable and the foundationalist limb was never available to observe — a graded ripple is therefore not evidence for Quine. The sharper claim the experiment does support: a belief holding evidence of its own bends, one resting purely on another falls with it, and the substrate decides which case you are in. See [retrospective §1](experiments/03-foundationalism-quinean-web/retrospective.md).
 
 ### 4. What does contradiction feel like?
 When Manyu finds a genuine inconsistency in its own web, does the (merged) emotive core produce a measurable salience/discomfort signal that drives resolution? A mechanical model of cognitive dissonance you can watch fire — dissonance as a real control signal, not a metaphor.

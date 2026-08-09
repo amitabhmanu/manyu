@@ -239,6 +239,62 @@ there are our authorship of belief valences; see design §6.1.
 - Drop-one robustness runs as part of analysis, not after it.
 - `seed_mood` control arm (NFR-3) runs in the same session.
 
+### 4.4 Amendment, 2026-08-09: the inner voice is off in Stage 4
+
+Recorded before the Stage 4 arm started, per the requirements §14
+pre-registration rule. No §1 constant changes, so no completed arm is voided.
+
+`process_reflective_turn` composes an inner voice on every turn. In Stage 3
+there was no provider, so the call was a no-op. In Stage 4 it would be a second
+paid call per event — 1,200 extra calls across the arm — and it is the only LLM
+in split's mood path.
+
+**Both builds run with `core.inner_voice.provider = None`.** Two reasons, and
+the second is the one that matters:
+
+1. Neither measured channel reads it. Merged's is `max(0, -valence)` over the
+   belief window; split's is `AffectState.emotions["fear"]`, written by
+   `FastAppraiser` from `event_type` deltas. Leaving the voice on would double
+   the spend to move a quantity the analysis never consults.
+2. **It removes NFR-3's confound by construction rather than controlling for
+   it.** NFR-3 was written because split's mood flows through an LLM-composed
+   frame while merged's is a deterministic query, so a between-build difference
+   could be the LLM. With the voice off and the extractor on, both builds make
+   exactly one provider call per turn, of the same kind, and the belief path
+   they share is the only place an LLM enters. The `seed_mood` control arm
+   stays available behind `--seed-mood` and is **not** run by default; it is
+   now a robustness check on a confound that has been designed out, not a
+   precondition. If it is skipped, `results.md` must say so rather than let
+   NFR-3 read as satisfied by an arm nobody ran.
+
+Stage 3 also ran without an inner voice, so this keeps the only difference
+between the two stages the one the staging exists to introduce: where beliefs
+come from.
+
+### 4.5 Pre-flight finding, 2026-08-09: valence is required but never asked for
+
+Found by reading, before any call — the check experiment 3's retrospective §3.1
+put on the standing list.
+
+Merged's entire channel is belief `valence`. `BeliefExtractor._schema()` does
+expose a numeric `valence` field, and `_strict_schema` marks every property
+required, so the model cannot silently omit it — the failure mode that made
+`supports` unreachable for the whole of experiment 3 is **not** present here,
+and `test_the_extractor_can_emit_the_fields_merged_reads` pins that.
+
+But the extractor's *prompt* never mentions valence. It asks for propositions,
+keys, and edges. So the field is reachable and unelicited: the model must emit
+a number and is told nothing about what it means.
+
+**Decision: change nothing, and make the pilot answer it.** Adding valence
+guidance to the prompt is an instrument change made on a hunch, and any wording
+that hints uncertainty is unwelcome would be choosing merged's answer — gate #1
+in the plainest form. The pilot (`--mode pilot`, 6 runs, 120 calls) exists to
+confirm both builds move before *n* is committed; if merged's window comes back
+uniformly at valence 0, the flat result is a fact about elicitation and **must
+not be reported as M-a**, which is a loss condition. Treat it as the pilot
+failing gate #4 and fix the elicitation before spending the full arm.
+
 ## 5. What voids a run
 
 - Any §1 constant changed after that arm started.
