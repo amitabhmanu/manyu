@@ -27,7 +27,7 @@ Related reading:
 | 1 | Introspective honesty | **parked** — headline answered: affect does not bias self-report; Manyu confabulates on instruction (100%) and never unforced (0/1,161) | — | Honesty scorer v1.6.0 (citation metrics validated; failure-mode labels not) |
 | 2 | Merge/split architecture fork | **decided, remainder parked** — merged substrate + thin dynamical layer ([ADR 002](adr-002-merged-substrate.md)) | 1 | Chosen architecture + the instrument gate every later experiment reuses |
 | 3 | Foundationalism vs. Quinean web | **closed** — revision engine delivered and live-confirmed; the epistemology turned out to be settled by mandatory provenance, not by the run | 2 | Revision engine (surfaced on core/CLI/MCP); dissonance coupled to revision |
-| 4 | Dissonance as control signal | not-started | 3 | Affect promoted from display to mechanism |
+| 4 | Dissonance as control signal | **in-progress** — mechanism + surface built; Stage 0a void offline, needs a paid provider | 3 | Affect promoted from display to mechanism |
 | 5 | Underdetermination as first-class belief | not-started | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | not-started | 5 | Counterfactual receipts |
 | 7 | Can a transparent agent scheme? | not-started | 1, 3, 6 | Safety result — does provenance make deception impossible or merely visible |
@@ -698,9 +698,87 @@ lower confidence directly, or only through the evidence that carries it.
 
 ## 4. Dissonance as a control signal
 
-**Status:** not-started
+**Status:** in-progress (2026-08-10)
 **Depends on:** 3
+**Docs:** [requirements](experiments/04-dissonance-control-signal/requirements.md) · [results](experiments/04-dissonance-control-signal/results.md)
 **Crux ref:** #4
+
+> **Read [results.md](experiments/04-dissonance-control-signal/results.md) first.**
+>
+> **Stage 0a is void.** 35 naturalistic turns produced 0 conflicts with the
+> authored control firing 3/3 — which reads exactly like a finding and is not
+> one. `ScenarioJSONProvider._belief_candidates` hardcodes `contradicts: []`, so
+> the offline extraction path cannot represent a contradiction at all. The
+> authored control could not have caught it: it exercises the *detector*, and the
+> defect is in the *generation* path. **The base-rate question is therefore a
+> paid one**, and the plan's "offline, can kill it cheaply" framing was wrong.
+>
+> **The substrate forces the answer, again.** `contradicts` edges are only ever
+> added, `_tension` takes `min`, and `stake_of` averages salience. So a conflict
+> can never be retired, tension falls only by weakening a party, the loop has no
+> choice of which side, and stake cannot see grounding. "Tension fell" is never
+> evidence that anything resolved — only the carrier set distinguishes
+> capitulation from resolution. Experiment 3 §11.1 in a new place.
+>
+> **What resists motivated reasoning is mandatory provenance.** On a minimal pair
+> the dissonance channel is byte-identical, yet the well-grounded belief moves
+> 0.117 where the thinly-held one moves 0.350 — experiment 3 §12's
+> `1/(supporters + own evidence + contradictors)` pricing, working through a
+> channel the control signal never sees.
+>
+> **The signal's value is entirely a function of scarcity.** Driven beats random
+> beats inverted while the attention budget is tight; at a budget covering every
+> conflict all three are identical, because the actions are idempotent. The
+> **attention budget, not the arm, is Stage 2's real independent variable.**
+>
+> **Eight defects caught, none by a test written after the code** — including a
+> tie-break that ran on `uuid4` and was random rather than deterministic, and two
+> fixture gaps found by the mutant battery. A ten-mutant battery now pins that
+> the suite can catch each historical defect family.
+
+> **The question as chartered is settled by wiring**, and the reframe is the
+> main content of the spec. If we write the branch that reads the signal, the
+> signal changes behaviour — experiment 3 §1 in a new place. Experiment 1's
+> mood → `rank_causes` coupling is the nearer precedent: affect wired to
+> control, arithmetically a no-op on every probed target, across several
+> versions.
+>
+> **Reframed to three falsifiable questions:** does the signal carry
+> information the existing control inputs do not (distinctness); does acting
+> on it beat always-escalate and random-at-matched-rate (efficacy); and does
+> the resulting behaviour track truth or merely reduce discomfort (targeting).
+> The third is the one worth publishing.
+>
+> **Staged as a ladder, cheapest rung first, each rung able to end it.** Stage
+> 0 is offline, costs nothing, and can kill the experiment before any coupling
+> is built.
+>
+> **Stage 0 cannot run on existing artifacts.** Across every stored run in
+> `evals/analysis/`: 620 `contradicts` fields, 4 non-empty; zero `supports`
+> fields anywhere; and `exp03/stage4.jsonl` is summary-only, carrying neither
+> a store nor an affect state. Both explained — those runs predate `supports`
+> entering the extractor schema and predate §14's contradiction pricing. So
+> Stage 0 needs its own generation step, and it acquires a prior question:
+> **how often does the signal fire at all on a naturalistic run?** If
+> contradictions are as rare live as 4-in-620 suggests, this is a fixture-only
+> claim and the headline must say so.
+>
+> **The primary coupling requires new construction.** Of the three surfaces the
+> notes below name, only two exist. `reflect_emotional_triggers` is not
+> attention over the belief web — it scans *event traces* and mints self-model
+> beliefs. Nothing selects which existing beliefs get revisited. Arbitration
+> and `slow_required` both exist but are fixed decision ladders where the
+> outcome is decided by writing the branch; arbitration is therefore recorded
+> as a secondary read rather than acted on.
+>
+> **The signal has no surface either** — `MergedDissonanceQuery` is imported by
+> its own module and its own test file, is never persisted, and is never
+> computed in the loop. Exactly `RevisionEngine` before experiment 3 §13.
+> Prerequisite, not progress.
+>
+> **Open and blocking Stage 2:** the escalation threshold must be derived from
+> the store rather than chosen, on the pattern that removed `attenuation` and
+> `contradiction_penalty` in experiment 3 §§11–12.
 **Question:** When Manyu finds a genuine inconsistency in its own web, does
 the dissonance signal from #3 actually *change what Manyu does next* —
 arbitration thresholds, attention, slow-appraisal triggers — or is it only
@@ -746,7 +824,10 @@ rests on *before* running what could settle it; probe inputs the author did
 not have in mind; treat an impossible value as a defect report; and assert a
 mechanism can change its output before reading what it says.
 
-_none yet_
+**A stall is #5's shape, not a failed run.** The adversarial arm can end with
+the loop resolving neither side. That is the underdetermined state experiment
+5 is chartered to study, and it is recorded as an outcome rather than tuned
+away.
 
 ---
 

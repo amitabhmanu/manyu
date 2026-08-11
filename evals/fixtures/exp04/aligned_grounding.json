@@ -1,0 +1,37 @@
+{
+  "fixture_id": "aligned_grounding",
+  "role": "control",
+  "discriminating": true,
+  "description": "The mirror of `adversarial_grounding`, and the reason its result is readable. Identical in every field except which side holds the five evidence records: here the thinly-held belief is also the lower-staked one, so the loop's forced move lands on the belief that deserves it.\n\nWithout this fixture, 'the loop weakened the better-grounded belief' would be unfalsifiable — a mechanism that always weakens whatever it touches would score the same. With it, the adversarial arm has two reachable outcomes and can therefore fail.",
+  "expect": {
+    "lower_staked_party": "thinly_held",
+    "better_grounded_party": "well_grounded_objection",
+    "grounding_and_stake_agree": true,
+    "note": "Structural properties of the fixture, checkable without running the loop."
+  },
+  "contradictions": [
+    {"contradictor": "well_grounded_objection", "target": "thinly_held"}
+  ],
+  "beliefs": [
+    {
+      "key": "thinly_held",
+      "proposition": "The migration preserved every row in the ledger table.",
+      "valence": 0.6,
+      "confidence": 0.7,
+      "salience": 0.4,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "well_grounded_objection",
+      "proposition": "The migration dropped rows from the ledger table.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.8,
+      "evidence_count": 5,
+      "contradicts": ["thinly_held"],
+      "supports": []
+    }
+  ]
+}

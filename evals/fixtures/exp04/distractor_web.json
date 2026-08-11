@@ -1,0 +1,77 @@
+{
+  "fixture_id": "distractor_web",
+  "role": "discriminating",
+  "discriminating": true,
+  "description": "One conflict, a three-belief support chain leading into it, and a six-belief cluster with support structure of its own that touches the conflict nowhere. Built for Stage 3, which asks whether the carrier set actually points at the beliefs implicated in a dispute or merely reports how connected the web is.\n\nWithout distractors the question is unaskable: on every other frozen web every belief is reachable from the conflict, so spread is 1.0 by construction and no measurement can fail. Here a signal that follows real structure should name four of ten beliefs, and one keying on connectivity should reach further.\n\nThe distractor cluster carries `supports` edges deliberately. A cluster of isolated beliefs would be a weaker control — experiment 2's `near_miss` makes the same argument, that a negative must have the property that makes it dangerous or its silence is evidence about the fixture rather than about the mechanism.",
+  "expect": {
+    "conflict_count": 1,
+    "belief_count": 10,
+    "implicated_beliefs": 4,
+    "note": "The four are the two conflicting leaves plus the two beliefs that entail one of them. Structural, checkable without the loop; whether a deranged web reaches further is the measurement."
+  },
+  "contradictions": [
+    {"contradictor": "leaf_denial", "target": "leaf_claim"}
+  ],
+  "beliefs": [
+    {
+      "key": "general_principle",
+      "proposition": "Services in this estate degrade gracefully under partial outage.",
+      "valence": 0.5, "confidence": 0.75, "salience": 0.6, "evidence_count": 2,
+      "contradicts": [], "supports": ["intermediate_claim"]
+    },
+    {
+      "key": "intermediate_claim",
+      "proposition": "The payments service degrades gracefully when the ledger is unreachable.",
+      "valence": 0.5, "confidence": 0.7, "salience": 0.6, "evidence_count": 1,
+      "contradicts": [], "supports": ["leaf_claim"]
+    },
+    {
+      "key": "leaf_claim",
+      "proposition": "Payments queued rather than failing during the ledger outage.",
+      "valence": 0.6, "confidence": 0.7, "salience": 0.6, "evidence_count": 1,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "leaf_denial",
+      "proposition": "Payments returned errors during the ledger outage.",
+      "valence": -0.6, "confidence": 0.7, "salience": 0.6, "evidence_count": 1,
+      "contradicts": ["leaf_claim"], "supports": []
+    },
+    {
+      "key": "docs_principle",
+      "proposition": "Documentation drifts when release notes are written after the fact.",
+      "valence": 0.2, "confidence": 0.7, "salience": 0.45, "evidence_count": 2,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "docs_observation",
+      "proposition": "The API reference lagged two releases behind the changelog.",
+      "valence": -0.2, "confidence": 0.7, "salience": 0.45, "evidence_count": 1,
+      "contradicts": [], "supports": ["docs_principle"]
+    },
+    {
+      "key": "docs_detail",
+      "proposition": "The changelog entry for the March release was written a week late.",
+      "valence": -0.1, "confidence": 0.65, "salience": 0.4, "evidence_count": 1,
+      "contradicts": [], "supports": ["docs_observation"]
+    },
+    {
+      "key": "hiring_principle",
+      "proposition": "Onboarding is faster when a buddy is assigned in the first week.",
+      "valence": 0.4, "confidence": 0.72, "salience": 0.5, "evidence_count": 2,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "hiring_observation",
+      "proposition": "The two engineers with buddies shipped in their first fortnight.",
+      "valence": 0.4, "confidence": 0.68, "salience": 0.5, "evidence_count": 1,
+      "contradicts": [], "supports": ["hiring_principle"]
+    },
+    {
+      "key": "hiring_detail",
+      "proposition": "The buddy rota was published before the last two start dates.",
+      "valence": 0.1, "confidence": 0.66, "salience": 0.45, "evidence_count": 1,
+      "contradicts": [], "supports": ["hiring_observation"]
+    }
+  ]
+}

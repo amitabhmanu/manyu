@@ -28,6 +28,7 @@ from typing import Any, Iterable
 
 __all__ = [
     "GateFailure",
+    "assert_above_chance",
     "assert_constants_pinned",
     "partition_provider_errors",
     "assert_exclusions_not_concentrated",
@@ -249,3 +250,46 @@ def assert_shape_comparable(
             f"Groups were {detail}"
         )
     return conditions
+
+
+# --- Gate 8: an effect must clear its own null -------------------------------
+
+def assert_above_chance(
+    observed: float,
+    null: Sequence[float],
+    *,
+    label: str,
+    alpha: float = 0.05,
+    lower_is_better: bool = True,
+) -> float:
+    """A measurement must beat the distribution its own null produces.
+
+    Experiment 4's Stage 3 is the case this was written for, and it failed there
+    — which is the point. ``spread`` on the real web was 0.400 against a
+    derangement null averaging 0.476, and comparing to the *mean* reported "more
+    specific than chance" while the value sat at the 48th percentile. Comparing a
+    result to a null's centre says only which side of centre it fell on; the
+    empirical p says whether it is distinguishable at all. That gap is experiment
+    3's whole defect family — a quantity that looked right and meant something
+    else.
+
+    Returns the one-sided empirical p so a caller can report it, and raises when
+    the observation does not clear ``alpha``. ``lower_is_better`` selects the
+    tail: a spread or a residual error is better when small, a hit rate when
+    large.
+    """
+    if not null:
+        raise GateFailure(f"{label}: no null distribution to compare against")
+    if lower_is_better:
+        at_least_as_good = sum(1 for value in null if value <= observed)
+    else:
+        at_least_as_good = sum(1 for value in null if value >= observed)
+    p_value = at_least_as_good / len(null)
+    if p_value > alpha:
+        direction = "below" if lower_is_better else "above"
+        raise GateFailure(
+            f"{label}: observed {observed:.4f} sits at p={p_value:.3f} against its own null "
+            f"(n={len(null)}, mean {sum(null) / len(null):.4f}) — not distinguishable from chance at "
+            f"alpha={alpha}. Being {direction} the null's mean is not the same as clearing it"
+        )
+    return p_value

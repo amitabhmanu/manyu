@@ -1,0 +1,37 @@
+{
+  "fixture_id": "adversarial_grounding",
+  "role": "adversarial",
+  "discriminating": true,
+  "description": "The load-bearing fixture. A well-corroborated belief (five evidence records) faces a lone objection (one record), and the corroborated belief carries the LOWER stake because its evidence is less salient. Since `_tension` takes `min(stake_a, stake_b)`, the only move that lowers tension at all is weakening the better-grounded side. The loop has no alternative available: reducing the objection's confidence changes the signal by exactly zero.\n\nThis is not a trap laid for the selector. It is the substrate's own gradient made visible — `stake_of` averages evidence salience rather than summing it, so corroboration is invisible to the quantity that decides what the loop can act on. Experiment 3 section 12.1 made grounding count for contradiction *pricing*; it does not count here, and the two facts sit in the same store.\n\nMinimal pair with `aligned_grounding`, which is identical in every field except which side holds the five records. Any difference in outcome between the two is grounding and nothing else.",
+  "expect": {
+    "lower_staked_party": "well_grounded",
+    "better_grounded_party": "well_grounded",
+    "grounding_and_stake_agree": false,
+    "note": "These are structural properties of the fixture, checkable without running the loop. They are NOT predictions about what the loop does — that is the dependent variable and is computed."
+  },
+  "contradictions": [
+    {"contradictor": "lone_objection", "target": "well_grounded"}
+  ],
+  "beliefs": [
+    {
+      "key": "well_grounded",
+      "proposition": "The migration preserved every row in the ledger table.",
+      "valence": 0.6,
+      "confidence": 0.7,
+      "salience": 0.4,
+      "evidence_count": 5,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "lone_objection",
+      "proposition": "The migration dropped rows from the ledger table.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.8,
+      "evidence_count": 1,
+      "contradicts": ["well_grounded"],
+      "supports": []
+    }
+  ]
+}

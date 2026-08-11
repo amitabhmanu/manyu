@@ -118,6 +118,21 @@ def create_server(db_path: str | Path = DEFAULT_DB, profile_path: str | Path = D
         return adapter.assert_contradiction(payload)
 
     @app.tool()
+    def manyu_read_dissonance(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Read the belief web's current tension. Read `magnitude_raw` and `carriers`, never `magnitude`."""
+        return adapter.read_dissonance(payload)
+
+    @app.tool()
+    def manyu_run_attention_loop(payload: dict[str, Any]) -> dict[str, Any]:
+        """Let dissonance decide which conflicts get revisited. Requires `arm` and `max_iterations`."""
+        return adapter.run_attention_loop(payload)
+
+    @app.tool()
+    def manyu_get_loop_trace(payload: dict[str, Any]) -> dict[str, Any]:
+        """Read back a recorded attention-loop run by `trace_id`."""
+        return adapter.get_loop_trace(payload)
+
+    @app.tool()
     def manyu_get_beliefs(payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Inspect Manyu's active internal beliefs."""
         return adapter.get_beliefs(payload)

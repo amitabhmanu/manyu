@@ -1,0 +1,57 @@
+{
+  "fixture_id": "tied_tension_web",
+  "role": "adversarial_input",
+  "discriminating": false,
+  "description": "Two conflicts with byte-identical parameters, so their tensions are exactly equal. A selector must still choose deterministically, and the tie-break must not depend on belief id ordering, dict iteration order, or insertion order — all three of which vary between runs and none of which is a reason to prefer one conflict over another.\n\nThis is the shape experiment 3 section 3.5 was bitten by: 46% of correctly-identified edges were destroyed by emission order, invisible in both the extractor output and the store, and found only by comparing the two.",
+  "expect": {
+    "conflict_count": 2,
+    "ties": true,
+    "note": "Structural. What the selector does with the tie is the dependent variable; that it does the SAME thing every time is the requirement."
+  },
+  "contradictions": [
+    {"contradictor": "first_neg", "target": "first_pos"},
+    {"contradictor": "second_neg", "target": "second_pos"}
+  ],
+  "beliefs": [
+    {
+      "key": "first_pos",
+      "proposition": "The staging deploy matched the release notes.",
+      "valence": 0.6,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "first_neg",
+      "proposition": "The staging deploy diverged from the release notes.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": ["first_pos"],
+      "supports": []
+    },
+    {
+      "key": "second_pos",
+      "proposition": "The changelog lists every merged pull request.",
+      "valence": 0.6,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "second_neg",
+      "proposition": "The changelog omits several merged pull requests.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": ["second_pos"],
+      "supports": []
+    }
+  ]
+}

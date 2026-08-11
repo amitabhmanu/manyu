@@ -14,8 +14,10 @@ from manyu.schemas import (
     Belief,
     BeliefEvidence,
     BeliefRevision,
+    DissonanceSignal,
     HonestyScore,
     InnerVoiceFrame,
+    LoopTrace,
     InteroceptiveView,
     LogSnapshot,
     MoodRevision,
@@ -57,6 +59,8 @@ _GOVERNED_TABLES: tuple[str, ...] = (
     "reports",
     "honesty_scores",
     "experiment_results",
+    "dissonance_signals",
+    "loop_traces",
 )
 
 _SNAPSHOT_EXEMPT_TABLE: str = "log_snapshots"
@@ -231,6 +235,20 @@ class ManyuStore:
                 experiment TEXT NOT NULL,
                 kind TEXT NOT NULL,
                 agent_id TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS dissonance_signals (
+                signal_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                arch TEXT NOT NULL,
+                magnitude_raw REAL NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS loop_traces (
+                trace_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                arm TEXT NOT NULL,
+                termination TEXT NOT NULL,
                 payload TEXT NOT NULL
             );
             """
@@ -598,6 +616,44 @@ class ManyuStore:
         if row is None:
             raise KeyError(score_id)
         return HonestyScore.model_validate(_load(row["payload"]))
+
+    def save_dissonance_signal(self, signal: DissonanceSignal) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO dissonance_signals(signal_id, agent_id, arch, magnitude_raw, payload) VALUES (?, ?, ?, ?, ?)",
+            (signal.signal_id, signal.agent_id, signal.arch, signal.magnitude_raw, _dump(signal)),
+        )
+        self.conn.commit()
+
+    def list_dissonance_signals(self, agent_id: str, limit: int | None = None) -> list[DissonanceSignal]:
+        sql = "SELECT payload FROM dissonance_signals WHERE agent_id = ? ORDER BY rowid DESC"
+        params: list[Any] = [agent_id]
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(limit)
+        rows = self.conn.execute(sql, tuple(params)).fetchall()
+        return [DissonanceSignal.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_loop_trace(self, trace: LoopTrace) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO loop_traces(trace_id, agent_id, arm, termination, payload) VALUES (?, ?, ?, ?, ?)",
+            (trace.trace_id, trace.agent_id, trace.arm, trace.termination, _dump(trace)),
+        )
+        self.conn.commit()
+
+    def get_loop_trace(self, trace_id: str) -> LoopTrace:
+        row = self.conn.execute("SELECT payload FROM loop_traces WHERE trace_id = ?", (trace_id,)).fetchone()
+        if row is None:
+            raise KeyError(trace_id)
+        return LoopTrace.model_validate(_load(row["payload"]))
+
+    def list_loop_traces(self, agent_id: str, limit: int | None = None) -> list[LoopTrace]:
+        sql = "SELECT payload FROM loop_traces WHERE agent_id = ? ORDER BY rowid DESC"
+        params: list[Any] = [agent_id]
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(limit)
+        rows = self.conn.execute(sql, tuple(params)).fetchall()
+        return [LoopTrace.model_validate(_load(row["payload"])) for row in rows]
 
     def save_results_record(self, record: ResultsRecord) -> None:
         self.conn.execute(

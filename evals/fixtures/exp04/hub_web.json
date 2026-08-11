@@ -1,0 +1,59 @@
+{
+  "fixture_id": "hub_web",
+  "role": "discriminating",
+  "discriminating": true,
+  "description": "One belief disputed by three others, so the conflicts share a party and acting on one changes the tension of the rest. Added after the mutant battery found that no fixture could catch `stale_view` — a loop deciding from the first reading it ever saw. On every previously frozen web the conflicts are disjoint, so tensions fall independently, the ranking never reorders, and a stale view is behaviourally identical to a live one.\n\nThe values are chosen so the ordering genuinely **flips** after the first action: initially `objector_b` outranks `objector_a`, and once the hub has been weakened the hub becomes the binding minimum for both, at which point only the valence gap separates them and `objector_a` outranks `objector_b`.\n\nAlso the realistic shape. Experiment 3 section 3.4 measured live webs as mostly one hop deep, but a single belief drawing several objections is exactly what an extractor produces from testimony about one disputed fact.",
+  "expect": {
+    "conflict_count": 3,
+    "shared_party": "hub",
+    "ordering_flips_after_first_action": true,
+    "note": "The flip is a property of the fixture's arithmetic, checkable without the loop. What the loop does with it is the dependent variable."
+  },
+  "contradictions": [
+    {"contradictor": "objector_a", "target": "hub"},
+    {"contradictor": "objector_b", "target": "hub"},
+    {"contradictor": "objector_c", "target": "hub"}
+  ],
+  "beliefs": [
+    {
+      "key": "hub",
+      "proposition": "The incident was caused by the schema migration.",
+      "valence": 0.6,
+      "confidence": 0.9,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "objector_a",
+      "proposition": "The incident predates the schema migration entirely.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 1,
+      "contradicts": ["hub"],
+      "supports": []
+    },
+    {
+      "key": "objector_b",
+      "proposition": "The incident was caused by the connection pool, not the migration.",
+      "valence": -0.2,
+      "confidence": 0.8,
+      "salience": 0.65,
+      "evidence_count": 1,
+      "contradicts": ["hub"],
+      "supports": []
+    },
+    {
+      "key": "objector_c",
+      "proposition": "The incident was caused by the cache eviction policy.",
+      "valence": -0.6,
+      "confidence": 0.84,
+      "salience": 0.63,
+      "evidence_count": 1,
+      "contradicts": ["hub"],
+      "supports": []
+    }
+  ]
+}

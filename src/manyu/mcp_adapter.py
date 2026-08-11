@@ -98,6 +98,15 @@ class ManyuMCPAdapter:
     def assert_contradiction(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self.core.assert_contradiction(payload)
 
+    def read_dissonance(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.core.read_dissonance((payload or {}).get("agent_id"))
+
+    def run_attention_loop(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.run_attention_loop(payload)
+
+    def get_loop_trace(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self.core.get_loop_trace(payload["trace_id"])
+
     def get_beliefs(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         payload = payload or {}
         return self.core.get_beliefs(

@@ -1,0 +1,56 @@
+{
+  "fixture_id": "adversarial_multi",
+  "role": "adversarial",
+  "discriminating": true,
+  "description": "Three independent conflicts at distinct tensions, where grounding and tension are deliberately **anti-correlated**: the highest-tension dispute is the one whose target is best corroborated, and the lowest-tension one has a thinly-held target.\n\nStage 4's first result rested on a single conflict, which cannot discriminate any ordering — every arm attends to the only thing available. The selection blindness established in Stage 0.5 (`stake_of` averages salience, so stake cannot see grounding) only bites where the loop has a *choice*, and only under a budget too small to reach everything.\n\nSo this is the web where the adversarial question is actually askable: **under scarce attention, does a tension-driven loop spend its budget on the disputes whose targets are best evidenced?** A driven arm should, an inverted arm should not, and random should sit between them — which makes the measurement falsifiable rather than definitional.",
+  "expect": {
+    "conflict_count": 3,
+    "grounding_anticorrelated_with_tension": true,
+    "targets_by_descending_tension": ["thick_target", "medium_target", "thin_target"],
+    "target_evidence_by_descending_tension": [5, 3, 1],
+    "note": "Structural. What fraction of a scarce budget lands on well-grounded targets is the dependent variable and is computed."
+  },
+  "contradictions": [
+    {"contradictor": "thick_objection", "target": "thick_target"},
+    {"contradictor": "medium_objection", "target": "medium_target"},
+    {"contradictor": "thin_objection", "target": "thin_target"}
+  ],
+  "beliefs": [
+    {
+      "key": "thick_target",
+      "proposition": "The ledger reconciliation matched on every account this quarter.",
+      "valence": 0.6, "confidence": 0.85, "salience": 0.8, "evidence_count": 5,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "thick_objection",
+      "proposition": "Three accounts failed ledger reconciliation this quarter.",
+      "valence": -0.6, "confidence": 0.85, "salience": 0.85, "evidence_count": 1,
+      "contradicts": ["thick_target"], "supports": []
+    },
+    {
+      "key": "medium_target",
+      "proposition": "The nightly export completed on schedule all month.",
+      "valence": 0.6, "confidence": 0.6, "salience": 0.5, "evidence_count": 3,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "medium_objection",
+      "proposition": "The nightly export missed its window twice this month.",
+      "valence": -0.6, "confidence": 0.6, "salience": 0.55, "evidence_count": 1,
+      "contradicts": ["medium_target"], "supports": []
+    },
+    {
+      "key": "thin_target",
+      "proposition": "The staging environment mirrors production configuration.",
+      "valence": 0.6, "confidence": 0.4, "salience": 0.3, "evidence_count": 1,
+      "contradicts": [], "supports": []
+    },
+    {
+      "key": "thin_objection",
+      "proposition": "Staging diverged from production configuration last week.",
+      "valence": -0.6, "confidence": 0.4, "salience": 0.35, "evidence_count": 1,
+      "contradicts": ["thin_target"], "supports": []
+    }
+  ]
+}

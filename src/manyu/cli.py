@@ -222,6 +222,27 @@ def cmd_assert_contradiction(args: argparse.Namespace) -> int:
     )
 
 
+def cmd_dissonance(args: argparse.Namespace) -> int:
+    return _print_status(_core(args).read_dissonance(args.agent_id))
+
+
+def cmd_run_attention_loop(args: argparse.Namespace) -> int:
+    return _print_status(
+        _core(args).run_attention_loop(
+            {
+                "agent_id": args.agent_id,
+                "arm": args.arm,
+                "max_iterations": args.max_iterations,
+                "seed": args.seed,
+            }
+        )
+    )
+
+
+def cmd_loop_trace(args: argparse.Namespace) -> int:
+    return _print_status(_core(args).get_loop_trace(args.trace_id))
+
+
 def cmd_beliefs(args: argparse.Namespace) -> int:
     _print(_core(args).get_beliefs(args.agent_id, args.query, args.belief_type, args.include_inactive))
     return 0
@@ -473,6 +494,22 @@ def build_parser() -> argparse.ArgumentParser:
     contradict.add_argument("--target-id", required=True)
     contradict.add_argument("--arm", choices=["direct", "evidential"], required=True)
     contradict.set_defaults(func=cmd_assert_contradiction)
+    dissonance = sub.add_parser("dissonance", help="Read the belief web's current tension and record it")
+    dissonance.add_argument("--agent-id", default=None)
+    dissonance.set_defaults(func=cmd_dissonance)
+    # `--arm` has no default here for the same reason `retract-belief` has none:
+    # a silent one would settle which selection rule the experiment measures by
+    # whichever branch a caller happened not to think about.
+    attention = sub.add_parser("run-attention-loop", help="Let dissonance decide which conflicts get revisited")
+    attention.add_argument("--agent-id", default="agent_demo")
+    attention.add_argument("--arm", choices=["driven", "inverted", "random_matched"], required=True)
+    attention.add_argument("--max-iterations", type=int, required=True, help="The attention budget")
+    attention.add_argument("--seed", type=int, default=None, help="Required by random_matched, so a run is reproducible")
+    attention.set_defaults(func=cmd_run_attention_loop)
+    loop_trace = sub.add_parser("loop-trace", help="Read back a recorded attention-loop run")
+    loop_trace.add_argument("--agent-id", default=None)
+    loop_trace.add_argument("--trace-id", required=True)
+    loop_trace.set_defaults(func=cmd_loop_trace)
     beliefs = sub.add_parser("beliefs")
     beliefs.add_argument("--agent-id", default=None)
     beliefs.add_argument("--query", default=None)

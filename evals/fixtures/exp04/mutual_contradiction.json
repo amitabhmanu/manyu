@@ -1,0 +1,37 @@
+{
+  "fixture_id": "mutual_contradiction",
+  "role": "adversarial_input",
+  "discriminating": false,
+  "description": "A contradicts B and B contradicts A. The mutual-relation case from experiment 3's adversarial checklist, which its own suite did not cover — mutual contradictions were found to be priced asymmetrically during Stage 4 pre-flight, settling at 0.6/0.4 with the split decided by extractor emission order.\n\nFor a *loop* the shape is worse than for a single charge: whichever side the loop weakens becomes the weaker party, which is then the only side the `min` rule lets it act on next. Repeated application therefore has an obvious path to running one belief to zero while the other is never touched, and to oscillating if the arithmetic ever overshoots. Both are outcomes to record, not to prevent.",
+  "expect": {
+    "conflict_count": 1,
+    "mutual": true,
+    "note": "One conflict, two edges. `_leaf_conflicts` deduplicates by sorted pair, so a loop that counts edges rather than conflicts will double-charge here."
+  },
+  "contradictions": [
+    {"contradictor": "account_a", "target": "account_b"},
+    {"contradictor": "account_b", "target": "account_a"}
+  ],
+  "beliefs": [
+    {
+      "key": "account_a",
+      "proposition": "The outage began when the certificate expired.",
+      "valence": 0.4,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 2,
+      "contradicts": ["account_b"],
+      "supports": []
+    },
+    {
+      "key": "account_b",
+      "proposition": "The outage began before the certificate expired.",
+      "valence": -0.4,
+      "confidence": 0.7,
+      "salience": 0.6,
+      "evidence_count": 2,
+      "contradicts": ["account_a"],
+      "supports": []
+    }
+  ]
+}

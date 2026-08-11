@@ -805,6 +805,62 @@ class HonestyScore(ManyuModel):
     scored_at: datetime = Field(default_factory=now_utc)
 
 
+class AttentionStepRecord(ManyuModel):
+    """One act of attention, persisted.
+
+    Mirrors `salience.AttentionStep`, which is a frozen dataclass because the
+    loop builds thousands of them and never validates one. This is the storable
+    face of it, and it carries `best_available_tension` so the record is
+    **self-auditing**: a driven arm must have chosen the best conflict then
+    available, and a gap between the two means the selection was made from stale
+    or otherwise wrong information.
+    """
+
+    iteration: int
+    belief_id_a: str
+    belief_id_b: str
+    contradictor_id: str
+    target_id: str
+    direction: str
+    tension_before: float = Field(ge=0.0)
+    best_available_tension: float = Field(ge=0.0)
+    raw_before: float = Field(ge=0.0)
+    tied_with: int = Field(ge=1)
+    outcome: str
+    moved: float
+    target_evidence_count: int = Field(ge=0)
+    target_stake: float = Field(ge=0.0)
+    contradictor_evidence_count: int = Field(ge=0)
+    contradictor_stake: float = Field(ge=0.0)
+
+
+class LoopTrace(ManyuModel):
+    """A full run of the attention loop, persisted for analysis.
+
+    `magnitude` is deliberately absent from every step: experiment 3
+    retrospective section 3.3 established that the saturated channel confounds
+    how much tension changed with where on the curve the web was sitting, and
+    requirements section 12 forbids reading it as a measure of belief dynamics.
+    The trajectory is raw tension throughout.
+    """
+
+    schema_version: str = "manyu.loop_trace.v0.1"
+    trace_id: str
+    agent_id: str
+    arm: str
+    max_iterations: int = Field(ge=1)
+    termination: str
+    steps: list[AttentionStepRecord] = Field(default_factory=list)
+    #: Raw tension before each act, plus the final value — always `len(steps) + 1`.
+    trajectory: list[float] = Field(default_factory=list)
+    inert: list[list[str]] = Field(default_factory=list)
+    #: True if any selection was a tie. Arms may not be compared across
+    #: separately-seeded stores when this is set, because the tie-break runs on
+    #: `uuid4` belief ids.
+    had_arbitrary_choice: bool = False
+    created_at: datetime = Field(default_factory=now_utc)
+
+
 class ExperimentContext(ManyuModel):
     experiment: str
     scenario_id: str | None = None

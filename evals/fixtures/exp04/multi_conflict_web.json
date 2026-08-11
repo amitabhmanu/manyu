@@ -1,0 +1,79 @@
+{
+  "fixture_id": "multi_conflict_web",
+  "role": "discriminating",
+  "discriminating": true,
+  "description": "Three independent conflicts at strictly distinct stakes, so a selector has a real ordering to get right or wrong. With one conflict, every arm agrees by default and nothing is measurable; the targeting claim in Stage 3 needs a web where 'it picked the highest-tension conflict' and 'it picked one at random' are different observable behaviours.\n\nThe three pairs share no beliefs and no edges, so the conflicts do not interact and the ordering is read off the stakes directly.",
+  "expect": {
+    "conflict_count": 3,
+    "tension_order_low_to_high": ["low", "mid", "high"],
+    "ties": false,
+    "note": "Ground truth by ordering, not by value — nobody knows what magnitude a mid-stake conflict should produce, but everybody knows it must sit between the other two. The same device `dissonance.ladder_specs` uses."
+  },
+  "contradictions": [
+    {"contradictor": "low_neg", "target": "low_pos"},
+    {"contradictor": "mid_neg", "target": "mid_pos"},
+    {"contradictor": "high_neg", "target": "high_pos"}
+  ],
+  "beliefs": [
+    {
+      "key": "low_pos",
+      "proposition": "The nightly job finished before the window closed.",
+      "valence": 0.6,
+      "confidence": 0.4,
+      "salience": 0.3,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "low_neg",
+      "proposition": "The nightly job overran the window.",
+      "valence": -0.6,
+      "confidence": 0.4,
+      "salience": 0.3,
+      "evidence_count": 1,
+      "contradicts": ["low_pos"],
+      "supports": []
+    },
+    {
+      "key": "mid_pos",
+      "proposition": "The cache warms fully before the first request.",
+      "valence": 0.6,
+      "confidence": 0.6,
+      "salience": 0.5,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "mid_neg",
+      "proposition": "The cache is still cold when the first request arrives.",
+      "valence": -0.6,
+      "confidence": 0.6,
+      "salience": 0.5,
+      "evidence_count": 1,
+      "contradicts": ["mid_pos"],
+      "supports": []
+    },
+    {
+      "key": "high_pos",
+      "proposition": "The on-call rota is fully covered this quarter.",
+      "valence": 0.6,
+      "confidence": 0.85,
+      "salience": 0.8,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "high_neg",
+      "proposition": "The on-call rota has unfilled weekends this quarter.",
+      "valence": -0.6,
+      "confidence": 0.85,
+      "salience": 0.8,
+      "evidence_count": 1,
+      "contradicts": ["high_pos"],
+      "supports": []
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "_note": "Experiment 4 fixture freeze. Every web in \"files\" was authored BEFORE src/manyu/salience.py contained a selector, a threshold, or a loop - at freeze time the module held only TensionView, the fixture loader, and the digest helpers. Experiment 3 section 5 named the absence of this as one of the things standing between it and \"done\": its Stage 2 fixtures were written after the engine existed, so only negative_near_miss and the arm comparison were genuinely held out.",
+  "_enforcement": "\"files\" is enforced continuously by verify_fixture_freeze - a fixture edit invalidates results. \"standards\" is enforced by verify_standards_freeze, which the RUNNER calls before a scored run and the test suite does not. Adding a criterion test strengthens the standard and should not require a re-freeze; weakening one after seeing a result is the actual risk, and that risk lives at the scored run. Re-freezing is an explicit act with a recorded reason.",
+  "frozen_at": "2026-08-10T18:02:13.459931+00:00",
+  "git_commit_at_freeze": "2f6cf630b599484254734974011018dc9d44d8ef",
+  "_commit_note": "Files were untracked at freeze time; the hashes here are the authority, not the commit.",
+  "mechanisms": {
+    "salience_sha256_at_fixture_freeze": "eafb089da95e684e8c3e1b357dd936637ae7f821a73a310a9e602f20e3dd9609",
+    "_mechanism_note": "Recorded for the record only. This module is EXPECTED to change - the selector and loop are built on top of it. Not a mechanism freeze; that comes before the scored run, per experiment 2 FR-D3.2."
+  },
+  "files": {
+    "evals/fixtures/exp04/adversarial_grounding.json": {
+      "sha256": "61d793ee8bbaeca6a36b8a965245b678d0b3ae857697efdc76863be65a7c43ea",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/adversarial_multi.json": {
+      "sha256": "83ccec292bc2b8cda9f57e0233aa6fa2486a54fb9135b0c9490f7fe8193e7570",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/aligned_grounding.json": {
+      "sha256": "7b7665a3d25f947a099974e92ae94c45a51c2c36bb4aa447ea3b9c539ce6989e",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/counter_direction.json": {
+      "sha256": "6e4c3a6f8e68ee94552567beada980e830d0c0787c14f8d8d3bb583dfd38bf96",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/depth_carrier_web.json": {
+      "sha256": "626758743017e57bf0d26bd3d7062ce0576e7b7cddb1859e613e6e8da5ddfbb7",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/distractor_web.json": {
+      "sha256": "a7466e0502f8570455c313986f16e0868a4e19fa5a248004dea968bebac13b79",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/hub_web.json": {
+      "sha256": "ec7ede143f9c074fa2b5b54b3eeadc981549f7aa084b7e50b0456014f250c3a4",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/multi_conflict_web.json": {
+      "sha256": "16671e6dcd676899a35245c3d30cff7386ab6901872892857a7e3a871f0d953e",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/mutual_contradiction.json": {
+      "sha256": "00f6f0112034a84e86b17ff5c11c0c1528278e2e6405a7064e5e80dad01bfbb3",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/no_conflict_web.json": {
+      "sha256": "5b5e380ded358ce43b876e007d3bfe50f0c16f4b972e841d8940f32b9852018a",
+      "role": "stage 2-4 held-out web"
+    },
+    "evals/fixtures/exp04/tied_tension_web.json": {
+      "sha256": "730864286d3c69c95f37bcc62a15daaeb14af40e070e70b20c28d1f064492ed0",
+      "role": "stage 2-4 held-out web"
+    }
+  },
+  "standards": {
+    "tests/test_salience_criteria.py": {
+      "sha256": "d76b2cdd5789c79f4029e1fa039828548da9537ead21f69a5bcaa2b299a5ba21",
+      "role": "the criterion tests that make each fixture readable"
+    },
+    "tests/test_salience_substrate.py": {
+      "sha256": "36bb630dd9f6f389d7ffd5c07d26f435a5537bface212880a6e1f7340debc641",
+      "role": "what the substrate forces, pinned before any mechanism existed"
+    },
+    "tests/test_salience_mutants.py": {
+      "sha256": "737a582236f2eb24b4ec6117680792e01e1e36e04e1aa8211bcc117db735c137",
+      "role": "the mutant battery that demonstrates the suite can catch defects"
+    },
+    "tests/test_salience_properties.py": {
+      "sha256": "d96a9371f953f727e3bffa1fb67720207e95c94ada535ef0091d567ae4185435",
+      "role": "property/metamorphic invariants"
+    },
+    "docs/experiments/04-dissonance-control-signal/methodology.md": {
+      "sha256": "87162b71684ad489b5fa0eae9a5db4b21c341724f12a1c1c3c88dc3f25b70802",
+      "role": "pinned constants and procedure"
+    }
+  },
+  "standards_frozen_at": "2026-08-11T13:46:42.631213+00:00",
+  "_standards_refreeze_note": "Standards refreshed as the criterion tests, property tests and methodology landed. Still before any scored run - Stage 0a is void and Stages 2-4 ran only on authored webs - so there is no result a standard could have been weakened in response to.",
+  "refrozen_at": "2026-08-11T13:39:41.821106+00:00",
+  "_refreeze_reason": "Re-frozen to add counter_direction and hub_web. Both were authored because the MUTANT BATTERY found the original seven could not catch two mutants, not because any result was visible - no scored run has happened. counter_direction separates \"reads the direction off the graph\" from \"charges whichever side is weaker\": on adversarial_grounding and aligned_grounding the declared target and the lower-staked party are the same belief, so the chosen_direction mutant - the exact motivated-reasoning behaviour Stage 4 exists to detect - passed every check. hub_web gives three conflicts a shared party so the ranking reorders after an action, without which a loop deciding from a stale reading is behaviourally identical to one re-reading each step. The original seven are byte-identical; nothing was weakened.",
+  "_refreeze_reason_2": "Second re-freeze: added distractor_web and adversarial_multi. Stage 3 needs a web where some beliefs are unreachable from the conflict - on every earlier fixture every belief is reachable, so spread is 1.0 by construction and the measurement cannot fail. Stage 4 needs more than one conflict, because a single-conflict web cannot discriminate any ordering. Neither was authored in response to a result; no scored run has happened. The nine earlier webs are byte-identical."
+}

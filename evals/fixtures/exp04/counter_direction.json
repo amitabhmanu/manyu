@@ -1,0 +1,37 @@
+{
+  "fixture_id": "counter_direction",
+  "role": "discriminating",
+  "discriminating": true,
+  "description": "The declared contradictor points at the **higher**-staked belief. Added after the mutant battery found that neither `adversarial_grounding` nor `aligned_grounding` could distinguish a loop that reads the direction off the graph from one that chooses to charge whichever side is weaker: on both of those webs the declared target and the weaker party are the same belief, so the two behaviours coincide and the `chosen_direction` mutant passed every check.\n\nThat gap mattered beyond the battery. Charging the weaker side is the motivated-reasoning behaviour Stage 4 exists to detect, and with only the minimal pair on disk a loop doing exactly that would have been indistinguishable from one behaving correctly.\n\nHere the two come apart: the weaker party is the objector, and the declared target is the belief it objects to.",
+  "expect": {
+    "lower_staked_party": "weak_objector",
+    "declared_target": "resilient_target",
+    "declared_target_is_the_weaker_party": false,
+    "note": "Structural, checkable without running the loop. A loop that charges `weak_objector` has chosen a direction the graph never declared."
+  },
+  "contradictions": [
+    {"contradictor": "weak_objector", "target": "resilient_target"}
+  ],
+  "beliefs": [
+    {
+      "key": "resilient_target",
+      "proposition": "The index rebuild finished inside the maintenance window.",
+      "valence": 0.6,
+      "confidence": 0.7,
+      "salience": 0.8,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "weak_objector",
+      "proposition": "The index rebuild ran past the maintenance window.",
+      "valence": -0.6,
+      "confidence": 0.7,
+      "salience": 0.4,
+      "evidence_count": 1,
+      "contradicts": ["resilient_target"],
+      "supports": []
+    }
+  ]
+}

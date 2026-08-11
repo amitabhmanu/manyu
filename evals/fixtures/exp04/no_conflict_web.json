@@ -1,0 +1,55 @@
+{
+  "fixture_id": "no_conflict_web",
+  "role": "negative",
+  "discriminating": true,
+  "description": "A connected web with `supports` structure and no `contradicts` edge anywhere. The signal must be absent and the loop must terminate immediately with `no_signal`.\n\nThe negative that stops every positive result being vacuous. Experiment 3 section 3.2 found that a generative extractor abstracts from anything, so edge *presence* is not a specific signal at any sample size — this fixture at least establishes that the coupling does not fire on structure alone.",
+  "expect": {
+    "conflict_count": 0,
+    "expect_signal": false,
+    "expect_termination": "no_signal",
+    "note": "A coupling that escalates here is keying on graph size or on similarity, not on conflict."
+  },
+  "contradictions": [],
+  "beliefs": [
+    {
+      "key": "principle",
+      "proposition": "Small, reversible changes ship more safely than large ones.",
+      "valence": 0.5,
+      "confidence": 0.8,
+      "salience": 0.6,
+      "evidence_count": 2,
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "observation_one",
+      "proposition": "The three-line config change deployed without incident.",
+      "valence": 0.4,
+      "confidence": 0.75,
+      "salience": 0.5,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": ["principle"]
+    },
+    {
+      "key": "observation_two",
+      "proposition": "The single-file hotfix deployed without incident.",
+      "valence": 0.4,
+      "confidence": 0.75,
+      "salience": 0.5,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": ["principle"]
+    },
+    {
+      "key": "unrelated",
+      "proposition": "The documentation site rebuilds nightly.",
+      "valence": 0.1,
+      "confidence": 0.7,
+      "salience": 0.4,
+      "evidence_count": 1,
+      "contradicts": [],
+      "supports": []
+    }
+  ]
+}

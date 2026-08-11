@@ -16,6 +16,7 @@ import pytest
 
 from manyu.gate import (
     GateFailure,
+    assert_above_chance,
     assert_constants_pinned,
     assert_exclusions_not_concentrated,
     assert_has_range,
@@ -195,3 +196,40 @@ def test_shape_comparable_fires_when_no_two_conditions_share_a_shape():
 def test_shape_comparable_fires_on_no_records():
     with pytest.raises(GateFailure, match="no records"):
         assert_shape_comparable([], shape_keys=("evidence_count",), condition_key="condition")
+
+
+# --- Gate 8: an effect must clear its own null -------------------------------
+
+def test_above_chance_passes_when_the_observation_clears_its_null():
+    null = [0.5 + index * 0.01 for index in range(50)]
+    p = assert_above_chance(0.40, null, label="spread")
+    assert p == 0.0
+
+
+def test_above_chance_fires_on_a_mid_distribution_observation():
+    """Experiment 4 Stage 3, reproduced exactly.
+
+    `spread` was 0.400 against a derangement null averaging 0.476 — below the
+    mean, and at the 48th percentile. Comparing to the mean said "more specific
+    than chance"; the empirical p says it is not distinguishable at all.
+    """
+    null = [0.2 + index * 0.012 for index in range(50)]
+    with pytest.raises(GateFailure) as caught:
+        assert_above_chance(0.40, null, label="spread")
+    assert "not distinguishable from chance" in str(caught.value)
+    assert "0.4" in str(caught.value)
+
+
+def test_above_chance_reads_the_other_tail_when_larger_is_better():
+    null = [0.1 * index for index in range(10)]  # 0.0 .. 0.9
+    # Nothing in the null reaches 1.0, so p is 0.0 — not 0.1. The upper tail is
+    # counted with `>=`, and the null's own maximum is 0.9.
+    assert assert_above_chance(1.0, null, label="hit rate", lower_is_better=False) == 0.0
+    # Half the null is at or above 0.45, so this is squarely mid-distribution.
+    with pytest.raises(GateFailure):
+        assert_above_chance(0.45, null, label="hit rate", lower_is_better=False)
+
+
+def test_above_chance_fires_on_an_empty_null():
+    with pytest.raises(GateFailure):
+        assert_above_chance(0.1, [], label="spread")

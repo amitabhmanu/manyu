@@ -228,10 +228,29 @@ class ManyuCore:
                 "trust_class": event.source.trust_class.value,
             }
         )
+        # FR-1: the dissonance read is taken at a defined point in the turn, and
+        # the point is **both sides of belief update**.
+        #
+        # Requirements section 14 left this open on the grounds that reading
+        # before and reading after are different experiments. They are, and the
+        # deciding fact is a confound rather than a preference: `update_beliefs`
+        # routes every newly declared contradiction through
+        # `RevisionEngine.assert_contradiction` (experiment 3 section 14), so by
+        # the time it returns, a contradiction that arrived this turn has already
+        # been charged and the tension it caused is already partly discharged. A
+        # single read afterwards cannot distinguish "the web was calm" from "the
+        # web was disturbed and immediately priced".
+        #
+        # Taking both also satisfies requirements section 12 structurally: the
+        # delta is reported against the baseline it was measured from, rather than
+        # beside it and hoping the reader joins them.
+        dissonance_before = self.read_dissonance(event.agent_id, persist=False)
+
         belief_payload: dict[str, Any] = {"agent_id": event.agent_id, "evidence_ids": [evidence["evidence_id"]]}
         if "belief_candidates" in payload:
             belief_payload["candidates"] = payload["belief_candidates"]
         belief_update = self.update_beliefs(belief_payload)
+        dissonance_after = self.read_dissonance(event.agent_id)
         worldview = self.review_beliefs({"agent_id": event.agent_id, "affect_threshold": payload.get("affect_threshold", 0.24)})
         voice_result = self.inner_voice.compose(trace)
         mood_result = None
@@ -248,6 +267,17 @@ class ManyuCore:
             "worldview": worldview,
             "inner_voice": voice_result,
             "mood": mood_result,
+            "dissonance": {
+                # Raw, never saturated. `magnitude` is concave in raw tension, so
+                # a delta taken on it confounds how much tension changed with
+                # where on the curve the web was sitting (experiment 3 section
+                # 3.3, requirements section 12).
+                "raw_before": (dissonance_before["signal"] or {}).get("magnitude_raw", 0.0),
+                "raw_after": (dissonance_after["signal"] or {}).get("magnitude_raw", 0.0),
+                "conflicts_before": dissonance_before["conflicts"],
+                "conflicts_after": dissonance_after["conflicts"],
+                "arose_this_turn": dissonance_after["conflicts"] - dissonance_before["conflicts"],
+            },
         }
 
     def state(self, agent_id: str | None = None) -> AffectState:
@@ -421,6 +451,116 @@ class ManyuCore:
         except ValueError as exc:
             return {"status": "error", "error": str(exc)}
         return {"status": "ok", **_propagation_payload(result)}
+
+    def read_dissonance(self, agent_id: str | None = None, persist: bool = True) -> dict[str, Any]:
+        """Read the belief web's tension, and record it.
+
+        The surface experiment 4 needs, and until now the detector had none:
+        `MergedDissonanceQuery` was imported by its own module and its own test
+        file, was never computed during a turn, and was never persisted. Exactly
+        where `RevisionEngine` stood before experiment 3 section 13.
+
+        **`magnitude` is returned but must not be read as a measure of belief
+        dynamics** (requirements section 12). It is concave in raw tension, so
+        the same raw change reads larger from a lower baseline and a delta
+        confounds how much tension changed with where on the saturation curve the
+        web was sitting. Read `magnitude_raw` and `carriers`. The control path
+        cannot reach `magnitude` at all — see `salience.TensionView`.
+        """
+        from manyu.dissonance import MergedDissonanceQuery
+
+        resolved = agent_id or self.profile.agent_id
+        signal = MergedDissonanceQuery(self.store).detect(resolved, "surface")
+        if signal is None:
+            return {"status": "ok", "signal": None, "conflicts": 0}
+        if persist:
+            self.store.save_dissonance_signal(signal)
+        direct = [carrier for carrier in signal.carriers if not carrier.path]
+        return {
+            "status": "ok",
+            "signal": signal.model_dump(mode="json"),
+            "conflicts": len(direct),
+            "implicated": len(signal.carriers),
+        }
+
+    def run_attention_loop(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Let dissonance decide what gets revisited, and record what it chose.
+
+        `arm` is required and has no default at any layer, on experiment 3
+        section 13's rule: a silent default settles an open question by whichever
+        branch a caller happened not to think about. `random_matched`
+        additionally requires a seed, because a run that cannot be reproduced
+        from its own record is not evidence.
+
+        Errors are returned rather than raised, matching `retract_belief`.
+        """
+        from manyu.salience import Arm, AttentionLoop
+        from manyu.schemas import AttentionStepRecord, LoopTrace
+
+        agent_id = str(payload.get("agent_id") or self.profile.agent_id)
+        raw_arm = payload.get("arm")
+        if not raw_arm:
+            return {"status": "error", "error": f"arm is required; use one of {[a.value for a in Arm]}"}
+        try:
+            arm = Arm(raw_arm)
+        except ValueError:
+            return {"status": "error", "error": f"unknown arm {raw_arm!r}; use one of {[a.value for a in Arm]}"}
+
+        try:
+            max_iterations = int(payload.get("max_iterations", 0))
+        except (TypeError, ValueError):
+            return {"status": "error", "error": "max_iterations must be an integer"}
+        if max_iterations < 1:
+            return {"status": "error", "error": "max_iterations must be at least 1"}
+
+        seed = payload.get("seed")
+        try:
+            loop = AttentionLoop(self, arm=arm, agent_id=agent_id, seed=None if seed is None else int(seed))
+            result = loop.run(max_iterations=max_iterations)
+        except ValueError as exc:
+            return {"status": "error", "error": str(exc)}
+
+        from uuid import uuid4
+
+        trace = LoopTrace(
+            trace_id=f"loop_{uuid4().hex[:12]}",
+            agent_id=agent_id,
+            arm=arm.value,
+            max_iterations=max_iterations,
+            termination=result.termination.value,
+            trajectory=[round(value, 6) for value in result.trajectory],
+            inert=[list(pair) for pair in result.inert],
+            had_arbitrary_choice=result.had_arbitrary_choice,
+            steps=[
+                AttentionStepRecord(
+                    iteration=step.iteration,
+                    belief_id_a=step.conflict[0],
+                    belief_id_b=step.conflict[1],
+                    contradictor_id=step.contradictor_id,
+                    target_id=step.target_id,
+                    direction=step.direction,
+                    tension_before=step.tension_before,
+                    best_available_tension=step.best_available_tension,
+                    raw_before=step.raw_before,
+                    tied_with=step.tied_with,
+                    outcome=step.outcome,
+                    moved=step.moved,
+                    target_evidence_count=step.target_evidence_count,
+                    target_stake=step.target_stake,
+                    contradictor_evidence_count=step.contradictor_evidence_count,
+                    contradictor_stake=step.contradictor_stake,
+                )
+                for step in result.steps
+            ],
+        )
+        self.store.save_loop_trace(trace)
+        return {"status": "ok", "trace": trace.model_dump(mode="json"), "total_movement": result.total_movement}
+
+    def get_loop_trace(self, trace_id: str) -> dict[str, Any]:
+        try:
+            return {"status": "ok", "trace": self.store.get_loop_trace(trace_id).model_dump(mode="json")}
+        except KeyError:
+            return {"status": "error", "error": f"unknown loop trace {trace_id}"}
 
     def _revision_engine(self, arm: str | ContradictionArm) -> RevisionEngine:
         return RevisionEngine(self.store, self.clock, ContradictionArm(arm))
