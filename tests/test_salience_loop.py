@@ -26,6 +26,7 @@ from manyu.salience import (
     selector_for,
     web_specs,
 )
+from manyu.schemas import DissonanceCarrier
 
 AGENT = "agent_demo"
 
@@ -352,19 +353,77 @@ def test_a_tie_is_recorded_rather_than_silently_broken() -> None:
     ids. So the arbitrary choice is *recorded*, and the methodology consequence
     is carried on the result: arms may not be compared across separately-seeded
     stores on a web where `had_arbitrary_choice` is true.
-    """
-    picks = set()
-    for _ in range(6):
-        core, _, reverse = _core("tied_tension_web")
-        result = AttentionLoop(core, arm=Arm.DRIVEN, agent_id=AGENT).run(max_iterations=1)
-        step = result.steps[0]
-        assert step.tied_with == 2, f"the tie was not detected: tied_with={step.tied_with}"
-        assert result.had_arbitrary_choice is True
-        picks.add(tuple(sorted(reverse[b] for b in step.conflict)))
 
-    assert len(picks) > 1, (
-        "the tie broke the same way six times over — either the fixture no longer ties, or belief ids "
-        "have become deterministic. Both change what this test is documenting"
+    That the choice is *arbitrary* is asserted in the two tests below rather than
+    here. The original version of this test sampled it — six runs, then
+    `len(picks) > 1` — which is the defect experiments 5 and 6 both named, only
+    pointing the other way: with two tied conflicts the six runs agree by chance
+    about 3% of the time, so the check went red on runs where nothing was wrong.
+    """
+    core, _, _ = _core("tied_tension_web")
+    result = AttentionLoop(core, arm=Arm.DRIVEN, agent_id=AGENT).run(max_iterations=1)
+
+    step = result.steps[0]
+    assert step.tied_with == 2, f"the tie was not detected: tied_with={step.tied_with}"
+    assert result.had_arbitrary_choice is True
+
+
+def test_the_tie_break_is_decided_by_belief_id_order() -> None:
+    """What the tie-break actually keys on, stated directly rather than sampled.
+
+    Two conflicts at byte-identical tension with ids supplied explicitly, so the
+    winner is a fact about the ids rather than a draw: `driven` takes the greatest
+    pair and `inverted` the least, because the tie-break rides along with the
+    `max`/`min` that chooses on tension. Drop the tie-break and both selectors
+    fall to whichever conflict `TensionView.conflicts` happens to list first,
+    which is a different answer.
+
+    The carriers are presented in both orders to pin the other half of the
+    fixture's requirement — that emission order cannot reach the choice. It is
+    `TensionView.conflicts` that sorts, not the selector, so this asserts the two
+    layers compose rather than testing the tie-break twice.
+    """
+    low = ("bel_000000000001", "bel_000000000002")
+    high = ("bel_ffffffffff01", "bel_ffffffffff02")
+
+    for first, second in ((low, high), (high, low)):
+        view = TensionView(
+            agent_id=AGENT,
+            magnitude_raw=1.0,
+            carriers=(
+                DissonanceCarrier(belief_id_a=first[0], belief_id_b=first[1], path=[], tension=0.5),
+                DissonanceCarrier(belief_id_a=second[0], belief_id_b=second[1], path=[], tension=0.5),
+            ),
+        )
+        assert view.tension_of(low) == view.tension_of(high), "the constructed conflicts are not tied"
+
+        assert CarrierDrivenSelector().select(view, frozenset()) == high, (
+            f"carriers emitted {first[0]} first: driven did not take the id-greatest pair"
+        )
+        assert InvertedSelector().select(view, frozenset()) == low, (
+            f"carriers emitted {first[0]} first: inverted did not take the id-least pair"
+        )
+
+
+def test_the_ids_the_tie_break_keys_on_carry_nothing_about_the_belief() -> None:
+    """Why a recorded tie is the honest response and a stable one would be a lie.
+
+    Belief ids are `bel_{uuid4().hex[:12]}`, so the ordering the test above pins
+    is not a property of the beliefs at all — seed the same fixture twice and not
+    one belief keeps its id, which means nothing about where it sorts survives
+    either. This is what `had_arbitrary_choice` exists to record, and why arms may
+    not be compared across separately-seeded stores on a web where it is true.
+
+    If ids ever become content-derived or otherwise stable across stores, this
+    fails and the methodology constraint can be revisited.
+    """
+    _, first, _ = _core("tied_tension_web")
+    _, second, _ = _core("tied_tension_web")
+
+    assert first.keys() == second.keys()
+    assert all(first[key] != second[key] for key in first), (
+        f"the same belief kept its id across two separately-seeded stores, so ids are no longer "
+        f"per-store: {first}"
     )
 
 
