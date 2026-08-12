@@ -104,6 +104,19 @@ class ManyuMCPAdapter:
     def run_attention_loop(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self.core.run_attention_loop(payload)
 
+    def derive_underdetermination(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.core.derive_underdetermination(payload or {})
+
+    def read_underdetermination(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.core.read_underdetermination((payload or {}).get("agent_id"))
+
+    def price_counterfactuals(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.core.price_counterfactuals(payload or {})
+
+    def read_counterfactuals(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        data = payload or {}
+        return self.core.read_counterfactuals(data.get("agent_id"), data.get("belief_id"))
+
     def get_loop_trace(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self.core.get_loop_trace(payload["trace_id"])
 

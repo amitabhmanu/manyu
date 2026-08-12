@@ -1,0 +1,41 @@
+{
+  "fixture_id": "entrenched",
+  "role": "positive-control",
+  "description": "The same standoff at two levels of entrenchment, reached by corroboration rather than by declaration.\n\nMethodology section 3 names the risk this fixture carries: stability is an input to the dose, so a fixture that SETS a stability value is authoring a large part of the answer. It is therefore built by delivering `corroborations` non-separating records through the priced ingest path - `BeliefUpdater._revise` raises stability 0.05 per revision carrying new evidence - so the entrenchment is accumulated by the substrate rather than typed in.\n\nEven so this row is a POSITIVE CONTROL and never evidence for the dose result. It exists to show the dose responds to entrenchment at all; the claim itself lives in the census over naturally-accumulated stability. A census without a control would be a distribution with nothing establishing that the mechanism can move.\n\nThe corroborating records are shared by both readings by construction, so they cannot separate the pair and cannot retire the standoff on their own - the arm measures entrenchment, not collapse.",
+  "expect": {
+    "shared_evidence": 2,
+    "rivals": 2,
+    "corroborations_low": 0,
+    "corroborations_high": 8,
+    "corroborating_records_shared_by_both": true,
+    "note": "Structural properties, checkable by reading the file. The stability each arm reaches is NOT authored here - it is whatever the substrate accumulates - and no expected dose appears anywhere in this fixture."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ],
+  "arms": {
+    "low": {"corroborations": 0},
+    "high": {"corroborations": 8}
+  }
+}

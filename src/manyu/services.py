@@ -591,6 +591,14 @@ class BeliefExtractor:
                                     "epistemic_principle",
                                     "aesthetic_preference",
                                     "uncertainty",
+                                    # `underdetermination` is deliberately NOT
+                                    # offered here. The extractor may not
+                                    # declare that two readings are
+                                    # indistinguishable — experiment 5
+                                    # requirements §7. That belief type is
+                                    # reachable only through
+                                    # `underdetermination.derive`, which reads
+                                    # the evidence overlap off the store.
                                 ],
                             },
                             "scope": {

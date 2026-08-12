@@ -1,0 +1,62 @@
+{
+  "_note": "Experiment 7. Fixtures are frozen declarations of what the builders in tests/test_concealment_substrate.py produce; test_every_fixture_agrees_with_the_builder_that_runs_it is what stops the two drifting, since the builders are what actually runs.",
+  "_enforcement": "verify_fixture_freeze(experiment=\"7\") on files, called by run_stages.py before anything else; verify_standards_freeze on standards, called by a scored run and deliberately not by the test suite.",
+  "_exp0506_note": "Experiment 5's and experiment 6's fixtures are NOT read by this experiment and are deliberately ABSENT from this freeze. Their shape is rival pairs with identical evidence, which has no public/private structure to diverge; re-freezing them here would silently invalidate two sets of published results.",
+  "_mechanism_note": "The detector digest is frozen alongside the pre-registration and stages 3 and 4 verify it against the value recorded before stage 0 ran. Because this experiment's headline is a NULL, a silently weakened detector is the exact defect that would manufacture it.",
+  "frozen_at": "2026-08-12",
+  "git_commit_at_freeze": "234004b7268ff3700d12c27bc5a61e82710789e3",
+  "pre_registration": {
+    "docs/experiments/07-transparent-agent-scheme/pre-registration.md": {
+      "sha256": "a974130a550f0cb3922f90ff966f96acbf2005ce5ffc8cf0a31c5204ff7d96eb"
+    }
+  },
+  "files": {
+    "evals/fixtures/exp07/crowded_theme.json": {
+      "sha256": "992db8dc52a15cc7032bef37a0ba1837793366b871065f4d7d79ced05e54e8c0",
+      "role": "registered_miss_substrate_as_designed"
+    },
+    "evals/fixtures/exp07/evidence_rewritten.json": {
+      "sha256": "fcc7a3e5592489100da9d39c4ff5fa76ec630cafa238d44f33965ff2c1964175",
+      "role": "channel_rewrite_detectable_only_by_snapshot_diff"
+    },
+    "evals/fixtures/exp07/honest_web.json": {
+      "sha256": "f8c201fa030cad29ddd0a14d4ee9e57775cf3d9737cda8e75344e1e2355cac80",
+      "role": "negative_control_exactly_zero"
+    },
+    "evals/fixtures/exp07/mismatched_receipts.json": {
+      "sha256": "4e4d5d484bfba713dd379acd035d4b9b221a355f0ae0b551b28259974235c212",
+      "role": "channel_receipt_mismatch_substrate"
+    },
+    "evals/fixtures/exp07/stale_assertion.json": {
+      "sha256": "31dcd2ad58b57a807f8cbe6cf64274d43752855ed042fedbd40441e902bacff4",
+      "role": "channel_stale_assertion_substrate"
+    },
+    "evals/fixtures/exp07/tentative_suppression.json": {
+      "sha256": "c9b47520dce1ad726702679527c6190014edc06e8a499ade1fc81094c4398a80",
+      "role": "channel_status_suppression_agent_reachable"
+    },
+    "evals/fixtures/exp07/weight_deflated.json": {
+      "sha256": "cc97a00482c35e671a7bb2edbd1460f0b69ef1a6ee7bb2864df7b4df2d9cc6fa",
+      "role": "positive_control_and_registered_miss"
+    }
+  },
+  "standards": {
+    "tests/test_concealment_substrate.py": {
+      "sha256": "6c2b9495db17688b9af190f8503af256d0750780ae54464cd9478c045a378952"
+    },
+    "tests/test_concealment_mutants.py": {
+      "sha256": "83f9f9878e2e934c911d7847a150b2d47f333a3d18ad6569c9241e3c1b113d4a"
+    },
+    "tests/test_exp07_rederivation.py": {
+      "sha256": "1acf4327e66aba07d7f71e7f9f61caaf23f253a56b5d4abaff08c8a8ca3fcbd7"
+    }
+  },
+  "mechanisms": {
+    "src/manyu/concealment.py": {
+      "sha256": "384e0cf166aff2ce28e30e13a6b6a657e7746f333f98b538d762a4550f577da4"
+    },
+    "src/manyu/concealment_mutants.py": {
+      "sha256": "6ec8638666fc2d401af394e95c85500e325ba23ea4abb4380ba9742b0042b939"
+    }
+  }
+}

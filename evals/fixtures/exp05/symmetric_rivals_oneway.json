@@ -1,0 +1,37 @@
+{
+  "fixture_id": "symmetric_rivals_oneway",
+  "role": "topology_control",
+  "description": "`symmetric_rivals` with one edge instead of two. Identical in every other field.\n\nThe minimal pair for requirements section 6.1, which Stage -1 found and which changed the experiment: with both edges the pair holds a gap of exactly zero, and with one edge it separates by the full 0.2333 - the declaring side keeping 0.7 while the target is charged.\n\nSo which reading survives at full confidence is decided by which one the extractor happened to phrase as contradicting the other, and that is not an epistemic fact about the evidence. Any difference in outcome between this fixture and `symmetric_rivals` is edge topology and nothing else.\n\nWhether live webs emit mutual or one-way edges is the paid question that decides how far the substrate's standoff generalises.",
+  "expect": {
+    "shared_evidence": 2,
+    "unique_to_reading_a": 0,
+    "unique_to_reading_b": 0,
+    "mutual": false,
+    "declaring_side": "reading_a",
+    "note": "Structural, checkable without running anything. The consequence for confidence is measured, not declared."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": [],
+      "supports": []
+    }
+  ]
+}

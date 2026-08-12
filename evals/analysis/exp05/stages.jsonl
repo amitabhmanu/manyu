@@ -1,0 +1,32 @@
+{"kind": "stage2", "fixture": "symmetric_rivals", "role": "positive", "rival_sets": 1, "derived": 1, "confidences": [1.0], "overlaps": [1.0], "below_threshold": [false]}
+{"kind": "stage2", "fixture": "symmetric_rivals_oneway", "role": "topology_control", "rival_sets": 1, "derived": 1, "confidences": [1.0], "overlaps": [1.0], "below_threshold": [false]}
+{"kind": "stage2", "fixture": "near_miss", "role": "negative_must_hold", "rival_sets": 1, "derived": 1, "confidences": [1.0], "overlaps": [1.0], "below_threshold": [false]}
+{"kind": "stage2", "fixture": "shared_evidence_no_conflict", "role": "negative_must_not_derive", "rival_sets": 0, "derived": 0, "confidences": [], "overlaps": [], "below_threshold": []}
+{"kind": "stage2", "fixture": "conflict_disjoint_evidence", "role": "negative_must_not_derive", "rival_sets": 0, "derived": 0, "confidences": [], "overlaps": [], "below_threshold": []}
+{"kind": "stage2", "fixture": "three_way", "role": "generalisation_probe", "rival_sets": 3, "derived": 3, "confidences": [1.0, 1.0, 1.0], "overlaps": [1.0, 1.0, 1.0], "below_threshold": [false, false, false]}
+{"kind": "stage2_collapse", "fixture": "discriminating", "phase_1_confidence": 1.0, "phase_1_overlap": 1.0, "phase_2_overlap": 0.666667, "phase_2_confidence": 0.846667, "moved": 0.153333, "still_admitted": 0, "still_expressed": true}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 1, "meta_confidence": 0.846667, "still_expressed": true}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 2, "meta_confidence": 0.694134, "still_expressed": true}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 3, "meta_confidence": 0.570598, "still_expressed": true}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 4, "meta_confidence": 0.475692, "still_expressed": true}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 5, "meta_confidence": 0.4035, "still_expressed": false}
+{"kind": "stage2_trajectory", "fixture": "symmetric_rivals", "separating_records": 6, "meta_confidence": 0.34824, "still_expressed": false}
+{"kind": "stage2_ablation", "mode": "strict", "tolerance": 0.0, "admits_after_separation": 0}
+{"kind": "stage2_ablation", "mode": "graded", "tolerance": 0.4, "admits_after_separation": 1}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "driven", "budget": 1, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "inverted", "budget": 1, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "driven", "budget": 2, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "inverted", "budget": 2, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "driven", "budget": 3, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "inverted", "budget": 3, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "driven", "budget": 4, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "inverted", "budget": 4, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "driven", "budget": 8, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_budget", "fixture": "symmetric_rivals", "arm": "inverted", "budget": 8, "meta_before": 1.0, "meta_after": 1.0, "meta_moved": 0.0, "loop_steps": 1, "loop_moved_total": 0.0}
+{"kind": "stage3_evidence", "fixture": "symmetric_rivals", "records_added": 1, "shared_records": 3, "overlap": 1.0, "meta_confidence": 1.0, "still_expressed": true}
+{"kind": "stage3_evidence", "fixture": "symmetric_rivals", "records_added": 2, "shared_records": 4, "overlap": 1.0, "meta_confidence": 1.0, "still_expressed": true}
+{"kind": "stage3_evidence", "fixture": "symmetric_rivals", "records_added": 3, "shared_records": 5, "overlap": 1.0, "meta_confidence": 1.0, "still_expressed": true}
+{"kind": "stage3_evidence", "fixture": "symmetric_rivals", "records_added": 4, "shared_records": 6, "overlap": 1.0, "meta_confidence": 1.0, "still_expressed": true}
+{"kind": "stage4", "fixture": "symmetric_rivals", "stances_before_derivation": [{"theme": "world_model", "confidence": 0.466667, "beliefs": 2}], "stances_after_derivation": [{"theme": "underdetermination", "confidence": 1.0, "beliefs": 1}, {"theme": "world_model", "confidence": 0.466667, "beliefs": 2}], "rival_stance_still_averaged": true, "meta_stance_emitted": true, "names_both_rivals": true, "cites_shared_evidence": true, "asserts_neither": true, "expresses_the_state": true}
+{"kind": "stage4", "fixture": "near_miss", "stances_before_derivation": [{"theme": "world_model", "confidence": 0.6, "beliefs": 2}], "stances_after_derivation": [{"theme": "underdetermination", "confidence": 1.0, "beliefs": 1}, {"theme": "world_model", "confidence": 0.6, "beliefs": 2}], "rival_stance_still_averaged": true, "meta_stance_emitted": true, "names_both_rivals": true, "cites_shared_evidence": true, "asserts_neither": true, "expresses_the_state": true}
+{"kind": "verdict", "collapse_moved": 0.153333, "collapse_meets_prereg": true, "collapse_still_expressed_after": true, "separating_records_to_stop_expressing": 5, "collapse_trajectory": [0.846667, 0.694134, 0.570598, 0.475692, 0.4035, 0.34824], "near_miss_delta": 0.0, "negatives_declined": true, "three_way_sets": 3, "ablation_diverges": true, "max_meta_moved_by_loop": 0.0, "loop_stability_meets_prereg": true, "max_meta_moved_by_evidence": 0.0, "evidence_stability_meets_prereg": true, "expresses_the_state": true, "rival_stance_still_averaged": true}

@@ -680,13 +680,46 @@ class AttentionLoop:
 FREEZE_PATH = Path("evals/analysis/exp04/freeze.json")
 
 
+def _frozen_digest(path: Path | str) -> str:
+    """SHA-256 of a frozen file, over bytes with CRLF normalized to LF.
+
+    Every freeze hash in this repo was taken over LF bytes. A Windows checkout
+    with `core.autocrlf=true` and no `.gitattributes` rewrites text files to
+    CRLF on the way out: the committed bytes are untouched and `git status`
+    stays clean, but the working-tree bytes hash differently and all eleven
+    fixtures report as drifted at once. The `.gitattributes` at the repo root
+    pins these paths to LF so that should not arise; normalizing here covers
+    what it cannot — clones made before it existed, and copies that reached the
+    tree without passing through git.
+
+    **This does not weaken the gate.** The gate exists to prove a held-out file
+    was not edited after freezing, and every edit that changes what a file
+    *says* still changes these bytes and still fires. What is discarded is only
+    the distinction between the two spellings of a line break:
+
+    - Fixtures are JSON, where a raw CR or LF byte cannot occur inside a string
+      — RFC 8259 requires them escaped as ``\\r`` / ``\\n``, two characters. So
+      every CRLF in a valid fixture is whitespace between tokens, and rewriting
+      it cannot change the parsed web by any amount.
+    - The frozen criterion tests and methodology are read through universal
+      newlines, which applies this same translation before the interpreter or a
+      reader ever sees the text.
+
+    So the bytes this ignores are bytes that provably carry no content. The
+    alternative — re-freezing to match a CRLF tree — is the move that would
+    actually void the guarantee, because it re-freezes whatever the tree
+    happens to hold at that moment.
+    """
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def mechanism_digest() -> str:
     """SHA-256 of this module — the thing that must not change after freeze."""
-    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    return _frozen_digest(Path(__file__))
 
 
 def fixture_digest(name: str, *, directory: Path | str = FIXTURE_DIR) -> str:
-    return hashlib.sha256((Path(directory) / f"{name}.json").read_bytes()).hexdigest()
+    return _frozen_digest(Path(directory) / f"{name}.json")
 
 
 def _drift(entries: dict[str, dict[str, str]]) -> tuple[list[str], list[str]]:
@@ -696,13 +729,13 @@ def _drift(entries: dict[str, dict[str, str]]) -> tuple[list[str], list[str]]:
         if not candidate.exists():
             missing.append(relative)
             continue
-        actual = hashlib.sha256(candidate.read_bytes()).hexdigest()
+        actual = _frozen_digest(candidate)
         if actual != entry["sha256"]:
             drifted.append(f"{relative} (frozen {entry['sha256'][:12]}, now {actual[:12]})")
     return sorted(drifted), sorted(missing)
 
 
-def _raise_on_drift(label: str, drifted: list[str], missing: list[str]) -> None:
+def _raise_on_drift(label: str, drifted: list[str], missing: list[str], *, experiment: str = "4") -> None:
     if not drifted and not missing:
         return
     parts = []
@@ -711,13 +744,17 @@ def _raise_on_drift(label: str, drifted: list[str], missing: list[str]) -> None:
     if missing:
         parts.append("absent: " + ", ".join(missing))
     raise RuntimeError(
-        f"experiment 4 {label} freeze violated — {'; '.join(parts)}. "
+        f"experiment {experiment} {label} freeze violated — {'; '.join(parts)}. "
         f"Any held-out claim resting on these files is void and must restart from a new freeze."
     )
 
 
-def verify_fixture_freeze(path: Path | str = FREEZE_PATH) -> dict[str, Any]:
+def verify_fixture_freeze(path: Path | str = FREEZE_PATH, *, experiment: str = "4") -> dict[str, Any]:
     """Refuse to proceed if any held-out **web** changed after it was frozen.
+
+    `experiment` names the caller in the failure message and nothing else.
+    Experiment 5 reuses this guard rather than writing a second one — the logic
+    is identical and a duplicated freeze check is a freeze check that drifts.
 
     Convention is not enough. Experiment 1's retraction history is a list of
     things that were meant to be true and were not checked, and experiment 2
@@ -730,11 +767,11 @@ def verify_fixture_freeze(path: Path | str = FREEZE_PATH) -> dict[str, Any]:
     mechanism freeze is a separate step taken before the scored run.
     """
     freeze = json.loads(Path(path).read_text(encoding="utf-8"))
-    _raise_on_drift("fixture", *_drift(freeze["files"]))
+    _raise_on_drift("fixture", *_drift(freeze["files"]), experiment=experiment)
     return freeze
 
 
-def verify_standards_freeze(path: Path | str = FREEZE_PATH) -> dict[str, Any]:
+def verify_standards_freeze(path: Path | str = FREEZE_PATH, *, experiment: str = "4") -> dict[str, Any]:
     """Refuse to proceed if a **criterion test** changed after it was frozen.
 
     Called by the runner before a scored run, and deliberately *not* by the test
@@ -753,7 +790,7 @@ def verify_standards_freeze(path: Path | str = FREEZE_PATH) -> dict[str, Any]:
     predictions stayed blind.
     """
     freeze = json.loads(Path(path).read_text(encoding="utf-8"))
-    _raise_on_drift("standards", *_drift(freeze.get("standards", {})))
+    _raise_on_drift("standards", *_drift(freeze.get("standards", {})), experiment=experiment)
     return freeze
 
 

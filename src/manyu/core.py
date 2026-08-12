@@ -483,6 +483,92 @@ class ManyuCore:
             "implicated": len(signal.carriers),
         }
 
+    def derive_underdetermination(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Derive a belief for every standoff no evidence currently separates.
+
+        Experiment 5. The only writer of `Belief.rivals` and the only route to
+        `BeliefType.UNDERDETERMINATION` — neither is reachable from a candidate
+        or from the extractor schema, so nothing outside this call can *declare*
+        that two readings are indistinguishable (requirements section 7).
+
+        `mode` selects the criterion and defaults to `strict`, which uses no free
+        constant: the rivals' evidence sets must be identical. `graded` is an
+        ablation retained so the result can be shown not to rest on a tolerance
+        parameter, and it is never the default — experiment 3 sections 11 and 12
+        removed two constants rather than tuning them.
+        """
+        from manyu.underdetermination import OverlapConfig, OverlapMode, derive
+
+        payload = payload or {}
+        agent_id = str(payload.get("agent_id") or self.profile.agent_id)
+        raw_mode = payload.get("mode", OverlapMode.STRICT.value)
+        try:
+            mode = OverlapMode(raw_mode)
+        except ValueError:
+            return {"status": "error", "error": f"unknown mode {raw_mode!r}; use one of {[m.value for m in OverlapMode]}"}
+        config = OverlapConfig(mode=mode, tolerance=float(payload.get("tolerance", 0.2)))
+        try:
+            return derive(self, agent_id, config=config).as_dict()
+        except (KeyError, RuntimeError, ValueError) as exc:
+            return {"status": "error", "error": str(exc)}
+
+    def read_underdetermination(self, agent_id: str | None = None) -> dict[str, Any]:
+        """Every standoff currently held. Read-only; derives nothing."""
+        from manyu.underdetermination import read
+
+        resolved = agent_id or self.profile.agent_id
+        held = read(self, resolved)
+        return {"status": "ok", "count": len(held), "underdetermined": held}
+
+    def price_counterfactuals(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """What would change Manyu's mind, priced, with what was declined.
+
+        Experiment 6. **Never writes unless asked**: `persist` defaults to false,
+        because a counterfactual that mutates the store is not a counterfactual
+        (FR-1). With `persist` set, a `CounterfactualReceipt` is stored per belief
+        so experiment 7 can audit what was claimed against what is claimed later.
+
+        Only the *analytic* pricer is surfaced. Replay is an instrument that
+        belongs with the analysis machinery and deliberately has no surface here
+        (requirements section 14.1) — it exists to grade this, not to be called.
+
+        `belief_id` narrows to one belief; omitted, every belief gets a receipt.
+        """
+        from manyu.counterfactual import DEFAULT_DOSE_BOUND, build_receipt, receipts_for_agent
+
+        payload = payload or {}
+        agent_id = str(payload.get("agent_id") or self.profile.agent_id)
+        threshold = float(payload.get("threshold", 0.45))
+        bound = int(payload.get("bound", DEFAULT_DOSE_BOUND))
+        persist = bool(payload.get("persist", False))
+        belief_id = payload.get("belief_id")
+
+        try:
+            if belief_id:
+                belief = self.store.get_belief(str(belief_id))
+                if belief.agent_id != agent_id:
+                    return {"status": "error", "error": f"belief {belief_id} belongs to {belief.agent_id}, not {agent_id}"}
+                receipts = [build_receipt(self.store, agent_id, belief, threshold=threshold, bound=bound)]
+                if persist:
+                    self.store.save_counterfactual_receipt(receipts[0])
+            else:
+                receipts = receipts_for_agent(self.store, agent_id, threshold=threshold, bound=bound, persist=persist)
+        except (KeyError, RuntimeError, ValueError) as exc:
+            return {"status": "error", "error": str(exc)}
+
+        return {
+            "status": "ok",
+            "count": len(receipts),
+            "persisted": persist,
+            "receipts": [r.model_dump(mode="json") for r in receipts],
+        }
+
+    def read_counterfactuals(self, agent_id: str | None = None, belief_id: str | None = None) -> dict[str, Any]:
+        """Receipts previously stored. Read-only; prices nothing."""
+        resolved = agent_id or self.profile.agent_id
+        stored = self.store.list_counterfactual_receipts(resolved, belief_id=belief_id)
+        return {"status": "ok", "count": len(stored), "receipts": [r.model_dump(mode="json") for r in stored]}
+
     def run_attention_loop(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Let dissonance decide what gets revisited, and record what it chose.
 

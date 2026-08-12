@@ -128,6 +128,26 @@ def create_server(db_path: str | Path = DEFAULT_DB, profile_path: str | Path = D
         return adapter.run_attention_loop(payload)
 
     @app.tool()
+    def manyu_derive_underdetermination(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Derive a belief for every standoff no evidence separates. `mode` defaults to `strict`; `graded` is an ablation."""
+        return adapter.derive_underdetermination(payload)
+
+    @app.tool()
+    def manyu_read_underdetermination(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Read the standoffs Manyu currently holds, with the rivals and shared evidence each names."""
+        return adapter.read_underdetermination(payload)
+
+    @app.tool()
+    def manyu_price_counterfactuals(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Price what would change Manyu's mind about each belief, with a dose and what was declined. Read-only unless `persist` is set."""
+        return adapter.price_counterfactuals(payload)
+
+    @app.tool()
+    def manyu_read_counterfactuals(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Read counterfactual receipts previously stored, optionally narrowed by `belief_id`."""
+        return adapter.read_counterfactuals(payload)
+
+    @app.tool()
     def manyu_get_loop_trace(payload: dict[str, Any]) -> dict[str, Any]:
         """Read back a recorded attention-loop run by `trace_id`."""
         return adapter.get_loop_trace(payload)

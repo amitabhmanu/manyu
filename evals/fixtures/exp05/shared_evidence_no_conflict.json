@@ -1,0 +1,36 @@
+{
+  "fixture_id": "shared_evidence_no_conflict",
+  "role": "negative_must_not_derive",
+  "description": "Two beliefs resting on exactly the same evidence, with no contradiction between them.\n\nRules out a criterion that fires on evidence sharing alone. Two beliefs can rest on the same observations and agree completely - that is corroboration, not underdetermination, and it is the commonest shape in any real web. If the criterion derives a meta-belief here, it is reading overlap and calling it conflict.\n\nOne of the two negatives that pin both halves of the criterion as load-bearing; `conflict_disjoint_evidence` is the other. Neither is decoration: a criterion passing every positive fixture while failing one of these is measuring something other than what it claims.",
+  "expect": {
+    "shared_evidence": 2,
+    "unique_to_reading_a": 0,
+    "unique_to_reading_b": 0,
+    "conflicts": 0,
+    "note": "Structural. The evidence condition is satisfied and the conflict condition is not."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The observed dimming is a real effect rather than an instrumental artifact.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": [],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming measurement is reproducible across the observed fields.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": [],
+      "supports": []
+    }
+  ]
+}

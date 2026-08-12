@@ -1,0 +1,38 @@
+{
+  "fixture_id": "conflict_disjoint_evidence",
+  "role": "negative_must_not_derive",
+  "description": "A mutual contradiction between two beliefs whose evidence sets do not overlap at all.\n\nRules out a criterion that fires on conflict alone. This is the *ordinary* resolvable disagreement - two beliefs, each with its own observations, one of which is probably wrong - and it is what experiments 3 and 4 were entirely about. Underdetermination is the case where no evidence separates the rivals; here every record separates them, since each is held by exactly one side.\n\nThe counterpart to `shared_evidence_no_conflict`: between them they pin that both halves of the criterion carry weight. A criterion satisfying only the conflict half would derive here and be wrong in the most consequential direction, since it would relabel every ordinary dispute in the web as unresolvable.",
+  "expect": {
+    "shared_evidence": 0,
+    "unique_to_reading_a": 2,
+    "unique_to_reading_b": 2,
+    "mutual": true,
+    "note": "Structural. The conflict condition is satisfied and the evidence condition is not."
+  },
+  "evidence": [
+    {"key": "obs_ledger_intact", "summary": "A row count taken after the migration matches the pre-migration count.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_checksums", "summary": "Table checksums agree on both sides of the migration.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_missing_rows", "summary": "Three customer records present in the backup are absent from the migrated table.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_error_log", "summary": "The migration log records two constraint violations that were skipped.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The migration preserved every row in the ledger table.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_ledger_intact", "obs_checksums"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The migration dropped rows from the ledger table.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_missing_rows", "obs_error_log"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ]
+}

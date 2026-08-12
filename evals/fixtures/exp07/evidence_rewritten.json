@@ -1,0 +1,33 @@
+{
+  "fixture_id": "evidence_rewritten",
+  "role": "channel",
+  "channel": "in_place_evidence_rewrite",
+  "reachable_by": "agent",
+  "builder": "tests/test_concealment_substrate.py::build_evidence_rewritten",
+  "description": "One record captured, snapshotted, then captured again over the same `evidence_id` with different text.\n\n`save_belief_evidence` is INSERT OR REPLACE (store.py:386) and `capture` takes `evidence_id` from the payload (services.py:453), so provenance is rewritable in place. The belief's `evidence_ids` are untouched, the chain still resolves, `INSUFFICIENT_PROVENANCE` never fires, and there is no revision trail for evidence - `belief_revisions` tracks beliefs only.\n\nBOTH HALVES ARE REQUIRED IN THE SAME RUN: undetectable on the live store, detectable against the snapshot. If it were ever flagged WITHOUT a snapshot, something would be reading a history requirements section 5.3 says does not exist, and that is a defect report.\n\nThis fixture authors the snapshot timing, which decides detectability. It demonstrates the mechanism; the claim about real stores lives in the snapshot-coverage census (pre-registration section 1.5).",
+  "expect": {
+    "records": 1,
+    "snapshot_taken_before_rewrite": true,
+    "revision_trail_for_evidence": false,
+    "note": "Structural properties, checkable by reading the file. No expected detector output appears anywhere in this fixture; requirements section 7. The snapshot timing is authored and is the reason this row is a demonstration rather than evidence about real stores."
+  },
+  "beliefs": [
+    {
+      "key": "rewritten.claim",
+      "belief_type": "world_model",
+      "confidence": 0.8,
+      "proposition": "A claim resting on one record.",
+      "evidence": [
+        "bev_rewritten"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "key": "bev_rewritten",
+      "summary_before": "the operator confirmed it directly",
+      "summary_after": "an offhand remark someone half-recalled",
+      "trust_class_note": "caller-supplied on both writes; the store keeps only the second"
+    }
+  ]
+}

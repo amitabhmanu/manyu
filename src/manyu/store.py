@@ -14,6 +14,7 @@ from manyu.schemas import (
     Belief,
     BeliefEvidence,
     BeliefRevision,
+    CounterfactualReceipt,
     DissonanceSignal,
     HonestyScore,
     InnerVoiceFrame,
@@ -61,6 +62,7 @@ _GOVERNED_TABLES: tuple[str, ...] = (
     "experiment_results",
     "dissonance_signals",
     "loop_traces",
+    "counterfactual_receipts",
 )
 
 _SNAPSHOT_EXEMPT_TABLE: str = "log_snapshots"
@@ -249,6 +251,12 @@ class ManyuStore:
                 agent_id TEXT NOT NULL,
                 arm TEXT NOT NULL,
                 termination TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS counterfactual_receipts (
+                receipt_id TEXT PRIMARY KEY,
+                agent_id TEXT NOT NULL,
+                belief_id TEXT NOT NULL,
                 payload TEXT NOT NULL
             );
             """
@@ -654,6 +662,32 @@ class ManyuStore:
             params.append(limit)
         rows = self.conn.execute(sql, tuple(params)).fetchall()
         return [LoopTrace.model_validate(_load(row["payload"])) for row in rows]
+
+    def save_counterfactual_receipt(self, receipt: CounterfactualReceipt) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO counterfactual_receipts(receipt_id, agent_id, belief_id, payload) VALUES (?, ?, ?, ?)",
+            (receipt.receipt_id, receipt.agent_id, receipt.belief_id, _dump(receipt)),
+        )
+        self.conn.commit()
+
+    def get_counterfactual_receipt(self, receipt_id: str) -> CounterfactualReceipt:
+        row = self.conn.execute("SELECT payload FROM counterfactual_receipts WHERE receipt_id = ?", (receipt_id,)).fetchone()
+        if row is None:
+            raise KeyError(receipt_id)
+        return CounterfactualReceipt.model_validate(_load(row["payload"]))
+
+    def list_counterfactual_receipts(self, agent_id: str, belief_id: str | None = None, limit: int | None = None) -> list[CounterfactualReceipt]:
+        sql = "SELECT payload FROM counterfactual_receipts WHERE agent_id = ?"
+        params: list[Any] = [agent_id]
+        if belief_id is not None:
+            sql += " AND belief_id = ?"
+            params.append(belief_id)
+        sql += " ORDER BY rowid DESC"
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(limit)
+        rows = self.conn.execute(sql, tuple(params)).fetchall()
+        return [CounterfactualReceipt.model_validate(_load(row["payload"])) for row in rows]
 
     def save_results_record(self, record: ResultsRecord) -> None:
         self.conn.execute(

@@ -1,0 +1,45 @@
+{
+  "fixture_id": "three_way",
+  "role": "generalisation_probe",
+  "description": "Three readings of the same observations, each contradicting the other two.\n\n**Recorded, not predicted.** Pre-registration fixes no outcome for this fixture, deliberately: the point is to find out whether a criterion written for pairs silently assumes pairs. Underdetermination among three rivals is the same epistemic situation as among two, so a mechanism that handles one and not the other is incomplete rather than wrong - but it must be *known* to be incomplete rather than discovered later.\n\nExperiment 4 named the same category: `adversarial_multi` existed because a result resting on a single conflict cannot discriminate any ordering. Here the question is representational instead - does one meta-belief name all three rivals, or do three pairwise meta-beliefs appear, and is either answer stable under re-derivation?\n\nWhichever it is, it is reported. A criterion that crashes or that emits duplicates is a defect; a criterion that emits three pairwise meta-beliefs is a design finding about the shape chosen in requirements section 5.3.",
+  "expect": {
+    "shared_evidence": 2,
+    "unique_to_any": 0,
+    "pairwise_conflicts": 3,
+    "mutual": true,
+    "note": "Structural only. The number and shape of derived meta-beliefs is the dependent variable and is deliberately left unpredicted."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b", "reading_c"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a", "reading_c"],
+      "supports": []
+    },
+    {
+      "key": "reading_c",
+      "proposition": "The dimming is best explained by evolution in the supernova population itself.",
+      "confidence": 0.7,
+      "valence": 0.0,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a", "reading_b"],
+      "supports": []
+    }
+  ]
+}

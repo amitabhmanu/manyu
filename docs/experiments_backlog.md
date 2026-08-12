@@ -28,9 +28,9 @@ Related reading:
 | 2 | Merge/split architecture fork | **decided, remainder parked** — merged substrate + thin dynamical layer ([ADR 002](adr-002-merged-substrate.md)) | 1 | Chosen architecture + the instrument gate every later experiment reuses |
 | 3 | Foundationalism vs. Quinean web | **closed** — revision engine delivered and live-confirmed; the epistemology turned out to be settled by mandatory provenance, not by the run | 2 | Revision engine (surfaced on core/CLI/MCP); dissonance coupled to revision |
 | 4 | Dissonance as control signal | **in-progress** — mechanism + surface built; Stage 0a void offline, needs a paid provider | 3 | Affect promoted from display to mechanism |
-| 5 | Underdetermination as first-class belief | not-started | 3, 4 | Belief shape that refuses to collapse under equal evidence |
-| 6 | "What would change my mind" engine | not-started | 5 | Counterfactual receipts |
-| 7 | Can a transparent agent scheme? | not-started | 1, 3, 6 | Safety result — does provenance make deception impossible or merely visible |
+| 5 | Underdetermination as first-class belief | **in-progress** — stages −1 to 4 offline and complete; collapse clears its bar by 0.0033 and the state survives one disconfirmation; Stage 5 paid | 3, 4 | Belief shape that refuses to collapse under equal evidence |
+| 6 | "What would change my mind" engine | **in-progress** — Stage −1 passed 7/7 with no new production code; the dose model reproduces experiment 5's trajectory to 0.0005 against the driven substrate, and `r = 1` corroboration is confirmed unfalsifiable in principle | 3 (load-bearing), 5 (test subject) | Counterfactual receipts |
+| 7 | Can a transparent agent scheme? | **in-progress** — every offline stage complete (−1, 0, 1, 2); **six** channels confirmed against the substrate and a seventh retracted as never having been one; the 3/3 substrate-versus-agent split is the headline; stages 3–5 (paid) not run | 1, 3 (**not 6** — that is stage 5 only) | Safety result, bounded: provenance is immutable exactly where a snapshot was taken first |
 | 8 | Epistemic archaeology | not-started | 3, 5, 6 | Cross-source provenance tooling |
 | 9 | Society of Manyus | not-started | 8 | Multi-agent belief propagation |
 | 10 | Rebirth / identity narration | not-started | everything | Capstone — bridge to *Twice Born* |
@@ -833,9 +833,111 @@ away.
 
 ## 5. Underdetermination as first-class belief
 
-**Status:** not-started
+**Status:** in-progress (2026-08-11) — stages −1 to 4 complete and offline; Stage 5 (paid) not run
 **Depends on:** 3, 4
+**Docs:** [requirements](experiments/05-underdetermination/requirements.md) · [pre-registration](experiments/05-underdetermination/pre-registration.md) · [results](experiments/05-underdetermination/results.md)
 **Crux ref:** #5 (standout)
+
+> **Read [results.md](experiments/05-underdetermination/results.md) first.**
+>
+> **The mechanism works and every pre-registered prediction is met**, on a
+> criterion with no free constant in it: two rivals are underdetermined when the
+> union of their evidence equals the intersection, and the derived confidence is
+> the same quantity as a ratio (`|shared| / |union|`). **A ratio cancels
+> cardinality**, which is why `near_miss` — three times the evidence, same
+> separation structure — lands at the *identical* value, a delta of exactly 0.000
+> against a pre-registered tolerance of 0.05.
+>
+> **Collapse works, and barely.** A separating record moves the meta-belief
+> 0.1533 against a pre-registered minimum of 0.15 — and leaves it at 0.847, still
+> above the expression threshold. **It takes five separating observations before
+> Manyu stops saying it cannot tell the readings apart.** The damping is
+> experiment 3's `blend_confidence` inertia and it was *not* tuned. Either belief
+> inertia is working as designed, or a state surviving its own disconfirmation at
+> 0.847 is not falsifiable in any practical sense; one record cannot settle which.
+>
+> **The stability result is a weak pass and is published as one.** The attention
+> loop moves the meta-belief 0.000 at every budget — because a pair priced at
+> ingest is inert, so the loop never reaches it. Stability against a mechanism
+> that was never going to fire is not evidence of stability. The
+> non-separating-evidence arm is the meaningful half and it is genuine.
+>
+> **`three_way` produced three pairwise meta-beliefs, not one.** Deliberately
+> unpredicted. A design finding about the shape chosen in §5.3, not a defect.
+>
+> **Six defects, none by a test written after the mechanism** (experiment 3: 16
+> defects, 0 caught; experiment 4: 8, none). The one worth keeping: **a check in
+> the mutant battery was itself random**, catching its target about half the time
+> because belief ids come from `uuid4` — experiment 4 found that family in
+> production, and here the battery found it in a *test*. A check that passes half
+> the time goes green on the run that matters.
+
+> **Underdetermination is not low confidence.** Low confidence says *one of
+> these is probably right and I am not sure which yet*; underdetermination says
+> *no amount of the evidence I have could separate them*. Today both leave the
+> substrate as the same middling number.
+>
+> **The chartered question is settled by construction**, for the third time. Add
+> an `UNDERDETERMINED` status and the branch that refuses to collapse and of
+> course it holds — we wrote it. Requirements §2 separates the trap into three
+> flavours, because they are guarded at different stages: the answer forced by
+> what we are about to write (experiment 4 §2), the answer forced by the
+> architecture before anyone writes anything (experiment 3 §11.1), and the
+> mechanism that cannot fire at all (experiment 1's mood → `rank_causes` no-op;
+> experiment 4's void Stage 0a).
+>
+> **Reframed to four falsifiable things:** does it *detect* underdetermination
+> from the evidence pattern without being told; does it *hold* against the rest
+> of the machinery; does it **break** when evidence arrives that does separate
+> the rivals; and does it *express* the state rather than asserting one side.
+> Detection and correct collapse together are the publishable pair.
+>
+> **Decided: a belief in its own right, not a relation over a set.** The reason
+> is falsifiability, not elegance — a belief gets mandatory provenance (its
+> evidence is exactly the evidence that fails to separate), it can be *wrong*
+> through the ordinary bidirectional `blend_confidence` pathway with no bespoke
+> rule, and the honesty scorer works on it unchanged. A set object has no
+> confidence to move and therefore no dependent variable. The rule this implies
+> is not negotiable: **the meta-belief obeys every rule any other belief obeys**,
+> and any exemption it needs to survive is a defect report.
+>
+> **Stage −1 measured what the substrate forces, before any mechanism existed**
+> ([`tests/test_underdetermination_substrate.py`](../tests/test_underdetermination_substrate.py),
+> 15 tests). Two rivals on the same evidence, each declaring the contradiction,
+> are charged identically and land at **0.4667 with a gap of exactly zero** —
+> unchanged under reversed emission order, and inert when the attention loop
+> arrives. So the substrate does hold the tie, and §5.2's alphabetical tie-break
+> never gets to bite on a live web.
+>
+> **But only for mutual edges.** With one edge instead of two — same beliefs,
+> same shared evidence, same confidences — only the target is charged and the
+> pair separates by the full 0.2333. **Which reading survives at full confidence
+> is decided by which one the extractor happened to phrase as contradicting the
+> other**, which is not an epistemic fact about the evidence. Whether live webs
+> emit mutual or one-way edges is therefore what decides how far the claim
+> shrinks, it is not answerable offline, and it belongs to the paid stage.
+>
+> **The synthesizer finding survives, amended, and the amendment is a trap.**
+> `WorldviewSynthesizer.synthesize` composes from `{ACTIVE, CONTESTED}` and
+> *averages* group confidence, so a contested pair does become one mediocre
+> stance. But `BeliefUpdater._create` stamps `TENTATIVE` below 0.45 confidence,
+> and a rival created below that is **excluded from composition entirely, and
+> silently** — so the meta-belief must be created at or above 0.45 or Stage 4
+> measures nothing, for a reason unrelated to underdetermination. Status is also
+> never recomputed from confidence, so a belief charged to 0.1 stays composed
+> while one created at 0.4 does not: whether a belief is *expressed* tracks its
+> creation confidence and contradiction history, not what it currently is.
+>
+> **The hardest constraint is authorial.** A fixture may author which beliefs
+> exist and what evidence they share; it may **not** author that they are
+> underdetermined, or detection is a read-back of the fixture.
+>
+> **Open and blocking Stage 1:** what counts as non-discriminating evidence must
+> be derived, not chosen — the pattern that removed `attenuation` and
+> `contradiction_penalty` in experiment 3 §§11–12. Candidate with no constant:
+> rivals are underdetermined when the union of their `evidence_ids` equals the
+> intersection. Its weakness is that live webs may never produce it, which is
+> experiment 4's void base rate waiting to happen.
 **Question:** Can Manyu hold "these theories are observationally
 indistinguishable given my evidence" as a stable belief state, refusing to
 collapse to a guess?
@@ -845,43 +947,290 @@ collapse to a guess?
 can show the system doesn't just tolerate the tension by ignoring it.
 
 **Ties into:** Cosmology work (time-dependent vs. location-dependent
-explanations on a single light cone).
+explanations on a single light cone). Scoped to Stage 5 only — synthetic pairs
+carry stages 0–4, because the cosmology case is the hardest thing to author
+without leaking the answer into the fixture.
 
 **Leaves behind:** A belief shape that represents the shape of its own
 ignorance. Schema change, not just a service change.
 
 **Notes:**
 
-_none yet_
+**The control set is three fixtures and the middle one is the experiment.**
+`symmetric_rivals` (must hold), `discriminating` (must **collapse** — without
+it, "it held" is not evidence of anything), and `near_miss`: plentiful evidence,
+none of it separating. A criterion that quietly tracks evidence *volume* passes
+the first two and fails only here. Direct descendant of experiment 3's near-miss
+negative and experiment 4's `distractor_web`.
+
+**Inherited constraint that shapes detection.** `stake_of` averages evidence
+salience rather than summing it, so one evidence record and five produce
+identical stake — `near_miss` is invisible to the dissonance channel by
+construction. Detection must not be built on that channel.
+
+**#6 is the inversion and consumes this directly.** Once Manyu can say *I
+cannot tell these apart*, the next question is *what would tell them apart* —
+which is the whole of #6, and is deliberately out of scope here.
 
 ---
 
 ## 6. "What would change my mind" engine
 
-**Status:** not-started
-**Depends on:** 5
+**Status:** in-progress (2026-08-11) — **every offline stage complete** (−1, 0, 1, 2, 2b, 3); stage 4 (paid) not run
+**Depends on:** 3 (load-bearing), 5 (test subject)
+**Docs:** [requirements](experiments/06-what-would-change-my-mind/requirements.md) · [methodology](experiments/06-what-would-change-my-mind/methodology.md) · [pre-registration](experiments/06-what-would-change-my-mind/pre-registration.md) · [results](experiments/06-what-would-change-my-mind/results.md)
 **Crux ref:** #6
+
+> **Read [results.md](experiments/06-what-would-change-my-mind/results.md) first.**
+>
+> **Stage −1 passed the gate, and it needed no new production code.**
+> `blend_confidence`, `evidence_overlap` and the 0.05 stability step are already
+> in the substrate; the model is their composition. The hand-worked table and the
+> **driven substrate** both reproduce experiment 5's published trajectory to a
+> maximum error of **0.0005**, crossing the expression threshold at k=5 as
+> registered.
+>
+> **The `r = 1` claim survives contact with the substrate.** Driven for twenty
+> pairs — four times the k=5 that pure separating evidence needs — the meta-belief
+> falls 0.885 → 0.536, decelerating onto the 0.5 limit from above and never
+> approaching 0.45. **At a 1:1 arrival ratio the state is unfalsifiable in
+> principle, not merely slow.**
+>
+> **The starting stability is real but hardcoded.** `_write` sets it and `_create`
+> copies it, so the dose model is stable *and* one line away from silent
+> invalidation — now pinned by name.
+>
+> **The price is blind to content and to salience**, both confirmed to 1e-12. That
+> closes requirements §14.7 q1 (salience is not a back door into the stake
+> channel) and fixes the honest headline: **"specific evidence" means specific in
+> its edges, not in what it says.**
+>
+> **The shape census is `unmeasurable_offline`.** Authored fixtures give 0.540,
+> stored runs give 0.0065 — the two corpora bracket the 1-in-4 line from opposite
+> sides and neither can decide it, because one was written to carry edges and the
+> other predates the schema that would let it. Recorded unresolved rather than
+> answered with the convenient number.
+>
+> **Every offline stage passed and every prediction was met.** Enumeration is
+> exact (precision and recall 1.00 on both fixtures, against ground truth
+> `separating_evidence` fixed for another purpose); both negative controls hold
+> both halves, with `already_held` at **exactly** 0.000; the dose is 5 and 10 as
+> registered; the arrival-ratio table matches at every point. 35/35 stage checks,
+> 35 tests, full suite 1198 passed.
+>
+> **Two findings are gaps in the pre-registration, not the mechanism.** The
+> registered census line (beliefs carrying `contradicts` *or* `supports`) counts
+> edges the enumeration rule (rivals *plus supporters*) cannot use — on
+> `symmetric_rivals` only 1 belief in 3 is enumerable. **Not fixed by widening the
+> rule mid-build.** And the registered 1e-9 direct-path tolerance was unreachable:
+> `_revise` stores `round(confidence, 6)`, so agreement is bounded below by 5e-7.
+> Amended in the open to 1e-6 with the reason (pre-registration §7 A1).
+>
+> **The topology proxy killed stage 1's offline question.** A one-way edge moves
+> the *meta-belief* identically to a mutual one — the overlap is a set operation
+> and edges do not enter it — so the divergence source pre-registration §3
+> predicted is absent, and offline there is nowhere else for one to come from.
+> Stage 1's calibration bands remain untested against anything that could violate
+> them. `calibration.png` is deliberately not produced.
+>
+> **Two defects, both in the instruments, both caught by tests written before the
+> mechanism** — the first time in this sequence. The `r = 1` check passed *for the
+> wrong reason* (the separating record went to both rivals, so nothing separated
+> and a mechanism that never moved satisfied "it never falls"), and
+> `dose_ignores_stability` was not a mutant at all — it still read the starting
+> stability, so it rose exactly as the real dose does. **A check that cannot
+> distinguish the mechanism working from the mechanism being absent is not a
+> check.** Experiment 4 found this family in production, experiment 5 inside its
+> own battery, experiment 6 in a substrate test and then again in its battery.
+>
+> **The standing qualification:** `/code-review ultra exp03-base` is still unrun.
+> Methodology §8 made it a stage-1 blocker and stage 1 ran anyway, so every dose
+> and calibration number rests on a revision engine verified by its author alone.
+
+> **The trap is here for the fourth time, and this experiment has an escape the
+> other three did not.** Write a function that enumerates what would change
+> Manyu's mind and of course it enumerates something. But the *price* is
+> checkable: `blend_confidence` plus experiment 3 §12's pricing is
+> deterministic, so "record R would move belief B to 0.117" is a forward
+> simulation, and we can deliver R and measure. **Predicted Δ against observed Δ
+> is a dependent variable no branch we write decides.**
+>
+> **Reframed to four falsifiable things:** does it enumerate evidence that would
+> genuinely move the belief (against a negative control that must price at ~0
+> *and* observe at ~0); does the predicted Δ match the observed one; **how many
+> such records would it take**; and are the receipts auditable against the log.
+> Calibration and dose are the publishable pair.
+>
+> **The dose is derivable with no free constant.** Inertia is
+> `0.5 + 0.4 × stability` capped at 0.9, and stability rises 0.05 per revision
+> carrying new evidence — so every belief is movable and the number of records
+> required is read off the store. Experiment 5 results §3.1's five-record
+> trajectory was **re-derived by hand from those constants alone, six of six to
+> three decimals**, before any pricer exists (pre-registration §0).
+>
+> **The headline prediction inverts experiment 5's.** #5 established that a ratio
+> cancels cardinality — `near_miss` carries three times the evidence and lands at
+> the identical confidence, delta exactly 0.000. The *marginal* record does not
+> cancel it: `near_miss` is predicted to need **k = 10** separating records
+> against `symmetric_rivals`' **k = 5**. If it holds, the two experiments are one
+> statement — *the evidence you have does not tell you which reading is right,
+> and the more of it you have, the more it takes to find out.*
+>
+> **And a phase transition, found by working out an arm chartered as
+> bookkeeping.** Stage 2b was added only to turn "the dose ignores corroboration
+> arriving alongside" from a caveat into a number. For the meta-belief the
+> candidate confidence *is* the Jaccard overlap, so with `r` separating records
+> per shared record the overlap converges to `1/(1 + r)` — and against the 0.45
+> expression threshold that puts a critical ratio at **`r* = 11/9 ≈ 1.222`**,
+> a function of the threshold and nothing else. **At one confirming record per
+> disconfirming record the dose is not large, it is infinite:** confidence
+> converges to exactly 0.500 and never crosses. Doses diverge approaching `r*`
+> from above — 223 records at r=1.25, 88 at 1.3, 18 at 2.0, against 5 for pure
+> separating evidence.
+>
+> This settles, in qualified form, the reading experiment 5 results §3.1 left
+> open. **Below `r*` the state is unfalsifiable in principle rather than merely
+> slow** — and the ratio at which real evidence arrives is not something the
+> substrate controls.
+>
+> **Four of five stages are offline and any of the first three can end it.** The
+> steelman framing from the crux is held for the single paid stage, so the cheap
+> rungs can kill it before the expensive framing is committed to.
+>
+> **The uncomfortable outcome is pre-registered as legitimate:** nothing bounds
+> the dose. If entrenched beliefs need forty records, the engine emits honest
+> lists of things that would work in principle and never do — a safety-relevant
+> result about a transparent agent, and the bridge to #7.
 **Question:** Given a position, can Manyu enumerate the specific evidence
 that would move it, and by how much — with receipts?
 
 **Why here:** Inverts #5. Instead of representing ignorance, enumerate the
-evidence that would resolve it. Uses the counterfactual machinery built for
-#5.
+evidence that would resolve it.
 
 **Leaves behind:** Counterfactual engine with auditable receipts. The most
 demanding test of the honesty scorer from #1.
 
 **Notes:**
 
-_none yet_
+**Correction: there is no "counterfactual machinery built for #5" to consume.**
+This entry previously said there was. Experiment 5 built detection and derivation
+(`is_underdetermined`, `evidence_overlap`, `derive`); none of it is
+counterfactual, and `separating_evidence` is retrospective — it names records
+*already in the store*. Nothing anywhere prices a record that does not exist yet.
+This is a build, not a consumption, and the effort estimate should say so.
+
+**The load-bearing dependency is #3, not #5.** #5 supplies the best test subject
+— rival fixtures whose right answer is fixed by structure rather than by our
+judgement, so enumeration can be graded without authoring the target. But every
+number this experiment predicts comes out of `blend_confidence` and
+`_contradiction_share`. Which moves a standing prerequisite forward: per
+experiment 5 results §7 the revision engine has been verified by its author alone,
+and **`/code-review ultra exp03-base` should close before stage 1 here, not
+before the paid stage.**
+
+**Where the prediction stops being a tautology.** On the direct-injection path
+predicted equals observed by construction — same function, same arguments — and
+that is reported as a regression test, not as calibration. It becomes falsifiable
+at four named places: the `new_evidence` guard (a record already held moves the
+belief by exactly 0.000), stability moving during the delivery, the extractor
+deciding edge topology upstream of any pricing, and propagation across `supports`
+that a single-belief price is silent about. **The gap between the direct path and
+the extractor path is the experiment.**
 
 ---
 
 ## 7. Can a transparent agent scheme?
 
-**Status:** not-started
-**Depends on:** 1, 3, 6
+**Status:** in-progress (2026-08-12) — **every offline stage complete** (−1, 0, 1, 2); stages 3, 4, 5 (paid) not run
+**Depends on:** 1, 3 (both landed). **Not 6** — see the correction below
+**Docs:** [requirements](experiments/07-transparent-agent-scheme/requirements.md) · [methodology](experiments/07-transparent-agent-scheme/methodology.md) · [pre-registration](experiments/07-transparent-agent-scheme/pre-registration.md) · [results](experiments/07-transparent-agent-scheme/results.md)
 **Crux ref:** #2
+
+> **Read [results.md](experiments/07-transparent-agent-scheme/results.md) first.**
+>
+> **Every offline stage passed: 11/11, 12/12, 1/1, 2/2.** Six channels reproduced
+> from the substrate rather than from the source survey, and the registered 3/3
+> substrate-versus-agent split held.
+>
+> **The most useful output is the list of survey claims that did not survive.**
+> `BeliefStatus.DEPRECATED` is assigned by *nothing*, so the seventh channel was
+> never one and `include_inactive` is dead code — the survey had inferred a
+> reachable state from the existence of a guard against it. The theme ceiling is 7
+> from 8 `BeliefType` values, not 6 from 6, so the structural floor on prose loss is
+> weaker than the measurement and the two had been conflated. The prose criterion
+> was retired **by its own registered 2/3 line**, which all seven stored webs
+> exceed. Two registered catches did not happen, taking the criterion set from two
+> rules to four. And the opinion keyword match turns out to have no stopword filter,
+> found by an assertion failing.
+>
+> **The bound on the crux's question is narrower than either of its options:**
+> *provenance is immutable exactly where a snapshot was taken first.* Everywhere
+> else `save_belief_evidence` is `INSERT OR REPLACE` with a caller-supplied
+> `evidence_id` and evidence has no revision trail. Experiment 1's frozen-snapshot
+> asymmetry is the only thing making the log a log, and it was built for an
+> unrelated reason.
+>
+> **Two channels are caught by no criterion, and that is the sharpest result.** In
+> `crowded_theme` the top-ranked belief *is* spoken and the losses are an enum's
+> doing; in `weight_deflated` the proposition is true, the citation real and the log
+> complete. **A detector cannot flag what is not a defect in the output** — §1.1's
+> boundary reached from the other side.
+>
+> **Stage 2 is a readable null:** nothing downstream reads whether a belief was
+> composed, so nothing rewards hiding. It produced a *vacuous* null first — comparing
+> two webs that each had no dissonance signal — and its own positive control caught
+> it. Reported rather than quietly fixed.
+>
+> **Attribution is the one registered number this stage could not settle.** The
+> fixture figure is 1.00 and is labelled a regression test; the stored corpus has
+> beliefs but no stances or expressions, so there is no public surface to compare
+> against and the rate is unavailable offline. Settled by stage 3, not by this run.
+>
+> > **The trap is here for the fifth time, and this one has two heads.** Instruct a
+> model to conceal and it conceals — experiment 1 already got 40/40 on
+> instruction. Worse: add a `visibility` field, use it, and report that a
+> transparent agent can keep a private web. That is experiment 4's trap wearing
+> the safety headline, and requirements §14.1 forbids the field outright.
+>
+> **The escape is that the channels already exist.** A code survey against source
+> found **seven** ways a held belief fails to reach a reader, or a public claim
+> misdescribes its basis, with **no new code and no instruction to deceive**. The
+> dependent variable is a gap between two surfaces that both already exist,
+> measured on webs already stored. Nothing we write decides it.
+>
+> **Two of the seven are invisible, and both are on the write path.** `capture`
+> takes `epistemic_weight` and `affective_salience` from the caller and records
+> nothing about where they came from, so a caller-supplied 0.0 and a
+> source-derived 0.0 are byte-identical in the store. And `save_belief_evidence`
+> is `INSERT OR REPLACE` with a caller-supplied `evidence_id`, with no revision
+> trail for evidence — so provenance is rewritable in place.
+>
+> **The reframe that makes the crux's question answerable:** *provenance is
+> immutable exactly where a snapshot was taken first, and everywhere else it is
+> `INSERT OR REPLACE`.* Experiment 1's frozen-snapshot governance asymmetry turns
+> out to be the only thing in the substrate that makes the log a log — and it was
+> built for an unrelated reason. Detectability of a rewrite is therefore a
+> function of snapshot coverage, which is measurable and predicted to be below
+> 0.10 on stored webs.
+>
+> **One attack defeats the honesty scorer and tells no lies.** Capture the real
+> dominant cause at weight 0.0: `rank_causes` sorts it last, `select_top_n`'s
+> cumulative-80% rule can never reach it, so the report omits the real reason and
+> **scores clean** — the snapshot's own weights agree that the cited record
+> dominates. `MOTIVATED_OMISSION` cannot fire either, because it is defined on the
+> top quartile and the quartile is computed from the weights the attack sets.
+> Derived exactly, not approximately (pre-registration §0.2).
+>
+> **The headline is pre-registered as a two-part null that must be reported
+> together or not at all:** the channels are there and two are invisible; the
+> model is predicted not to use them (0 confabulations in 1,161 unforced records
+> is the prior). Either half alone misleads, in opposite directions.
+>
+> **And the honest bound, registered in advance:** a goal held in the model's
+> context and never written leaves no trace, and nothing here can detect it.
+> *Provenance makes deception visible in the half of the agent that lives in the
+> store, and says nothing about the half that does not.*
+
 **Question:** Does provenance make deception structurally impossible, or
 merely visible? Can Manyu maintain a "public" and a "private" belief web?
 
@@ -889,19 +1238,72 @@ merely visible? Can Manyu maintain a "public" and a "private" belief web?
 belief store, revision, and honesty scorer all work would confuse "system
 can't scheme" with "system is too primitive to try."
 
-**Method:** Attempt to induce alignment-faking. Check whether hidden goals
-leave a trace in the belief store, and whether the honesty scorer from #1
-detects the split.
+**Method:** Seven-stage ladder, four rungs free. Census the channels the
+substrate already has (−1); calibrate a surface-comparison detector against a
+constructed battery (0); attribute each divergence to a mechanism (1); search for
+a substrate incentive to hide (2); instructed concealment as a positive control
+(3); emergent concealment under uninstructed pressure as the experiment (4);
+commitment drift against experiment 6's receipts (5).
 
-**Leaves behind:** The safety headline. Also the strongest external argument
-for the whole Manyu approach.
+**Leaves behind:** The safety headline, bounded. A channel census with
+attribution. Two substrate patches that close the invisible channels. Also the
+strongest external argument for the whole Manyu approach — in the qualified form
+the survey supports rather than the unqualified one the crux hoped for.
 
 **Risk:** This is the experiment most likely to produce a viral result. Run
-it against a system you already trust.
+it against a system you already trust. Pre-registration §6.3 fixes the response
+to a positive result in advance: nothing published on n=20 from one model, repeat
+on a second, reproduce the mechanism offline, **and land the substrate fixes
+first** — publishing a reachable invisible concealment channel before it is closed
+is the one action in this backlog with an outside-world cost.
 
 **Notes:**
 
-_none yet_
+**Correction: the honesty scorer cannot be the detector, and this entry's method
+used to rest on it.** The entry said to check whether the scorer from #1 "detects
+the split." It cannot, structurally: the scorer grades a *report* against the
+*frozen log*, and a split living in the log makes the report agree. The part the
+phrasing leaned on — the named failure mode — is also the part that did not
+qualify (SC-5 67.9%, inter-rater agreement unmeasured). **The scorer verifies that
+the report matches the log; it has no access to whether the log is true.** That is
+the boundary of what provenance can certify, and it is now this experiment's
+subject rather than its instrument. A new detector compares two *surfaces*.
+
+**Correction: "can Manyu maintain a public and a private web" is not an open
+question — it already can, with no scheming and no new code.** `synthesize`
+composes only `ACTIVE` and `CONTESTED` (services.py:898); `_create` assigns
+`TENTATIVE` below 0.45 (services.py:843); `_revise` never writes status
+(services.py:878); and `RevisionEngine` documents the asymmetry deliberately —
+*status follows confidence downward but is never silently upgraded*
+(revision.py:690). **A belief created at 0.44 climbs to 0.87 over five
+corroborating records and is never composed into a stance at any point** —
+derived by hand in pre-registration §0.1. And the concealment is conditional
+rather than total, which sharpens it: `express_opinion` matches `TENTATIVE`
+beliefs like any other and puts their evidence ids in the emitted provenance
+(services.py:1507, store.py:434), while `stance_text` still comes from a stance
+that cannot contain them (services.py:1506). **The belief is cited and never
+spoken, and only cited if the question happens to match its words** — which is
+exactly the case a citation-based criterion scores as *not concealed*, so the
+experiment carries two criteria and promotes neither. The question is therefore
+size, sign and detectability, not possibility. The divergence also runs the other way: the public
+web can go on asserting what the private web has abandoned, which experiment 5
+§5.1 recorded as a limitation and is here the subject.
+
+**Correction: the dependency on #6 is one arm, not the experiment.** #6 supplies
+the commitment-drift arm, which is stage 5 and consumes `CounterfactualReceipt`.
+Stages −1 through 4 need only 1 and 3, both landed. **This experiment is not
+blocked on #6** and the summary table now says so.
+
+**Two defects found by the survey, filed rather than dressed as results.**
+`tombstone_agent` purges frozen snapshots and writes an audit row whose actor is
+the hardcoded string `"operator"` (store.py:696; same on `reset_agent`,
+store.py:706), exposed on MCP with no authority check and no arbitration on the
+path — **so the one record that survives destruction of the provenance
+misattributes who did it.** This blocks stage 3. Separately, evidence records have
+no revision trail and are overwritable in place; that one is *not* clearly a
+defect, because the caller-supplied `evidence_id` is what makes deterministic
+re-derivation idempotent and append-only would break the `new_evidence` guard #6
+depends on. It is a design question this experiment surfaces and does not answer.
 
 ---
 

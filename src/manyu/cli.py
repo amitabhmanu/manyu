@@ -226,6 +226,36 @@ def cmd_dissonance(args: argparse.Namespace) -> int:
     return _print_status(_core(args).read_dissonance(args.agent_id))
 
 
+def cmd_derive_underdetermination(args: argparse.Namespace) -> int:
+    return _print_status(
+        _core(args).derive_underdetermination(
+            {"agent_id": args.agent_id, "mode": args.mode, "tolerance": args.tolerance}
+        )
+    )
+
+
+def cmd_underdetermination(args: argparse.Namespace) -> int:
+    return _print_status(_core(args).read_underdetermination(args.agent_id))
+
+
+def cmd_price_counterfactuals(args: argparse.Namespace) -> int:
+    return _print_status(
+        _core(args).price_counterfactuals(
+            {
+                "agent_id": args.agent_id,
+                "belief_id": args.belief_id,
+                "threshold": args.threshold,
+                "bound": args.bound,
+                "persist": args.persist,
+            }
+        )
+    )
+
+
+def cmd_counterfactuals(args: argparse.Namespace) -> int:
+    return _print_status(_core(args).read_counterfactuals(args.agent_id, args.belief_id))
+
+
 def cmd_run_attention_loop(args: argparse.Namespace) -> int:
     return _print_status(
         _core(args).run_attention_loop(
@@ -497,6 +527,34 @@ def build_parser() -> argparse.ArgumentParser:
     dissonance = sub.add_parser("dissonance", help="Read the belief web's current tension and record it")
     dissonance.add_argument("--agent-id", default=None)
     dissonance.set_defaults(func=cmd_dissonance)
+    # `--mode` *is* defaulted, and the asymmetry with `--arm` is deliberate.
+    # There, both arms were live candidates and the experiment was choosing
+    # between them. Here `strict` is the mechanism and `graded` is an ablation
+    # kept only to show the result does not rest on a tolerance parameter —
+    # experiment 3 §§11-12 removed two constants rather than tuning them, and
+    # offering the tuned form as an equal option would undo that.
+    derive_ud = sub.add_parser("derive-underdetermination", help="Derive a belief for every standoff no evidence separates")
+    derive_ud.add_argument("--agent-id", default="agent_demo")
+    derive_ud.add_argument("--mode", choices=["strict", "graded"], default="strict")
+    derive_ud.add_argument("--tolerance", type=float, default=0.2, help="Ablation only; ignored unless --mode graded")
+    derive_ud.set_defaults(func=cmd_derive_underdetermination)
+    read_ud = sub.add_parser("underdetermination", help="Read the standoffs currently held")
+    read_ud.add_argument("--agent-id", default=None)
+    read_ud.set_defaults(func=cmd_underdetermination)
+    # `--persist` is off by default because pricing must not mutate (experiment 6
+    # FR-1). Only the analytic pricer is offered; replay is an instrument for
+    # grading it and deliberately has no surface (requirements §14.1).
+    price_cf = sub.add_parser("price-counterfactuals", help="Price what would change Manyu's mind, with doses and what was declined")
+    price_cf.add_argument("--agent-id", default="agent_demo")
+    price_cf.add_argument("--belief-id", default=None, help="Narrow to one belief; omitted, every belief gets a receipt")
+    price_cf.add_argument("--threshold", type=float, default=0.45, help="Confidence below which a belief counts as changed")
+    price_cf.add_argument("--bound", type=int, default=400, help="Dose search bound; beyond it the dose is reported as null, never as a number")
+    price_cf.add_argument("--persist", action="store_true", help="Store a receipt per belief so it can be audited later")
+    price_cf.set_defaults(func=cmd_price_counterfactuals)
+    read_cf = sub.add_parser("counterfactuals", help="Read counterfactual receipts previously stored")
+    read_cf.add_argument("--agent-id", default=None)
+    read_cf.add_argument("--belief-id", default=None)
+    read_cf.set_defaults(func=cmd_counterfactuals)
     # `--arm` has no default here for the same reason `retract-belief` has none:
     # a silent one would settle which selection rule the experiment measures by
     # whichever branch a caller happened not to think about.

@@ -1,0 +1,73 @@
+{
+  "_note": "Experiment 5 freeze. Every fixture in \"files\" was authored BEFORE src/manyu/underdetermination.py existed - at freeze time there was no criterion, no seeder and no derivation, only the Stage -1 substrate tests. Experiment 3 section 5 named the absence of this as one of the things standing between it and \"done\"; experiment 4 wrote it and this reuses its verifier rather than duplicating one.",
+  "_enforcement": "Fixtures are enforced continuously by salience.verify_fixture_freeze(path, experiment=\"5\") - a fixture edit invalidates results. The pre-registration is hashed here for the same reason: choosing a threshold after seeing a distribution is experiment 1 failure mode #1, and this is what makes \"the numbers were fixed in advance\" checkable rather than remembered. Amending is allowed and is recorded in pre-registration section 8; amending silently is not.",
+  "frozen_at": "2026-08-11T14:53:35.478858+00:00",
+  "git_commit_at_freeze": "234004b7268ff3700d12c27bc5a61e82710789e3",
+  "_commit_note": "Files were untracked at freeze time; the hashes here are the authority, not the commit.",
+  "pre_registration": {
+    "path": "docs/experiments/05-underdetermination/pre-registration.md",
+    "sha256": "cb93fab905c47aaa4d6cf9f47b1dbafc4acdfdae0f904ccaef8e70a8d298440d",
+    "_note": "Written 2026-08-11, after Stage -1 and before any mechanism. Section 0 records a measurement rather than a prediction and says so."
+  },
+  "files": {
+    "evals/fixtures/exp05/conflict_disjoint_evidence.json": {
+      "sha256": "fa59886a62c3d9ac96af2f2063d45cd4977f8530a629dcae8440337fceabff63",
+      "role": "negative_must_not_derive"
+    },
+    "evals/fixtures/exp05/discriminating.json": {
+      "sha256": "089cd69f1bb8dcd018a53c9f04dc1fe1952c9f5679a630319d3f2ec972bb6cb4",
+      "role": "negative_must_collapse"
+    },
+    "evals/fixtures/exp05/near_miss.json": {
+      "sha256": "a121a417ddfad770b666f2657c146f3c03ba0944c9dc268db323661687d87176",
+      "role": "negative_must_hold"
+    },
+    "evals/fixtures/exp05/shared_evidence_no_conflict.json": {
+      "sha256": "c4aca522c8593728a1f16afe126024c1a9777b686771336f726389e45b796044",
+      "role": "negative_must_not_derive"
+    },
+    "evals/fixtures/exp05/symmetric_rivals.json": {
+      "sha256": "d19aa426a52a845b4cef5473efe22db4a45088dc1c3f2ee9f0c1fb80527ea64b",
+      "role": "positive"
+    },
+    "evals/fixtures/exp05/symmetric_rivals_oneway.json": {
+      "sha256": "3174343bc009319098405ab5f83ff44c552183e7053021b7a9beabd8157aea96",
+      "role": "topology_control"
+    },
+    "evals/fixtures/exp05/three_way.json": {
+      "sha256": "ef51fe4c3eb556f3b71c5d45cb9a81ed6f4c368e85979d30bd374b9c241f76ab",
+      "role": "generalisation_probe"
+    }
+  },
+  "standards": {
+    "tests/test_underdetermination_substrate.py": {
+      "sha256": "033006ee664ffc12fce532bf13bda0cda6846c4c9ca54808d3499b784d506d70",
+      "role": "criterion test"
+    },
+    "tests/test_underdetermination_reference.py": {
+      "sha256": "d0623196cd13eba738366545f131b889fcee4ddb02e7c09cbe4a0390d6a76673",
+      "role": "criterion test"
+    },
+    "tests/test_underdetermination_mutants.py": {
+      "sha256": "e986e7212ac182d54f5ea84506fc9d49cfaf29d383b5a11cd50a37557005a3a1",
+      "role": "criterion test"
+    },
+    "tests/test_underdetermination_properties.py": {
+      "sha256": "148ee5497fe05401dc9274dc01a16d2373c9c0b3f8ca0cd4b2f4dcdb26cdc1b0",
+      "role": "criterion test"
+    },
+    "tests/test_underdetermination_surface.py": {
+      "sha256": "3b2b85b0ade829b238f6943f4a3e1d33d2de71fc33e0709990771e9e4c98ed78",
+      "role": "criterion test"
+    },
+    "tests/_reference_underdetermination.py": {
+      "sha256": "12ac54eab10b0a39f0b9698330c6bb5acf172176bd69b66f98e0af44b91e5d6f",
+      "role": "criterion test"
+    }
+  },
+  "_standards_note": "Populated when the criterion tests are written. Enforced by the runner before a scored run, deliberately not by the test suite - adding a check strengthens the standard and must stay cheap; weakening one after a result is visible is the actual risk.",
+  "mechanisms": {
+    "underdetermination_sha256": "677f016c9574146abebb71cbe77ce2dfef231935a89cd499b9f339c2cd76da99",
+    "_mechanism_note": "Recorded at the end of the offline stages. Stage 5 is a scored run against a live provider, so this is the value a Stage 5 pre-flight must re-check: a criterion edit between here and there invalidates the offline results the live stage is compared against."
+  }
+}

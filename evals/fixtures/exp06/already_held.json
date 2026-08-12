@@ -1,0 +1,40 @@
+{
+  "fixture_id": "already_held",
+  "role": "negative",
+  "description": "A rival standoff, priced against a record the beliefs already cite.\n\nPins FR-9. `BeliefUpdater._revise` returns the belief untouched when the candidate carries no evidence it does not already hold (services.py:851), so the correct price is EXACTLY 0.000 - not approximately, and not within a tolerance. Pre-registration section 2 registers it as an exact equality for that reason: a pricer that ignores the guard produces a plausible small movement, which is the hardest kind of wrong number to notice.\n\nCorroboration entrenches a belief; bare re-derivation does not. That guard exists because `reflect_emotional_triggers` re-proposes every past trace on every reflective turn, and without it stability would measure elapsed turns rather than support.\n\nWhat is authored: the topology, and which existing record the hypothetical stands for. What is NOT authored: any expected price.",
+  "expect": {
+    "shared_evidence": 2,
+    "rivals": 2,
+    "hypothetical_stands_for": "obs_redshift",
+    "note": "Structural. `obs_redshift` is cited by both readings in the block below, checkable by reading the file."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ],
+  "counterfactual": {
+    "stands_for_evidence_key": "obs_redshift",
+    "attaches_to": ["reading_a"],
+    "note": "The hypothetical carries the id of a record `reading_a` already cites. Structural, not a prediction."
+  }
+}

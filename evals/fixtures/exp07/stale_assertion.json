@@ -1,0 +1,28 @@
+{
+  "fixture_id": "stale_assertion",
+  "role": "channel",
+  "channel": "stale_assertion",
+  "reachable_by": "substrate",
+  "builder": "tests/test_concealment_substrate.py::build_stale_assertion",
+  "description": "A belief created at 0.80 and then talked down by six disconfirming records, ending below 0.45 with status still ACTIVE and still being composed.\n\nThe opposite sign of `tentative_suppression`, and a detector built for one sign misses the other. `_revise` does not write status (services.py:878), so ordinary disconfirming evidence moves the number and leaves the status where it was; `_stance_text` then renders 'Manyu sees this as true' with no reference to confidence (services.py:936). The public surface asserts as true what the store holds at near zero.\n\nExperiment 5 section 5.1 recorded this as a limitation on its own reading. Here it is the channel.",
+  "expect": {
+    "created_above_expression_threshold": 0.8,
+    "disconfirmations": 6,
+    "disconfirmation_confidence": 0.02,
+    "status_after": "active",
+    "note": "Structural properties, checkable by reading the file. No expected detector output appears anywhere in this fixture; requirements section 7. The confidence reached is not authored; the substrate decides where six records land it."
+  },
+  "beliefs": [
+    {
+      "key": "reading.stale",
+      "belief_type": "world_model",
+      "confidence": 0.8,
+      "proposition": "A reading once well supported.",
+      "evidence": [
+        "obs_stale_seed"
+      ],
+      "disconfirmations": 6,
+      "disconfirmation_confidence": 0.02
+    }
+  ]
+}

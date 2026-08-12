@@ -1,0 +1,41 @@
+{
+  "fixture_id": "near_miss",
+  "role": "negative_must_hold",
+  "description": "**The load-bearing fixture.** Six observations instead of two, all of them shared, none of them separating.\n\nA criterion that quietly tracks evidence *volume* rather than whether evidence separates passes `symmetric_rivals` and passes `discriminating` and fails only here. There is no other fixture in the set that could tell, which is why this one decides whether the result means anything.\n\nDirect descendant of experiment 2's `near_miss` (same topic, near-identical wording, no edges, so zero movement) and experiment 4's `distractor_web`. Both existed because a mechanism that looks right on a two-node web is not yet known to be reading the graph.\n\nAlso a guard against a second confound: `stake_of` averages evidence salience rather than summing it, so one record and six produce identical stake. The dissonance channel is therefore blind to the difference between this fixture and `symmetric_rivals` by construction - which is exactly why the criterion must not be built on that channel. Requirements section 12.",
+  "expect": {
+    "shared_evidence": 6,
+    "unique_to_reading_a": 0,
+    "unique_to_reading_b": 0,
+    "mutual": true,
+    "evidence_ratio_against_symmetric_rivals": 3,
+    "note": "Structural. Three times the evidence of `symmetric_rivals` with the same separation structure - which is to say, none. Pre-registration section 3 predicts the meta-belief lands within 0.05 of its `symmetric_rivals` value, and states in advance why the criterion cannot see the difference."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_magnitude_scatter", "summary": "The scatter in supernova magnitudes is consistent across the sample.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_calibration", "summary": "The distance ladder calibration has been checked against two independent anchors.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_survey_depth", "summary": "The survey reaches the same depth in each observed field.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_dust", "summary": "Extinction by intervening dust has been bounded and is too small to account for the effect.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy", "obs_magnitude_scatter", "obs_calibration", "obs_survey_depth", "obs_dust"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy", "obs_magnitude_scatter", "obs_calibration", "obs_survey_depth", "obs_dust"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ]
+}

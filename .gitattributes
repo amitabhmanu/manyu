@@ -1,0 +1,20 @@
+# Line endings.
+#
+# Several files in this repo are under a content freeze: `evals/analysis/*/freeze.json`
+# records a SHA-256 per file and `verify_fixture_freeze` / `verify_standards_freeze`
+# refuse to run if any of them changed. Those hashes were taken over LF bytes.
+#
+# On Windows, `core.autocrlf=true` rewrites text files to CRLF on checkout. The
+# committed bytes are unchanged and `git status` stays clean, but the working-tree
+# bytes no longer hash to the frozen value, so every frozen file reports as drifted
+# at once. Pinning these types to LF keeps the checked-out bytes equal to the
+# committed bytes on every platform.
+#
+# The frozen material is JSON (fixtures), Python (criterion tests) and Markdown
+# (methodology), so all three are pinned. The index is already LF throughout, so
+# this changes what checkout writes and nothing else.
+
+*.json  text eol=lf
+*.jsonl text eol=lf
+*.py    text eol=lf
+*.md    text eol=lf

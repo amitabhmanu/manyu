@@ -1,0 +1,38 @@
+{
+  "fixture_id": "mismatched_receipts",
+  "role": "channel",
+  "channel": "receipt_mismatch",
+  "reachable_by": "substrate",
+  "builder": "tests/test_concealment_substrate.py::build_mismatched_receipts",
+  "description": "Two beliefs in two themes. A question matching only the second, so `express` draws its prose from `stances[0]` (services.py:1506) and its provenance from the keyword-matched belief (services.py:1507). Nothing requires them to correspond.\n\nBoth halves are well-formed on their own, which IS the channel: an auditor checking that provenance is non-empty passes this store. The `trusts_non_empty_provenance` mutant is the auditor making exactly that error.\n\nTwo channels fire on this web, not one. The unrelated belief is also flagged, by the citation rule, because the question never matched it and its evidence reached no surface at all - discovered by an assertion in the mutant battery failing, not designed in.",
+  "expect": {
+    "beliefs": 2,
+    "themes": 2,
+    "question_matches_exactly_one_belief": true,
+    "note": "Structural properties, checkable by reading the file. No expected detector output appears anywhere in this fixture; requirements section 7."
+  },
+  "beliefs": [
+    {
+      "key": "receipts.other",
+      "belief_type": "interaction_pattern",
+      "confidence": 0.9,
+      "proposition": "Pair programming sessions run longer than planned.",
+      "evidence": [
+        "obs_receipt_other"
+      ]
+    },
+    {
+      "key": "receipts.matched",
+      "belief_type": "world_model",
+      "confidence": 0.5,
+      "proposition": "Telescopes require calibration.",
+      "evidence": [
+        "obs_receipt_matched"
+      ]
+    }
+  ],
+  "probe": {
+    "question": "telescopes?",
+    "note": "Deliberately one bare word. `_matching_beliefs` keeps every question word of four characters or more with no stopword list, so a question like 'What about telescopes?' pulls in unrelated beliefs on the word 'about' - see test_opinion_keyword_match_has_no_stopword_filter."
+  }
+}

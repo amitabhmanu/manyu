@@ -99,6 +99,13 @@ class BeliefType(str, Enum):
     EPISTEMIC_PRINCIPLE = "epistemic_principle"
     AESTHETIC_PREFERENCE = "aesthetic_preference"
     UNCERTAINTY = "uncertainty"
+    #: Experiment 5. Distinct from `UNCERTAINTY`, which is generic hedging —
+    #: *one of these is probably right and I am not sure which yet*. This is the
+    #: stronger claim that **no evidence currently held could separate** the
+    #: rivals named in `Belief.rivals`. Overloading `UNCERTAINTY` was considered
+    #: and refused: it would make the two indistinguishable in every downstream
+    #: query, and telling them apart is what experiment 5 measures.
+    UNDERDETERMINATION = "underdetermination"
 
 
 class BeliefScope(str, Enum):
@@ -463,6 +470,19 @@ class Belief(ManyuModel):
     contradicts: list[str] = Field(default_factory=list)
     #: See `BeliefCandidate.supports`.
     supports: list[str] = Field(default_factory=list)
+    #: Experiment 5. The beliefs this one declares observationally
+    #: indistinguishable given the evidence it cites. Non-empty only on a
+    #: `BeliefType.UNDERDETERMINATION` belief.
+    #:
+    #: **Deliberately absent from `BeliefCandidate` and from the extractor
+    #: schema**, and that asymmetry is the mechanism rather than an oversight.
+    #: Requirements §7 forbids a fixture or an extractor declaring that two
+    #: beliefs are underdetermined, because a declared rival set makes detection
+    #: a read-back of the fixture. With no field to declare it in, the rule is
+    #: structural instead of a matter of discipline — the only way this list gets
+    #: populated is `underdetermination.derive`, reading the evidence off the
+    #: store.
+    rivals: list[str] = Field(default_factory=list)
     status: BeliefStatus = BeliefStatus.ACTIVE
     uncertainty: str = ""
     created_at: datetime = Field(default_factory=now_utc)
@@ -858,6 +878,64 @@ class LoopTrace(ManyuModel):
     #: separately-seeded stores when this is set, because the tie-break runs on
     #: `uuid4` belief ids.
     had_arbitrary_choice: bool = False
+    created_at: datetime = Field(default_factory=now_utc)
+
+
+class CounterfactualItem(ManyuModel):
+    """One priced mind-changer — experiment 6, FR-4.
+
+    `attaches_to` is the machine-readable half: the belief ids the hypothetical
+    record would enter. For a rival standoff, a record entering *one* rival
+    separates the pair and moves the meta-belief; a record entering both does
+    not, whatever it says. That distinction is the whole of the enumeration and
+    it is expressed here as ids rather than prose.
+    """
+
+    hypothetical_id: str
+    summary: str
+    #: Belief ids the record would become evidence for.
+    attaches_to: list[str] = Field(default_factory=list)
+    #: `supports`, `contradicts`, or `none`.
+    edge_intent: str = "none"
+    #: Confidence the belief would take. `delta` is signed: negative weakens.
+    predicted_confidence: float = Field(ge=0.0, le=1.0)
+    delta: float
+    #: Which arithmetic produced it — `blend`, `overlap`, or `guard_noop`.
+    mechanism: str
+    #: Records needed to cross the expression threshold, or None if unreachable
+    #: within the search bound. **None means "not within bound", never zero.**
+    dose: int | None = None
+    dose_bounded_at: int | None = None
+
+
+class CounterfactualReceipt(ManyuModel):
+    """What Manyu says would change its mind about one belief, with prices.
+
+    Stored rather than returned as a query result, so experiment 7 can audit what
+    was claimed last week against what is claimed now. Deliberately **not** a
+    belief: it has no confidence of its own, and making it one would import
+    experiment 5 section 5.3's rule (subject to every rule any belief obeys) only
+    to need an immediate exemption from `blend_confidence`, which that section
+    calls a defect report rather than a fix.
+    """
+
+    schema_version: str = "manyu.counterfactual.v0.1"
+    receipt_id: str
+    agent_id: str
+    #: The belief the receipt is about.
+    belief_id: str
+    belief_key: str | None = None
+    belief_type: str
+    confidence_before: float = Field(ge=0.0, le=1.0)
+    items: list[CounterfactualItem] = Field(default_factory=list)
+    #: Candidates the enumerator considered and rejected, with the reason.
+    #: FR-11: analysis must be able to tell "found nothing" from "found things
+    #: and priced them at zero".
+    declined: list[dict[str, Any]] = Field(default_factory=list)
+    #: Belief ids and evidence ids consulted — the receipt's own provenance,
+    #: which is what the honesty scorer reads at stage 3.
+    consulted: list[str] = Field(default_factory=list)
+    threshold: float = 0.45
     created_at: datetime = Field(default_factory=now_utc)
 
 

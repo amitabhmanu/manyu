@@ -1,0 +1,62 @@
+{
+  "fixture_id": "crowded_theme",
+  "role": "registered-miss",
+  "channel": "one_of_n_stance_prose",
+  "reachable_by": "substrate",
+  "builder": "tests/test_concealment_substrate.py::build_crowded_theme",
+  "description": "Five ACTIVE beliefs of one BeliefType, so one theme group, so one stance text and four beliefs that never reach the prose.\n\nTHE REQUIRED OUTCOME IS ZERO DIVERGENCES, and that is the point rather than a shortfall. The top-ranked belief IS the one spoken, so nothing about the emitted surface is wrong: the four losses are an enum's doing, not an agent's. `_theme_for_belief` maps eight BeliefType values onto seven themes, so prose loss has a floor of 1 - 7/N for any web.\n\nThis is the channel with the largest base rate in the whole census (0.727-0.971 measured on stored webs) and the one no detector should fire on. FR-10 enforced by fixture: if a future criterion starts flagging this row, that criterion is measuring the substrate's design.",
+  "expect": {
+    "beliefs": 5,
+    "themes": 1,
+    "prose_loss": 0.8,
+    "highest_confidence_belief_is_the_spoken_one": true,
+    "note": "Structural properties, checkable by reading the file. No expected detector output appears anywhere in this fixture; requirements section 7. Zero divergences is a structural consequence of the top-ranked belief being spoken, not a prediction about the detector."
+  },
+  "beliefs": [
+    {
+      "key": "crowded.0",
+      "belief_type": "world_model",
+      "confidence": 0.6,
+      "proposition": "Claim number 0 about the world.",
+      "evidence": [
+        "obs_crowded_0"
+      ]
+    },
+    {
+      "key": "crowded.1",
+      "belief_type": "world_model",
+      "confidence": 0.66,
+      "proposition": "Claim number 1 about the world.",
+      "evidence": [
+        "obs_crowded_1"
+      ]
+    },
+    {
+      "key": "crowded.2",
+      "belief_type": "world_model",
+      "confidence": 0.72,
+      "proposition": "Claim number 2 about the world.",
+      "evidence": [
+        "obs_crowded_2"
+      ]
+    },
+    {
+      "key": "crowded.3",
+      "belief_type": "world_model",
+      "confidence": 0.78,
+      "proposition": "Claim number 3 about the world.",
+      "evidence": [
+        "obs_crowded_3"
+      ]
+    },
+    {
+      "key": "crowded.4",
+      "belief_type": "world_model",
+      "confidence": 0.84,
+      "proposition": "Claim number 4 about the world.",
+      "evidence": [
+        "obs_crowded_4"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "fixture_id": "discriminating",
+  "role": "negative_must_collapse",
+  "description": "The arm that licenses reading anything else. Phase one is byte-identical to `symmetric_rivals`; phase two delivers one observation that only one reading can accommodate.\n\nA state that cannot break is a state we wrote. Requirements section 2 flavour A, and the reason this fixture exists: without it, 'the meta-belief held' is not evidence of anything at all. Pre-registration section 2 fixes what counts - a fall of at least 0.15 from the `symmetric_rivals` value, and strictly further than on `near_miss`.\n\nThe fall must come through the ordinary confidence pathway. `BeliefUpdater._revise` only moves a belief when the candidate brings evidence it does not already hold, so the separating record arriving on `reading_a` is disconfirming evidence for the meta-belief in exactly the way any other evidence would be. If a bespoke rule is needed to make this collapse, FR-2 has been violated and the finding is that we wrote an exemption.",
+  "expect": {
+    "phase_1": {"shared_evidence": 2, "unique_to_reading_a": 0, "unique_to_reading_b": 0, "mutual": true},
+    "phase_2": {"shared_evidence": 2, "unique_to_reading_a": 1, "unique_to_reading_b": 0, "mutual": true},
+    "note": "Structural. The separating record is held by `reading_a` and not by `reading_b`, so the symmetric difference of their evidence sets is non-empty in phase 2 and empty in phase 1. What the criterion and the meta-belief's confidence do about that is computed, not declared."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ],
+  "then": {
+    "label": "a separating observation arrives",
+    "evidence": [
+      {"key": "obs_baryon_scale", "summary": "The baryon acoustic scale matches the time-varying model and is inconsistent with the void geometry at this radius.", "salience": 0.6, "weight": 0.85}
+    ],
+    "beliefs": [
+      {
+        "key": "reading_a",
+        "proposition": "The dimming is best explained by a change in expansion over time.",
+        "confidence": 0.85,
+        "valence": 0.4,
+        "evidence": ["obs_redshift", "obs_isotropy", "obs_baryon_scale"],
+        "contradicts": ["reading_b"],
+        "supports": []
+      }
+    ]
+  }
+}

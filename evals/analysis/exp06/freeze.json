@@ -1,0 +1,48 @@
+{
+  "_note": "Experiment 6. Fixtures authored before src/manyu/counterfactual.py existed.",
+  "_enforcement": "verify_fixture_freeze(experiment=\"6\") on files; verify_standards_freeze on standards, called by a scored run and deliberately not by the test suite.",
+  "_exp05_note": "Experiment 5 fixtures are consumed READ-ONLY and are deliberately ABSENT from this freeze. Re-freezing them here would silently invalidate experiment 5 published results.",
+  "frozen_at": "2026-08-11",
+  "git_commit_at_freeze": "234004b7268ff3700d12c27bc5a61e82710789e3",
+  "pre_registration": {
+    "docs/experiments/06-what-would-change-my-mind/pre-registration.md": {
+      "sha256": "c1e9262906b1b84fb0abe29092c493d08adb47a248ed18b799ad9e745bc28ac5"
+    }
+  },
+  "files": {
+    "evals/fixtures/exp06/already_held.json": {
+      "sha256": "9e14b4868c777430c2bc3898c9909c2a276469254786dc6dc94f29ab4ff604c6",
+      "role": "negative_exact_zero_FR9"
+    },
+    "evals/fixtures/exp06/entrenched.json": {
+      "sha256": "e8063fe872517f77cf0f8acc36f83f6d1c612e61a64b91f5b855a155129fd36b",
+      "role": "positive_control_never_evidence"
+    },
+    "evals/fixtures/exp06/irrelevant_evidence.json": {
+      "sha256": "00d2ef0fe61ed82cf296b48f22ef67c9d30ff17dbfc07c1c05260ca55300fc2d",
+      "role": "negative_priced_and_observed_at_zero"
+    }
+  },
+  "standards": {
+    "tests/test_counterfactual_substrate.py": {
+      "sha256": "b805928d7f398c2546129c7450c4b2f440e3ea7df8a60b811565508ecc288a41"
+    },
+    "tests/test_counterfactual_mutants.py": {
+      "sha256": "6d69ca0f5d1ad426ac9f12988d8a293862ba7621f6276e597ab8c4ee6b2bae58"
+    },
+    "tests/test_exp06_rederivation.py": {
+      "sha256": "c55ebb6a25f974e4db9a9a728ab5b403aa7a691ccfa6d88efe2263156a73f723"
+    },
+    "tests/test_counterfactual_surface.py": {
+      "sha256": "46432af64303ca31d1a21464e2189169a1b12d3feab72045fd4be2278795a65b"
+    }
+  },
+  "mechanisms": {
+    "src/manyu/counterfactual.py": {
+      "sha256": "0c1a119793fc4c55b69488d429353e598d5c5717eaf870409dba8fd9705a93c3"
+    },
+    "src/manyu/counterfactual_mutants.py": {
+      "sha256": "3571b17f12e34e1cfb71847f448374be5f8aa88ee16e522189a7c93da9a3a341"
+    }
+  }
+}

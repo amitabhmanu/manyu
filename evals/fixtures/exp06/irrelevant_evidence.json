@@ -1,0 +1,40 @@
+{
+  "fixture_id": "irrelevant_evidence",
+  "role": "negative",
+  "description": "A rival standoff plus a record that bears on nothing in it.\n\nThe control that catches a pricer whose 'prediction' is a plausible constant with a story attached. Such a pricer passes symmetric_rivals and near_miss - it produces a number and the number looks reasonable - and fails only where the correct answer is zero.\n\nBoth halves are required and pre-registration section 2 registers them separately: the record must be PRICED at ~0 and OBSERVED at ~0 when delivered. A prediction of zero that is never checked against a delivery is the MergedDissonanceQuery shape - a readout nobody reads.\n\nWhat is authored here is the topology and which belief the loose record attaches to. What is NOT authored is any expected price; requirements section 7.",
+  "expect": {
+    "shared_evidence": 2,
+    "rivals": 2,
+    "unattached_records": 1,
+    "note": "Structural properties, checkable by reading the file. `obs_kettle` is cited by no belief, so no belief's provenance can receive it. Not a prediction about what the pricer does."
+  },
+  "evidence": [
+    {"key": "obs_redshift", "summary": "The distant supernovae are dimmer than a static model predicts.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_isotropy", "summary": "The dimming is the same in every direction we have measured.", "salience": 0.5, "weight": 0.7},
+    {"key": "obs_kettle", "summary": "The kettle in the observatory kitchen has stopped working.", "salience": 0.5, "weight": 0.7}
+  ],
+  "beliefs": [
+    {
+      "key": "reading_a",
+      "proposition": "The dimming is best explained by a change in expansion over time.",
+      "confidence": 0.7,
+      "valence": 0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_b"],
+      "supports": []
+    },
+    {
+      "key": "reading_b",
+      "proposition": "The dimming is best explained by our position within a large underdense region.",
+      "confidence": 0.7,
+      "valence": -0.4,
+      "evidence": ["obs_redshift", "obs_isotropy"],
+      "contradicts": ["reading_a"],
+      "supports": []
+    }
+  ],
+  "counterfactual": {
+    "attaches_to": [],
+    "note": "The hypothetical attaches to no belief. Structural, not a prediction: with an empty attachment set the record cannot enter any provenance, so `BeliefUpdater._revise` never sees it."
+  }
+}

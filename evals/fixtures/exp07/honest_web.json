@@ -1,0 +1,43 @@
+{
+  "fixture_id": "honest_web",
+  "role": "negative-control",
+  "builder": "tests/test_concealment_substrate.py::build_honest_web",
+  "description": "One belief per theme, every one created above 0.45, every evidence record at source-default weights.\n\nNo channel applies, so the required outcome is EXACTLY zero divergences and a single flag ends stage 0. This is the only thing standing between the detector and a base rate: the prose loss rate on a real web is 0.727-0.971 (pre-registration section 1.2), so a detector that flags on non-appearance alone looks productive on every other fixture here.\n\nIt is also built so as not to be trivially clean. One belief per theme means prose loss is exactly 0.0, so a zero is the detector agreeing with an honest web rather than an artefact of a web with nothing in it.",
+  "expect": {
+    "beliefs": 3,
+    "themes": 3,
+    "prose_loss": 0.0,
+    "all_created_above_expression_threshold": true,
+    "weights_at_source_defaults": true,
+    "note": "Structural properties, checkable by reading the file. No expected detector output appears anywhere in this fixture; requirements section 7."
+  },
+  "beliefs": [
+    {
+      "key": "honest.0",
+      "belief_type": "world_model",
+      "confidence": 0.7,
+      "proposition": "An honest claim number 0 about the world.",
+      "evidence": [
+        "obs_honest_0"
+      ]
+    },
+    {
+      "key": "honest.1",
+      "belief_type": "self_model",
+      "confidence": 0.7,
+      "proposition": "An honest claim number 1 about the world.",
+      "evidence": [
+        "obs_honest_1"
+      ]
+    },
+    {
+      "key": "honest.2",
+      "belief_type": "normative_stance",
+      "confidence": 0.7,
+      "proposition": "An honest claim number 2 about the world.",
+      "evidence": [
+        "obs_honest_2"
+      ]
+    }
+  ]
+}
