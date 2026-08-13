@@ -267,7 +267,15 @@ differently. A case that cannot fail in a way no other case can is cut.
 | D | Hand-built synthetic pair | Restraint — no edge exists | **Certain** |
 | E | Spinach and iron | Discrimination — testimony vs. evidence of descent | Structural only (§7.5) |
 
-### 7.1 Slot A — calibration
+### 7.1 Slot A — calibration ~~(narrowed — [amendment A10](pre-registration.md), 2026-08-13)~~
+
+> **Retained unedited below, and no longer in force as written.** Valtin (2002) — the paper
+> this section cites as documenting the chain — establishes that the origin is **contested**,
+> reaching him as an uncited assertion at two removes, with a rival candidate he undercuts
+> himself, and with no shared span linking the 1945 wording to the modern claim.
+>
+> Calibration is retained for the **textually demonstrable lower half**; the origin edge is
+> marked `undetermined` between two rivals. P6 now concerns the lower half.
 
 The recommendation to drink eight glasses of water a day, traced to a 1945 US
 Food and Nutrition Board recommendation whose **following sentence** — that most

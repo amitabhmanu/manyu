@@ -659,3 +659,140 @@ The same rule gives the same answer, which is what makes it a rule rather than a
 The correct output is that **the edge does not form and the assertion is reported.** A
 genealogy that shows an assertion pointing at nothing is more informative than one that
 shows nothing at all.
+
+---
+
+## A10–A12: the source-contact pass, 2026-08-13
+
+The three investigation papers were obtained and read: Valtin (2002) for slot A, Livio
+(2013) and O'Raifeartaigh & Mitton (2018) for slot B, Rekdal (2014) for slot E. Each
+overturned something the requirements asserted.
+
+**The pattern is itself a finding and belongs in `results.md`.** Four slots have now had a
+premise refuted by contact with their own sources: slot C was cut (A8), slot A's origin
+turns out contested (A10), slot B's silence turns out to be disagreement (A11), and slot E
+has a lineage a layer deeper than charted (A12). None was caught by reading the spec. All
+were caught in step 2, before any key was authored and before any spend.
+
+That is what the offline stages are for. It is also a measurement of how much of the
+original §7 was assumption presented as fact, and the results must say so rather than
+present four tidy slots as though they had been designed correctly.
+
+### A10 — 2026-08-13: slot A's origin is contested, and its head carries no textual descent
+
+**What Valtin establishes.** §7.1 charters slot A as calibration — *"recover a lineage that
+is objectively in the record"* — on the premise that the 1945 → "8 glasses" chain is
+documented. The paper that documents it refutes that premise.
+
+Valtin does not assert the FNB origin. He reports it at two removes: *"According to J. Papai
+(65), P. Thomas has suggested a different origin"*, where ref 65 is a page on
+`urbanlegends.com` and "P. Thomas" is never fully cited. The dropped-sentence claim —
+that the last sentence was not heeded — is **Thomas's assertion about descent**, not a
+textual link.
+
+His own candidate origin is Stare & McWilliams (1974, p. 175), which he immediately
+undercuts: not one of the sources he read cites it, and half a dozen leading nutritionists
+could not point him to it.
+
+**And the wordings do not match.** FNB 1945 says *2.5 liters* and *1 milliliter for each
+calorie*; Stare says *6 to 8 glasses*, counting coffee, tea, milk and beer toward the total;
+the modern claim is *eight 8-oz glasses*, excluding exactly those. **No shared span carries
+the top of this chain.**
+
+**Decided: slot A is narrowed, not cut.**
+
+- **Calibration is retained for the lower half** — the modern propagation of the stock phrase,
+  where verbatim repetition is expected and textual descent is demonstrable.
+- **The origin edge is marked `undetermined`**, with two rival candidates (FNB 1945 and Stare
+  1974), neither textually linked to the claim.
+
+**Consequences.** P3 is unaffected: it scores hand-fed instances at stage 0 and `score`
+excludes undetermined edges from `expected`. P6 — the arms tying on slot A — now concerns
+the textual lower half, and is recorded as such. The slot becomes *better* than chartered:
+it carries calibration, a genuine underdetermined edge, and the portfolio's verbatim case.
+
+**Confirmed from Valtin's reference list**, and superseding the worksheet's guesses: FNB 1945
+is *Recommended Dietary Allowances, revised 1945*, National Research Council, Reprint and
+Circular Series No. 122, **1945 (Aug), pp. 3–18** — month resolution confirmed. Stare &
+McWilliams is *Nutrition for Good Health*, Fullerton CA: Plycon, 1974, **p. 175**.
+
+### A11 — 2026-08-13: slot B's edge is undetermined because the investigators disagree
+
+**What the two investigations say.** Livio (2013, ch. 10) concludes Gamow probably invented
+the phrasing, and states his search scope: Einstein's papers, books and personal
+correspondence after 1932, chosen because that is when Einstein and de Sitter declared the
+constant unnecessary; plus Pauling's diary, where Einstein calls the Roosevelt letter *one
+great mistake* and not the constant; plus evidence that Gamow and Einstein were **not**
+close.
+
+O'Raifeartaigh & Mitton (2018, *Physics in Perspective* 20: 318–341; arXiv:1804.06768)
+conclude the opposite — that it is very likely Einstein said it — on reports from three
+independent physicists.
+
+**The amendment.** P8 **stands, re-grounded.** It was registered on the premise that the
+record is silent. The better reason is that **two published investigations reach opposite
+conclusions from the same evidence**. An edge two experts contest is undetermined in a
+stronger sense than one merely uncited, and it is the sense experiment 5's machinery was
+built for.
+
+This was very nearly got backwards. Reading O'Raifeartaigh & Mitton's abstract alone
+suggested P8 would fail; Livio's chapter shows P8 is safer than registered. **A conclusion
+drawn from one investigation would have been wrong in a way no later check would have
+caught**, because it would have produced a confident key that the arms were then scored
+against.
+
+**Livio's scope qualifies** under the standard this experiment applies to every disputant —
+a search of unstated scope establishes no absence. His is bounded and checkable.
+
+**Slot B's repeaters are identified**, ending the harvest problem: Gino Segrè (*Ordinary
+Geniuses*), Albrecht Fölsing (who assumed Gamow authentic and repeated the citation), and
+J. P. Leahy ("Einstein's Greatest Blunder").
+
+**One caution recorded.** A PDF supplied as "Livio" was a three-page book review in a
+mathematics newsletter, not the book. It garbles the claim and misspells Gamow, and its ISBN
+disagrees with the book's. It is a legitimate corpus node as a downstream mutation, and it is
+**not** the investigation. Its brief mistaken use is recorded here because the failure mode —
+a secondary source standing in for the primary one — is the exact failure slot E studies.
+
+### A12 — 2026-08-13: slot E's lineage runs a layer deeper, and gains a second undetermined edge
+
+**Five Bender nodes, not four** (Rekdal 2014: 645, with loci):
+
+| Node | Locus |
+|---|---|
+| Bender 1972 | p. 11 — inaugural lecture, Queen Elizabeth College |
+| Bender 1975a | **p. 15** — *The Facts of Food*, reportedly the same sentence |
+| Bender 1975b | **p. 142** — journal article, same year |
+| Bender 1977 | *The Spectator* — hedge weakened |
+| **Bender & Bender 1982** | **p. 55** — medical textbook |
+
+**Bender & Bender 1982 is new and is the most mutated node in the corpus.** It postdates
+Hamblin by a year, adds a specific year (1870), and converts "misplaced decimal point" into
+"a mistake in the transcription of analytical results".
+
+**And Rekdal marks its ancestry undetermined himself**: he cannot tell whether Bender's
+increased certainty came from his own further investigation or from Hamblin's 1981 article.
+That is an undetermined edge **stated by the investigator**, not argued for by the corpus
+author — the strongest form available, and slot E now carries two undetermined edges rather
+than one.
+
+**Also recorded.**
+
+- **Sutton is 2010a and 2010b**, two documents. This supersedes the worksheet's
+  2010-versus-2012a framing; the one-node-one-document rule applies to both.
+- **Hamblin's own reply to Sutton** (2010a: 7): he could not remember where he learned it,
+  but was sure he had not made it up. A first-hand statement about the origin's
+  unknowability, and direct evidence for the undetermined mark.
+- **Larsson (1995: 448–449)** — Rekdal's own entry point, absent from the worksheet.
+- **Bonnie Taylor-Blake** — the reader who connected Sutton to Bender; a node in the
+  discovery chain rather than the descent chain, and it must not be confused for one.
+- **Rekdal's dates**: OnlineFirst 12 June 2014, a second OnlineFirst 23 June 2014, Version of
+  Record 29 July 2014, issue 44(4). Per the convention that `published` is when a text became
+  available to be descended from, **12 June 2014** governs. Two OnlineFirst versions means the
+  text may have changed between them; whichever is used must be recorded.
+
+**A transcription hazard, recorded because it would be invisible in a corpus file.** The
+indented blocks on Rekdal p. 640 are **his own constructed example sentences**, written to
+illustrate citation practice. They are not quotations of any source. Harvesting excerpts by
+layout would file them as corpus instances, and they would look entirely plausible as
+layer-2 repetitions.
