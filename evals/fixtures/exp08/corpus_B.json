@@ -47,19 +47,22 @@
       "assertion_id": "gamow1956_attributes_blunder_to_einstein",
       "asserted_by": "gamow1956",
       "claims": "einstein -> the blunder phrase",
-      "note": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9)."
+      "note": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9).",
+      "cited_by": "all instances of the asserting document"
     },
     {
       "assertion_id": "gamow1970_attributes_blunder_to_einstein",
       "asserted_by": "gamow1970",
       "claims": "einstein -> the blunder phrase",
-      "note": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data."
+      "note": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data.",
+      "cited_by": "all instances of the asserting document"
     },
     {
       "assertion_id": "wheeler_claims_direct_hearing",
       "asserted_by": "wheeler2000",
       "claims": "einstein -> the blunder phrase, on independent first-hand authority",
-      "note": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try."
+      "note": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try.",
+      "cited_by": "all instances of the asserting document"
     }
   ],
   "evidence": [
@@ -82,21 +85,24 @@
       "source_id": "gamow1956",
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase",
-      "summary": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9)."
+      "summary": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9).",
+      "cited_by": []
     },
     {
       "evidence_id": "ev_B_assert_gamow1970_attributes_blunder_to_einstein",
       "source_id": "gamow1970",
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase",
-      "summary": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data."
+      "summary": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data.",
+      "cited_by": []
     },
     {
       "evidence_id": "ev_B_assert_wheeler_claims_direct_hearing",
       "source_id": "wheeler2000",
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase, on independent first-hand authority",
-      "summary": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try."
+      "summary": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try.",
+      "cited_by": []
     }
   ],
   "claim_instances": [
@@ -153,6 +159,17 @@
       ]
     }
   ],
+  "key_authoring_note": {
+    "rule": "Record ONLY the highest-precedence mutation operator for each edge. An edge can genuinely carry several -- slot A has one that is both an attribution shift and a deletion -- but `mutation` is single-valued (A13), and a key recording both would count one as `misidentified` against an arm that was entirely correct.",
+    "precedence": [
+      "attribution_shift -- attributed_to differs",
+      "deletion -- the descendant's sentences are a proper subset of the ancestor's",
+      "qualification -- the hedge set differs",
+      "rewording -- the excerpts differ and nothing above applies",
+      "none -- the excerpts are identical modulo whitespace and case"
+    ],
+    "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed"
+  },
   "expect": {
     "instance_count": 3,
     "source_count": 3,

@@ -74,7 +74,8 @@
       "assertion_id": "hamblin_style_origin_claim",
       "asserted_by": "valtin2002",
       "claims": "an unnamed prior recommendation -> the 8x8 claim",
-      "note": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9)."
+      "note": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9).",
+      "cited_by": "all instances of the asserting document"
     }
   ],
   "evidence": [
@@ -132,7 +133,8 @@
       "source_id": "valtin2002",
       "record_kind": "assertion",
       "claims": "an unnamed prior recommendation -> the 8x8 claim",
-      "summary": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9)."
+      "summary": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9).",
+      "cited_by": []
     }
   ],
   "claim_instances": [
@@ -234,6 +236,17 @@
       ]
     }
   ],
+  "key_authoring_note": {
+    "rule": "Record ONLY the highest-precedence mutation operator for each edge. An edge can genuinely carry several -- slot A has one that is both an attribution shift and a deletion -- but `mutation` is single-valued (A13), and a key recording both would count one as `misidentified` against an arm that was entirely correct.",
+    "precedence": [
+      "attribution_shift -- attributed_to differs",
+      "deletion -- the descendant's sentences are a proper subset of the ancestor's",
+      "qualification -- the hedge set differs",
+      "rewording -- the excerpts differ and nothing above applies",
+      "none -- the excerpts are identical modulo whitespace and case"
+    ],
+    "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed"
+  },
   "expect": {
     "instance_count": 5,
     "source_count": 4,

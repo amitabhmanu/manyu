@@ -6,6 +6,7 @@
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-13 (f) pre-registration.md and test_exp08_properties.py re-frozen for A13. The first real corpus showed an edge carrying TWO mutations -- vreeman2007 -> carroll2015 is both an attribution shift and a deletion -- and classify_mutation returns the first match, hiding the second. `mutation` stays single-valued, recorded as a simplification rather than a claim. The binding consequence falls on the key author: a key must record only the highest-precedence operator, or it scores a correct arm as misidentified. The precedence ladder is pinned by test_mutation_precedence_is_fixed and carried in every corpus file's key_authoring_note, because a rule living only in the pre-registration is one someone applies from memory.",
     "2026-08-13 (e) pre-registration.md re-frozen for A10-A12, the source-contact pass. The three investigation papers were read and each overturned a premise: slot A's origin is contested and its head carries no textual descent (A10, narrowed rather than cut); slot B's edge is undetermined because Livio and O'Raifeartaigh & Mitton reach OPPOSITE conclusions, which strengthens P8 rather than threatening it (A11); slot E's Bender lineage runs five nodes deep with a second investigator-stated undetermined edge (A12). Four slots have now had a premise refuted by contact with their own sources, and that pattern is itself a finding for results.md. No code changed; no scored arm run.",
     "2026-08-13 (d) descent.py, test_exp08_properties.py and pre-registration.md re-frozen for A9. Reconstruction gains `unresolved_assertions`: slot E found Hamblin asserting descent from an unnamed source, and encoded the obvious way that assertion VANISHED — no pair shares a singly-cited record, so no edge forms and the declined reason read 'no shared evidence record', which is false. Diagnostic only; classify_support and score never read `record_kind`, pinned by two tests. STILL NO SCORED ARM RUN.",
     "2026-08-13 (c) pre-registration.md re-frozen for A8, cutting slot C before any excerpt was transcribed.",
@@ -19,8 +20,8 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "8029b9d3788503e455c21d398717f776e21ef8fbfc02d4b90bfd8771a70fe188",
-      "amendments_at_freeze": ["A1", "A2", "A3", "A4", "A5", "A6", "A7 (moot)", "A8", "A9", "A10", "A11", "A12"]
+      "sha256": "6bec9006e67ec93729688af19100c2d01c0d555bff5c355bb1ac202359c9481e",
+      "amendments_at_freeze": ["A1", "A2", "A3", "A4", "A5", "A6", "A7 (moot)", "A8", "A9", "A10", "A11", "A12", "A13"]
     }
   },
   "files": {
@@ -43,8 +44,8 @@
       "role": "defect_battery_including_the_section_6_3_capability_check"
     },
     "tests/test_exp08_properties.py": {
-      "sha256": "81da111dd14a8c95b53c082a21b9170332e9e640921370fa1d73e88248f90d42",
-      "role": "structural_prohibitions_no_aggregate_no_threshold_no_arm_branch"
+      "sha256": "d2991c903525fbc97de2fecc8f13b836f00f2c4ad4d75c87c9d5b1f551f6740b",
+      "role": "structural_prohibitions_no_aggregate_no_threshold_no_arm_branch_and_mutation_precedence"
     },
     "evals/analysis/exp08/generate_slot_d.py": {
       "sha256": "860ae9345335c93738b2677e6e3d30b734970ce92d2bd37334c02dcd87c6dace",

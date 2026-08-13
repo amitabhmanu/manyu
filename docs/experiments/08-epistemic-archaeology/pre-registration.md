@@ -796,3 +796,46 @@ indented blocks on Rekdal p. 640 are **his own constructed example sentences**, 
 illustrate citation practice. They are not quotations of any source. Harvesting excerpts by
 layout would file them as corpus instances, and they would look entirely plausible as
 layer-2 repetitions.
+
+### A13 — 2026-08-13: an edge can carry more than one mutation; the vocabulary returns one
+
+**Found on the first real corpus.** In slot A's pilot, `vreeman2007 → carroll2015` is
+reported as `ATTRIBUTION_SHIFT` — Vreeman names Valtin, Carroll degrades that to a bare
+hyperlink. It is *also* a genuine `DELETION`: Carroll's excerpt is a proper sentence-subset
+of Vreeman's. Both are true. `classify_mutation` returns the first that matches, so the
+deletion is invisible.
+
+This was not anticipated by §11 or by A4, and it was not visible on the synthetic fixtures —
+only a corpus where one source both re-attributes *and* abridges its predecessor produces it,
+which is what real correction chains do.
+
+**Decided: `mutation` stays single-valued for now.** The concession is recorded: an edge
+genuinely can carry several mutations, and the single value is a simplification rather than
+a claim about how texts change. Making it a set is the faithful design and remains open.
+
+**Why not now.** Changing it alters what `mutations_identified` and `mutations_misidentified`
+count, which are scored dimensions. No key exists yet, so the change would be legitimate
+today — but the pilot has not yet shown that the loss matters, and §11's dimensions should
+not be re-cut on a single instance. If a hand-authored key turns out to need two operators on
+one edge often enough to distort the score, that is the trigger, and the amendment is written
+then.
+
+**The binding consequence, and it falls on the key author rather than the code.**
+
+> A key must record **only the highest-precedence operator** for each edge. A key recording
+> both `attribution_shift` and `deletion` would count one as `misidentified` against an arm
+> that was entirely correct.
+
+The precedence is fixed, and is now pinned by
+`test_mutation_precedence_is_fixed` so that reordering the checks cannot silently invalidate
+keys authored under the old order:
+
+1. `ATTRIBUTION_SHIFT` — `attributed_to` differs
+2. `DELETION` — the descendant's sentences are a proper subset of the ancestor's
+3. `QUALIFICATION` — the hedge set differs
+4. `REWORDING` — the excerpts differ and nothing above applies
+5. `NONE` — the excerpts are identical modulo whitespace and case
+
+The ladder is also carried in every corpus file's `key_authoring_note`, because that is where
+a key author will be looking, and a rule that lives only in the pre-registration is a rule
+someone applies from memory.

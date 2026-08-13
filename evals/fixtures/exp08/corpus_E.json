@@ -4,7 +4,7 @@
   "slot": "E",
   "status": "PILOT - INCOMPLETE",
   "generated_by": "evals/analysis/exp08/build_corpora.py",
-  "description": "Slot E, discrimination. PILOT, and the thinnest of the three. rekdal2014 is not HELD by the author, so the central testimony edge -- bender* -> hamblin1981, asserted by Rekdal -- CANNOT BE BUILT. Without it slot E exercises no testimony edge at all, which is the one thing the slot exists for. Treat any result as a pipeline check.",
+  "description": "Slot E, discrimination. PILOT, but the only slot whose CORE JOB IS ALREADY EXERCISED: it carries a TEXTUAL edge (bender1972 -> bender1977, a hedge erosion) and two TESTIMONY edges (bender* -> hamblin1981, asserted by Rekdal) in the same graph. That is exactly what `discrimination_correct` needs in order to be able to FAIL an arm that labels everything TESTIMONY. Note the shape: the endpoints of the testimony edges share only 'decimal point', two tokens, deliberately not recorded as a span -- so no textual reading competes with the testimony one, which is the clean case P2 registered. Still a pilot: three of five Bender nodes are missing, layer 1 is absent entirely, and no key exists.",
   "sources": [
     {
       "source_id": "bender1972",
@@ -29,6 +29,14 @@
       "date_resolution": "day",
       "role": "the assertion; names no source",
       "content_sha256": "641e5d7f255fabaab01ced50892a9322c64997fe1a76da5659ad9f8c16d0df59"
+    },
+    {
+      "source_id": "rekdal2014",
+      "citation": "Rekdal, Ole Bjorn. \"Academic urban legends.\" Social Studies of Science 44, no. 4 (2014): 638-654. DOI 10.1177/0306312714535679. OnlineFirst 12 June 2014.",
+      "published": "2014-06-12",
+      "date_resolution": "day",
+      "role": "investigation; contributes the central testimony assertion WITHOUT a claim-instance of its own",
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
   "spans": [
@@ -56,7 +64,21 @@
       "assertion_id": "hamblin_asserts_decimal_origin",
       "asserted_by": "hamblin1981",
       "claims": "an UNNAMED 19th-century analysis -> the iron-rich claim",
-      "note": "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case."
+      "note": "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case.",
+      "cited_by": [
+        "E.hamblin1981.c1"
+      ]
+    },
+    {
+      "assertion_id": "rekdal_asserts_bender_to_hamblin",
+      "asserted_by": "rekdal2014",
+      "claims": "bender1972/1977 -> hamblin1981",
+      "note": "THE CENTRAL TESTIMONY EDGE. Rekdal is a THIRD document, neither endpoint, so this resolves as TESTIMONY rather than textual -- which is correct, because the endpoints share only 'decimal point', two tokens, deliberately not recorded as a span. rekdal2014 contributes this record WITHOUT being a claim-instance: an assertion lives in the asserting document, and that document need not itself make a first-order claim in the corpus.",
+      "cited_by": [
+        "E.bender1972.c1",
+        "E.bender1977.c1",
+        "E.hamblin1981.c1"
+      ]
     }
   ],
   "evidence": [
@@ -93,7 +115,22 @@
       "source_id": "hamblin1981",
       "record_kind": "assertion",
       "claims": "an UNNAMED 19th-century analysis -> the iron-rich claim",
-      "summary": "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case."
+      "summary": "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case.",
+      "cited_by": [
+        "E.hamblin1981.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_E_assert_rekdal_asserts_bender_to_hamblin",
+      "source_id": "rekdal2014",
+      "record_kind": "assertion",
+      "claims": "bender1972/1977 -> hamblin1981",
+      "summary": "THE CENTRAL TESTIMONY EDGE. Rekdal is a THIRD document, neither endpoint, so this resolves as TESTIMONY rather than textual -- which is correct, because the endpoints share only 'decimal point', two tokens, deliberately not recorded as a span. rekdal2014 contributes this record WITHOUT being a claim-instance: an assertion lives in the asserting document, and that document need not itself make a first-order claim in the corpus.",
+      "cited_by": [
+        "E.bender1972.c1",
+        "E.bender1977.c1",
+        "E.hamblin1981.c1"
+      ]
     }
   ],
   "claim_instances": [
@@ -110,6 +147,7 @@
       "belief_key": "e.inst.c1.bender1972",
       "proposition": "[bender1972 §p11] the fame of spinach may well have grown from a misplaced decimal point",
       "evidence_ids": [
+        "ev_E_assert_rekdal_asserts_bender_to_hamblin",
         "ev_E_fame_of_spinach_bender1972",
         "ev_E_fame_of_spinach_bender1977",
         "ev_E_misplaced_decimal_point_bender1972",
@@ -129,6 +167,7 @@
       "belief_key": "e.inst.c1.bender1977",
       "proposition": "[bender1977 §p18] The fame of spinach appears to have been based on a misplaced decimal point",
       "evidence_ids": [
+        "ev_E_assert_rekdal_asserts_bender_to_hamblin",
         "ev_E_fame_of_spinach_bender1972",
         "ev_E_fame_of_spinach_bender1977",
         "ev_E_misplaced_decimal_point_bender1972",
@@ -148,23 +187,35 @@
       "belief_key": "e.inst.c1.hamblin1981",
       "proposition": "[hamblin1981 §p1671] German chemists reinvestigating the iron content of spinach had shown in the 1930s that the original workers had put the decimal point in the wrong place and made a tenfold overestimate of its value.",
       "evidence_ids": [
-        "ev_E_assert_hamblin_asserts_decimal_origin"
+        "ev_E_assert_hamblin_asserts_decimal_origin",
+        "ev_E_assert_rekdal_asserts_bender_to_hamblin"
       ]
     }
   ],
+  "key_authoring_note": {
+    "rule": "Record ONLY the highest-precedence mutation operator for each edge. An edge can genuinely carry several -- slot A has one that is both an attribution shift and a deletion -- but `mutation` is single-valued (A13), and a key recording both would count one as `misidentified` against an arm that was entirely correct.",
+    "precedence": [
+      "attribution_shift -- attributed_to differs",
+      "deletion -- the descendant's sentences are a proper subset of the ancestor's",
+      "qualification -- the hedge set differs",
+      "rewording -- the excerpts differ and nothing above applies",
+      "none -- the excerpts are identical modulo whitespace and case"
+    ],
+    "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed"
+  },
   "expect": {
     "instance_count": 3,
-    "source_count": 3,
+    "source_count": 4,
     "span_count": 2,
-    "assertion_count": 1,
+    "assertion_count": 2,
     "note": "Structural only. No expected edge, support kind or mutation appears here -- those live in key_E.json, authored by hand and separately (FR-2)."
   },
   "known_gaps": [
-    "rekdal2014 not HELD -- the central testimony edge cannot be built, so DISCRIMINATION IS NOT EXERCISED.",
     "bender1975a (p. 15), bender1975b (p. 142) and bender&bender1982 (p. 55) not obtained; the lineage is 2 of 5 nodes.",
-    "sutton2010a and 2010b not obtained.",
+    "bender&bender1982 missing means the SECOND undetermined edge -- the one Rekdal states himself -- cannot be built.",
+    "sutton2010a and 2010b not obtained, so layer 3 has no dispute in the corpus.",
     "larsson1995 not obtained.",
-    "No layer-1 instance, so Hamblin's assertion has no downstream endpoint either.",
+    "No layer-1 instance, so Hamblin's assertion has no downstream endpoint and discrimination has no TEXTUAL half from layer 1 -- though the Bender span now supplies one.",
     "hamblin1981's excerpt is a narrowed continuous span, not the full passage."
   ]
 }

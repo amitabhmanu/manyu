@@ -257,6 +257,33 @@ def test_rewording_is_the_residual_and_never_outranks_a_named_operator() -> None
     assert classify_mutation(ancestor, reattributed) is MutationOp.ATTRIBUTION_SHIFT
 
 
+def test_mutation_precedence_is_fixed() -> None:
+    """A13. Keys are authored against this order, so reordering silently breaks them.
+
+    An edge can genuinely carry several mutations — slot A's pilot has one that is
+    both an attribution shift and a deletion — and the vocabulary returns the
+    first that matches. That is a recorded simplification, not a claim about how
+    texts change. What makes it survivable is that the order never moves.
+    """
+    base = "The allowance is two units. Most of it comes from food."
+
+    def _pair(excerpt: str, attributed: str | None = None) -> MutationOp:
+        ancestor = ClaimInstance("X.a", "x.a", "doc_a", "1900-01-01", base, ("ev1",))
+        descendant = ClaimInstance(
+            "X.b", "x.b", "doc_b", "1950-01-01", excerpt, ("ev1",), attributed_to=attributed
+        )
+        return classify_mutation(ancestor, descendant, hedges=("possibly",))
+
+    # Both an attribution shift AND a deletion. Attribution wins.
+    assert _pair("The allowance is two units.", attributed="a named authority") is MutationOp.ATTRIBUTION_SHIFT
+    # Deletion alone.
+    assert _pair("The allowance is two units.") is MutationOp.DELETION
+    # Reworded, no subset, no attribution change.
+    assert _pair("The allowance is possibly three units.") is MutationOp.QUALIFICATION
+    assert _pair("The allowance is three units. Most of it comes from food.") is MutationOp.REWORDING
+    assert _pair(base) is MutationOp.NONE
+
+
 def test_attribution_shift_outranks_deletion() -> None:
     """Order matters: a claim can shed a sentence *and* change hands, and for a
     genealogy the change of hands is the more consequential of the two."""

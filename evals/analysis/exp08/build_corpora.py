@@ -163,15 +163,21 @@ E_HAMBLIN = ("German chemists reinvestigating the iron content of spinach had sh
 SLOT_E: dict[str, Any] = {
     "slot": "E",
     "description": (
-        "Slot E, discrimination. PILOT, and the thinnest of the three. rekdal2014 is not HELD "
-        "by the author, so the central testimony edge -- bender* -> hamblin1981, asserted by "
-        "Rekdal -- CANNOT BE BUILT. Without it slot E exercises no testimony edge at all, "
-        "which is the one thing the slot exists for. Treat any result as a pipeline check."
+        "Slot E, discrimination. PILOT, but the only slot whose CORE JOB IS ALREADY "
+        "EXERCISED: it carries a TEXTUAL edge (bender1972 -> bender1977, a hedge erosion) and "
+        "two TESTIMONY edges (bender* -> hamblin1981, asserted by Rekdal) in the same graph. "
+        "That is exactly what `discrimination_correct` needs in order to be able to FAIL an "
+        "arm that labels everything TESTIMONY. Note the shape: the endpoints of the testimony "
+        "edges share only 'decimal point', two tokens, deliberately not recorded as a span -- "
+        "so no textual reading competes with the testimony one, which is the clean case P2 "
+        "registered. Still a pilot: three of five Bender nodes are missing, layer 1 is absent "
+        "entirely, and no key exists."
     ),
     "sources": [
         ("bender1972", "Bender, Arnold E. The Wider Knowledge of Nutrition. Inaugural Lecture, 24 October 1972, Queen Elizabeth College, University of London. London: Castle Cary Press, 1972, p. 11.", "1972-10-24", "day", "origin of the decimal-point story (A12)"),
         ("bender1977", "Bender, Arnold E. \"Iron in spinach.\" The Spectator, 9 July 1977, p. 18.", "1977-07-09", "day", "same author, hedge weakened"),
         ("hamblin1981", "Hamblin, T. J. \"Fake!\" British Medical Journal 283, no. 6307 (19-26 December 1981): 1671-1674.", "1981-12-19", "day", "the assertion; names no source"),
+        ("rekdal2014", "Rekdal, Ole Bjorn. \"Academic urban legends.\" Social Studies of Science 44, no. 4 (2014): 638-654. DOI 10.1177/0306312714535679. OnlineFirst 12 June 2014.", "2014-06-12", "day", "investigation; contributes the central testimony assertion WITHOUT a claim-instance of its own"),
     ],
     "spans": [
         ("fame_of_spinach", "fame of spinach", ["bender1972", "bender1977"], None),
@@ -183,14 +189,15 @@ SLOT_E: dict[str, Any] = {
         ("E.hamblin1981.c1", "hamblin1981", "§p1671", "NARROWED to one continuous sentence. The worksheet excerpt carried ellipses and could not be hashed or diffed; the fuller passage remains un-obtained.", E_HAMBLIN, [], None, "Names NO ONE -- only 'German chemists' and 'the original workers'. Confirmed by a peer-reviewed source."),
     ],
     "assertions": [
-        ("hamblin_asserts_decimal_origin", "hamblin1981", "an UNNAMED 19th-century analysis -> the iron-rich claim", "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case."),
+        ("hamblin_asserts_decimal_origin", "hamblin1981", "an UNNAMED 19th-century analysis -> the iron-rich claim", "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case.", ["E.hamblin1981.c1"]),
+        ("rekdal_asserts_bender_to_hamblin", "rekdal2014", "bender1972/1977 -> hamblin1981", "THE CENTRAL TESTIMONY EDGE. Rekdal is a THIRD document, neither endpoint, so this resolves as TESTIMONY rather than textual -- which is correct, because the endpoints share only 'decimal point', two tokens, deliberately not recorded as a span. rekdal2014 contributes this record WITHOUT being a claim-instance: an assertion lives in the asserting document, and that document need not itself make a first-order claim in the corpus.", ["E.bender1972.c1", "E.bender1977.c1", "E.hamblin1981.c1"]),
     ],
     "known_gaps": [
-        "rekdal2014 not HELD -- the central testimony edge cannot be built, so DISCRIMINATION IS NOT EXERCISED.",
         "bender1975a (p. 15), bender1975b (p. 142) and bender&bender1982 (p. 55) not obtained; the lineage is 2 of 5 nodes.",
-        "sutton2010a and 2010b not obtained.",
+        "bender&bender1982 missing means the SECOND undetermined edge -- the one Rekdal states himself -- cannot be built.",
+        "sutton2010a and 2010b not obtained, so layer 3 has no dispute in the corpus.",
         "larsson1995 not obtained.",
-        "No layer-1 instance, so Hamblin's assertion has no downstream endpoint either.",
+        "No layer-1 instance, so Hamblin's assertion has no downstream endpoint and discrimination has no TEXTUAL half from layer 1 -- though the Bender span now supplies one.",
         "hamblin1981's excerpt is a narrowed continuous span, not the full passage.",
     ],
 }
@@ -213,16 +220,27 @@ def build(spec: dict[str, Any]) -> dict[str, Any]:
             })
         span_records[span_id] = ids
 
-    for assertion_id, asserted_by, claims, note in spec["assertions"]:
+    # An assertion is cited by BOTH endpoints, and is located in the asserting
+    # document -- which need not itself be a claim-instance. That is what lets
+    # rekdal2014 supply slot E's central testimony edge without making a
+    # first-order claim of its own.
+    for assertion in spec["assertions"]:
+        assertion_id, asserted_by, claims, note = assertion[:4]
         evidence.append({
             "evidence_id": f"ev_{slot}_assert_{assertion_id}", "source_id": asserted_by,
             "record_kind": "assertion", "claims": claims, "summary": note,
+            "cited_by": list(assertion[4]) if len(assertion) > 4 else [],
         })
 
     instances = []
     for iid, source_id, locus, locus_note, excerpt, span_ids, attributed, note in spec["instances"]:
         cited = sorted({r for sid in span_ids for r in span_records[sid]})
-        cited += [f"ev_{slot}_assert_{a}" for a, by, _, _ in spec["assertions"] if by == source_id]
+        for assertion in spec["assertions"]:
+            # Explicit `cited_by` names instances; absent it, the assertion is
+            # cited by every instance of the document that made it.
+            explicit = list(assertion[4]) if len(assertion) > 4 else None
+            if (iid in explicit) if explicit is not None else (source_id == assertion[1]):
+                cited.append(f"ev_{slot}_assert_{assertion[0]}")
         instances.append({
             "instance_id": iid, "source_id": source_id, "locus": locus, "locus_note": locus_note,
             "excerpt": excerpt, "excerpt_sha256": _sha(excerpt), "excerpt_status": "HELD",
@@ -249,11 +267,31 @@ def build(spec: dict[str, Any]) -> dict[str, Any]:
         "sources": sources,
         "spans": [{"span_id": s, "text": t, "appears_in": a, "note": n} for s, t, a, n in spans],
         "asserted_descents": [
-            {"assertion_id": a, "asserted_by": by, "claims": c, "note": n}
-            for a, by, c, n in spec["assertions"]
+            {
+                "assertion_id": a[0], "asserted_by": a[1], "claims": a[2], "note": a[3],
+                "cited_by": list(a[4]) if len(a) > 4 else "all instances of the asserting document",
+            }
+            for a in spec["assertions"]
         ],
         "evidence": evidence,
         "claim_instances": instances,
+        "key_authoring_note": {
+            "rule": (
+                "Record ONLY the highest-precedence mutation operator for each edge. An edge "
+                "can genuinely carry several -- slot A has one that is both an attribution "
+                "shift and a deletion -- but `mutation` is single-valued (A13), and a key "
+                "recording both would count one as `misidentified` against an arm that was "
+                "entirely correct."
+            ),
+            "precedence": [
+                "attribution_shift -- attributed_to differs",
+                "deletion -- the descendant's sentences are a proper subset of the ancestor's",
+                "qualification -- the hedge set differs",
+                "rewording -- the excerpts differ and nothing above applies",
+                "none -- the excerpts are identical modulo whitespace and case",
+            ],
+            "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed",
+        },
         "expect": {
             "instance_count": len(instances), "source_count": len(sources),
             "span_count": len(spans), "assertion_count": len(spec["assertions"]),
