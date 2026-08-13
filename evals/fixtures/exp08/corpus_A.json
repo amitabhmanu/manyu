@@ -4,7 +4,7 @@
   "slot": "A",
   "status": "PILOT - INCOMPLETE",
   "generated_by": "evals/analysis/exp08/build_corpora.py",
-  "description": "Slot A as narrowed by A10: calibration retained for the textually demonstrable half, origin edge undetermined between rivals. PILOT. Every document here is the origin or a correction -- the propagators (Vreeman & Carroll's web references w1-w4) are unidentified, so the half of the graph that carries the myth forward is absent. Results demonstrate the pipeline and A6's confound, and demonstrate nothing about calibration.",
+  "description": "Slot A as narrowed by A10: calibration retained for the textually demonstrable half, origin edge undetermined between rivals. PILOT. Every document here is the origin or a correction. The propagators are now IDENTIFIED -- not from Vreeman & Carroll's w-list, which stayed behind a CAPTCHA, but from Valtin's own reference list, which is better because Valtin QUOTES them (refs 3, 17, 42, 54). They are still absent as nodes because every propagator excerpt available is RELAYED through Valtin, and only HELD is committable. Results demonstrate the pipeline and A6's confound, and demonstrate nothing about calibration.",
   "sources": [
     {
       "source_id": "fnb1945",
@@ -19,8 +19,8 @@
       "citation": "Valtin, Heinz. \"'Drink at least eight glasses of water a day.' Really?\" American Journal of Physiology 283, no. 5 (2002): R993-R1004.",
       "published": "2002-11-01",
       "date_resolution": "month",
-      "role": "investigation; reports the FNB origin at two removes",
-      "content_sha256": "ee65f48955658e20e8f55edf995866e95d640f8597f9e21c0ded4bb58e4db55d"
+      "role": "investigation; reports the FNB origin at two removes and floats a SECOND, rival origin it then argues against",
+      "content_sha256": "107ce0a41d79e222b3b413793f191e6e30d28d760d4ca4a35ecdae943f20f25b"
     },
     {
       "source_id": "vreeman2007",
@@ -28,7 +28,7 @@
       "published": "2007-12-22",
       "date_resolution": "day",
       "role": "correction; names Valtin (w8)",
-      "content_sha256": "bcc85e9524a30a99c6991408a59755371cde4f606e5b3807b97c6aa8d98d31d9"
+      "content_sha256": "c42d93269e9d0393200035390d3d8078a07b9a05747848fa6dc11f4fdced6a04"
     },
     {
       "source_id": "carroll2015",
@@ -67,15 +67,62 @@
         "fnb1945"
       ],
       "note": "Attested in ONE document. Neither Valtin nor Vreeman & Carroll quote this sentence. The weakest excerpt in slot A, and the one carrying the second deletion."
+    },
+    {
+      "span_id": "stare_6to8",
+      "text": "around 6 to 8 glasses per 24 hours",
+      "appears_in": [
+        "valtin2002",
+        "vreeman2007"
+      ],
+      "note": "The rival origin's text, and it survives BOTH the web and print editions of vreeman2007 unchanged -- which is why the print variant does not break this span."
+    },
+    {
+      "span_id": "stare_beverages",
+      "text": "in the form of coffee, tea, milk, soft drinks, beer, etc.",
+      "appears_in": [
+        "valtin2002",
+        "vreeman2007"
+      ],
+      "note": "The clause that DEFEATS the rival origin: Stare allowed the caffeinated drinks 8x8 forbids. Both investigators quote it, and neither propagator does."
     }
   ],
   "asserted_descents": [
     {
-      "assertion_id": "hamblin_style_origin_claim",
+      "assertion_id": "thomas_asserts_fnb_origin",
       "asserted_by": "valtin2002",
-      "claims": "an unnamed prior recommendation -> the 8x8 claim",
-      "note": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9).",
-      "cited_by": "all instances of the asserting document"
+      "claims": "fnb1945 -> the 8x8 claim",
+      "note": "Reported at TWO REMOVES and now fully cited: Valtin ref 65 is Papai J, 'Eight glasses of water per day. An update', urbanlegends.com, and Papai relays P. Thomas, who is never cited at all. Valtin states the mechanism -- the last sentence of the FNB passage 'was not heeded' -- which is why `thirst_qualifier` and `prepared_foods` matter. The downstream endpoint, the propagated claim, is ABSENT from this corpus, so the edge cannot form (A9). cited_by is EXPLICIT: the default -- every instance of the asserting document -- silently gave this assertion two endpoints once A.valtin2002.q_stare existed, both in valtin2002, so it formed no edge AND dropped out of unresolved_assertions. An assertion that vanishes is the precise failure A9 was written to prevent, and the default reintroduced it the moment a second locus was added.",
+      "cited_by": [
+        "A.valtin2002.c1"
+      ]
+    },
+    {
+      "assertion_id": "valtin_floats_stare_origin",
+      "asserted_by": "valtin2002",
+      "claims": "stare1974 -> the 8x8 claim",
+      "note": "The RIVAL origin, and the one A10 said the corpus lacked. Valtin ref 81 is Stare FJ & McWilliams M, `Nutrition for Good Health`, Plycon, Fullerton CA, 1974, p. 175 -- reached not by search but through an OBITUARY (ref 77) and a former colleague (ref 82). Valtin quotes the passage in full, then gives four numbered reasons against it: undocumented, '6 to 8' is not 'at least eight', it ALLOWS caffeinated drinks, and it credits the regulation 8x8 denies. So the asserting document argues against its own assertion -- an edge no arm should draw with confidence. Upstream endpoint ABSENT: the Stare passage is RELAYED through Valtin, never HELD (A9).",
+      "cited_by": [
+        "A.valtin2002.q_stare"
+      ]
+    },
+    {
+      "assertion_id": "vc_asserts_fnb_origin",
+      "asserted_by": "vreeman2007",
+      "claims": "fnb1945 -> the 8x8 claim",
+      "note": "'One origin may be a 1945 recommendation' (w5), with the mechanism at w6: 'If the last, crucial sentence is ignored...'. A SECOND document asserting the same undetermined edge, five years after Valtin, and hedged the same way. Downstream endpoint still absent (A9).",
+      "cited_by": [
+        "A.vreeman2007.c1"
+      ]
+    },
+    {
+      "assertion_id": "vc_asserts_stare_origin",
+      "asserted_by": "vreeman2007",
+      "claims": "stare1974 -> the 8x8 claim",
+      "note": "'Another endorsement may have come from' (w7). Both investigators reached both candidates and neither picked one, which is the strongest evidence slot A has that the origin edge is genuinely undetermined rather than merely unresearched. Upstream endpoint absent (A9).",
+      "cited_by": [
+        "A.vreeman2007.q_stare"
+      ]
     }
   ],
   "evidence": [
@@ -129,12 +176,72 @@
       "summary": "span 'thirst_qualifier' attested in fnb1945"
     },
     {
-      "evidence_id": "ev_A_assert_hamblin_style_origin_claim",
+      "evidence_id": "ev_A_stare_6to8_valtin2002",
+      "source_id": "valtin2002",
+      "span_id": "stare_6to8",
+      "record_kind": "span",
+      "summary": "span 'stare_6to8' attested in valtin2002"
+    },
+    {
+      "evidence_id": "ev_A_stare_6to8_vreeman2007",
+      "source_id": "vreeman2007",
+      "span_id": "stare_6to8",
+      "record_kind": "span",
+      "summary": "span 'stare_6to8' attested in vreeman2007"
+    },
+    {
+      "evidence_id": "ev_A_stare_beverages_valtin2002",
+      "source_id": "valtin2002",
+      "span_id": "stare_beverages",
+      "record_kind": "span",
+      "summary": "span 'stare_beverages' attested in valtin2002"
+    },
+    {
+      "evidence_id": "ev_A_stare_beverages_vreeman2007",
+      "source_id": "vreeman2007",
+      "span_id": "stare_beverages",
+      "record_kind": "span",
+      "summary": "span 'stare_beverages' attested in vreeman2007"
+    },
+    {
+      "evidence_id": "ev_A_assert_thomas_asserts_fnb_origin",
       "source_id": "valtin2002",
       "record_kind": "assertion",
-      "claims": "an unnamed prior recommendation -> the 8x8 claim",
-      "summary": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9).",
-      "cited_by": []
+      "claims": "fnb1945 -> the 8x8 claim",
+      "summary": "Reported at TWO REMOVES and now fully cited: Valtin ref 65 is Papai J, 'Eight glasses of water per day. An update', urbanlegends.com, and Papai relays P. Thomas, who is never cited at all. Valtin states the mechanism -- the last sentence of the FNB passage 'was not heeded' -- which is why `thirst_qualifier` and `prepared_foods` matter. The downstream endpoint, the propagated claim, is ABSENT from this corpus, so the edge cannot form (A9). cited_by is EXPLICIT: the default -- every instance of the asserting document -- silently gave this assertion two endpoints once A.valtin2002.q_stare existed, both in valtin2002, so it formed no edge AND dropped out of unresolved_assertions. An assertion that vanishes is the precise failure A9 was written to prevent, and the default reintroduced it the moment a second locus was added.",
+      "cited_by": [
+        "A.valtin2002.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_A_assert_valtin_floats_stare_origin",
+      "source_id": "valtin2002",
+      "record_kind": "assertion",
+      "claims": "stare1974 -> the 8x8 claim",
+      "summary": "The RIVAL origin, and the one A10 said the corpus lacked. Valtin ref 81 is Stare FJ & McWilliams M, `Nutrition for Good Health`, Plycon, Fullerton CA, 1974, p. 175 -- reached not by search but through an OBITUARY (ref 77) and a former colleague (ref 82). Valtin quotes the passage in full, then gives four numbered reasons against it: undocumented, '6 to 8' is not 'at least eight', it ALLOWS caffeinated drinks, and it credits the regulation 8x8 denies. So the asserting document argues against its own assertion -- an edge no arm should draw with confidence. Upstream endpoint ABSENT: the Stare passage is RELAYED through Valtin, never HELD (A9).",
+      "cited_by": [
+        "A.valtin2002.q_stare"
+      ]
+    },
+    {
+      "evidence_id": "ev_A_assert_vc_asserts_fnb_origin",
+      "source_id": "vreeman2007",
+      "record_kind": "assertion",
+      "claims": "fnb1945 -> the 8x8 claim",
+      "summary": "'One origin may be a 1945 recommendation' (w5), with the mechanism at w6: 'If the last, crucial sentence is ignored...'. A SECOND document asserting the same undetermined edge, five years after Valtin, and hedged the same way. Downstream endpoint still absent (A9).",
+      "cited_by": [
+        "A.vreeman2007.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_A_assert_vc_asserts_stare_origin",
+      "source_id": "vreeman2007",
+      "record_kind": "assertion",
+      "claims": "stare1974 -> the 8x8 claim",
+      "summary": "'Another endorsement may have come from' (w7). Both investigators reached both candidates and neither picked one, which is the strongest evidence slot A has that the origin edge is genuinely undetermined rather than merely unresearched. Upstream endpoint absent (A9).",
+      "cited_by": [
+        "A.vreeman2007.q_stare"
+      ]
     }
   ],
   "claim_instances": [
@@ -178,19 +285,19 @@
     {
       "instance_id": "A.valtin2002.c1",
       "source_id": "valtin2002",
-      "locus": "§unresolved",
-      "locus_note": null,
+      "locus": "§POSSIBLE ORIGIN OF 8 × 8",
+      "locus_note": "Section heading, HELD from the full text. The page within R993-R1004 stays unresolved -- the publisher's HTML carries no page breaks, the same limitation as vreeman2007.",
       "excerpt": "A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is 1 milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
       "excerpt_sha256": "ee65f48955658e20e8f55edf995866e95d640f8597f9e21c0ded4bb58e4db55d",
       "excerpt_status": "HELD",
       "attributed_to": null,
       "attribution_note": null,
       "belief_key": "a.inst.c1.valtin2002",
-      "proposition": "[valtin2002 §unresolved] A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is 1 milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "proposition": "[valtin2002 §POSSIBLE ORIGIN OF 8 × 8] A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is 1 milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
       "evidence_ids": [
         "ev_A_allowance_liters_fnb1945",
         "ev_A_allowance_liters_valtin2002",
-        "ev_A_assert_hamblin_style_origin_claim",
+        "ev_A_assert_thomas_asserts_fnb_origin",
         "ev_A_prepared_foods_carroll2015",
         "ev_A_prepared_foods_fnb1945",
         "ev_A_prepared_foods_valtin2002",
@@ -200,20 +307,61 @@
     {
       "instance_id": "A.vreeman2007.c1",
       "source_id": "vreeman2007",
-      "locus": "§unresolved",
-      "locus_note": "p. 1288 or 1289; PMC HTML carries no page breaks",
+      "locus": "§myth.1 (p. 1288)",
+      "locus_note": "Page RESOLVED from the publisher PDF, which the PMC HTML could not give. Excerpt is the WEB edition. PRINT p. 1288 reads “...1 ml for each calorie of food...” where the web edition reads “1 millilitre”, and “recommended, without references, the consumption of” where the web edition reads “once recommended, without references, the consumption”.",
       "excerpt": "A suitable allowance of water for adults is 2.5 litres daily in most instances. An ordinary standard for diverse persons is 1 millilitre for each calorie of food. Most of this quantity is contained in prepared foods.",
       "excerpt_sha256": "bcc85e9524a30a99c6991408a59755371cde4f606e5b3807b97c6aa8d98d31d9",
       "excerpt_status": "HELD",
       "attributed_to": "Heinz Valtin",
       "attribution_note": null,
       "belief_key": "a.inst.c1.vreeman2007",
-      "proposition": "[vreeman2007 §unresolved] A suitable allowance of water for adults is 2.5 litres daily in most instances. An ordinary standard for diverse persons is 1 millilitre for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "proposition": "[vreeman2007 §myth.1 (p. 1288)] A suitable allowance of water for adults is 2.5 litres daily in most instances. An ordinary standard for diverse persons is 1 millilitre for each calorie of food. Most of this quantity is contained in prepared foods.",
       "evidence_ids": [
+        "ev_A_assert_vc_asserts_fnb_origin",
         "ev_A_prepared_foods_carroll2015",
         "ev_A_prepared_foods_fnb1945",
         "ev_A_prepared_foods_valtin2002",
         "ev_A_prepared_foods_vreeman2007"
+      ]
+    },
+    {
+      "instance_id": "A.valtin2002.q_stare",
+      "source_id": "valtin2002",
+      "locus": "§POSSIBLE ORIGIN OF 8 × 8",
+      "locus_note": "The block quotation, one paragraph below A.valtin2002.c1's passage. Same document, same section, different locus -- and classify_support must decline the pair on source_id alone.",
+      "excerpt": "How much water each day? This is usually well regulated by various physiological mechanisms, but for the average adult, somewhere around 6 to 8 glasses per 24 hours and this can be in the form of coffee, tea, milk, soft drinks, beer, etc. Fruits and vegetables are also good sources of water.",
+      "excerpt_sha256": "dd489745d0f74e6c2abbbf8b627fbdfc7ab1e7c14e39a8397090064b7d2e10bb",
+      "excerpt_status": "HELD",
+      "attributed_to": "Frederick J. Stare and Margaret McWilliams",
+      "attribution_note": "Valtin names BOTH coauthors, in the text and again in his reasons against.",
+      "belief_key": "a.inst.q_stare.valtin2002",
+      "proposition": "[valtin2002 §POSSIBLE ORIGIN OF 8 × 8] How much water each day? This is usually well regulated by various physiological mechanisms, but for the average adult, somewhere around 6 to 8 glasses per 24 hours and this can be in the form of coffee, tea, milk, soft drinks, beer, etc. Fruits and vegetables are also good sources of water.",
+      "evidence_ids": [
+        "ev_A_assert_valtin_floats_stare_origin",
+        "ev_A_stare_6to8_valtin2002",
+        "ev_A_stare_6to8_vreeman2007",
+        "ev_A_stare_beverages_valtin2002",
+        "ev_A_stare_beverages_vreeman2007"
+      ]
+    },
+    {
+      "instance_id": "A.vreeman2007.q_stare",
+      "source_id": "vreeman2007",
+      "locus": "§myth.1 (p. 1288)",
+      "locus_note": "Excerpt is the WEB edition; the print drops 'once' and adds 'of'. Neither difference touches either span.",
+      "excerpt": "Another endorsement may have come from a prominent nutritionist, Frederick Stare, who once recommended, without references, the consumption “around 6 to 8 glasses per 24 hours,” which could be “in the form of coffee, tea, milk, soft drinks, beer, etc.”",
+      "excerpt_sha256": "5a323cd8bd8179a02b48f5a3525514f077fc88763c84203f15fea0eed8ca5c56",
+      "excerpt_status": "HELD",
+      "attributed_to": "Frederick Stare",
+      "attribution_note": "The coauthor is GONE. Valtin's 'Drs. Stare and McWilliams' becomes 'a prominent nutritionist, Frederick Stare' -- a real attribution shift, five years and one hop downstream, and the second one slot A carries.",
+      "belief_key": "a.inst.q_stare.vreeman2007",
+      "proposition": "[vreeman2007 §myth.1 (p. 1288)] Another endorsement may have come from a prominent nutritionist, Frederick Stare, who once recommended, without references, the consumption “around 6 to 8 glasses per 24 hours,” which could be “in the form of coffee, tea, milk, soft drinks, beer, etc.”",
+      "evidence_ids": [
+        "ev_A_assert_vc_asserts_stare_origin",
+        "ev_A_stare_6to8_valtin2002",
+        "ev_A_stare_6to8_vreeman2007",
+        "ev_A_stare_beverages_valtin2002",
+        "ev_A_stare_beverages_vreeman2007"
       ]
     },
     {
@@ -248,16 +396,17 @@
     "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed"
   },
   "expect": {
-    "instance_count": 5,
+    "instance_count": 7,
     "source_count": 4,
-    "span_count": 3,
-    "assertion_count": 1,
+    "span_count": 5,
+    "assertion_count": 4,
     "note": "Structural only. No expected edge, support kind or mutation appears here -- those live in key_A.json, authored by hand and separately (FR-2)."
   },
   "known_gaps": [
-    "Propagators w1-w4 not identified; corpus is origin + corrections only.",
-    "stare1974, the rival origin, not obtained -- the undetermined origin edge has one candidate rather than two.",
-    "Three loci are §unresolved.",
-    "thirst_qualifier is attested in one document and corroborated by nothing."
+    "Propagators: ROLE held from vreeman2007's body text ('found throughout the popular press.w1-w4') and CITATIONS held from Valtin's list (3 = UCLA S-N-A-C pamphlet 2000; 17 = Brody, NY Times, 11 July 2000, p. D8; 42 = Hines, Am Fitness 19:23-25, 2001; 54 = Majette-Haynes, IBWA). They are still NOT NODES: every propagator sentence available is relayed through Valtin, and only HELD is committable. The bmj.com w-list, which would give w1-w4's own identities, is behind a CAPTCHA and was not obtained.",
+    "stare1974 itself not obtained. The rival origin now has textual substance -- two HELD documents quote it -- but the quoted document is absent, so both Stare assertions have an absent upstream endpoint.",
+    "One locus is §unresolved (carroll2015, which has no pagination to resolve). fnb1945's page within pp. 3-18 and valtin2002's page within R993-R1004 are section-resolved only.",
+    "thirst_qualifier is attested in one document and corroborated by nothing.",
+    "vreeman2007 exists in TWO editions that differ inside slot A's own excerpts, and the corpus treats them as one source. Held as a decision, not an oversight: promoting the print run to its own source_id would add a fourth reading of the millilitre clause and a same-document pair the mechanism must decline. The key author owns that call, and carroll2015 has the identical fork."
   ]
 }

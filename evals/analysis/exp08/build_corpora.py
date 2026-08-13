@@ -22,6 +22,15 @@ variant would erase the mutation being measured. This is why slot A's
 `wheeler2000` nor `hamblin1981` joins the span of the thing they are talking
 about.
 
+**An assertion's `cited_by` should be written EXPLICITLY.** The default -- every
+claim-instance of the asserting document -- is safe only while that document has
+one locus. Add a second and the assertion silently acquires two endpoints in the
+same document, which forms no edge (siblings) *and* drops out of
+`unresolved_assertions`, because that list reports assertions reaching fewer than
+two instances. The assertion disappears. Slot A hit this the moment
+`A.valtin2002.q_stare` was added, and A9 exists precisely to stop assertions
+disappearing.
+
 **`§unresolved` is a value, not a gap.** A held document whose locus is not
 established records `§unresolved`, so an unknown page stays distinguishable from
 one nobody needed.
@@ -62,19 +71,52 @@ A_VALTIN = A_FNB1.replace("one milliliter", "1 milliliter")
 A_VREEMAN = A_VALTIN.replace("liters", "litres").replace("milliliter", "millilitre")
 A_CARROLL = "Most of this quantity is contained in prepared foods."
 
+# The SECOND origin candidate, and the second textual family in slot A. Both
+# documents quote Stare & McWilliams 1974, which is itself NOT HELD -- so the
+# family exists entirely as quotation, and its edge runs between the two
+# quoters rather than from the quoted. Exactly the shape A10 said slot A
+# lacked: a rival origin with textual substance rather than a bare name.
+A_VALTIN_STARE = (
+    "How much water each day? This is usually well regulated by various physiological "
+    "mechanisms, but for the average adult, somewhere around 6 to 8 glasses per 24 hours "
+    "and this can be in the form of coffee, tea, milk, soft drinks, beer, etc. Fruits and "
+    "vegetables are also good sources of water."
+)
+A_VREEMAN_STARE = (
+    "Another endorsement may have come from a prominent nutritionist, Frederick Stare, who "
+    "once recommended, without references, the consumption “around 6 to 8 glasses per 24 "
+    "hours,” which could be “in the form of coffee, tea, milk, soft drinks, beer, etc.”"
+)
+
+# The PRINT text of the same two passages, from the publisher PDF of pp. 1288-1289.
+# NOT built into instances -- recorded so the divergence is on the record and can be
+# promoted to its own source the day the key author decides a printing is a document.
+# The differences are small and every one of them is a mutation the scorer would see:
+# "1 millilitre" (web) reads "1 ml" (print); "once recommended, the consumption" reads
+# "recommended, the consumption of"; "Furthermore" reads "Also"; "In contrast" reads
+# "But". The print carries NO reference markers at all -- "A full version with
+# references is on bmj.com" -- so w1-w9 exist only in the web edition.
+A_VREEMAN_PRINT_VARIANT = (
+    "PRINT p. 1288 reads “...1 ml for each calorie of food...” where the web edition "
+    "reads “1 millilitre”, and “recommended, without references, the consumption of” "
+    "where the web edition reads “once recommended, without references, the consumption”."
+)
+
 SLOT_A: dict[str, Any] = {
     "slot": "A",
     "description": (
         "Slot A as narrowed by A10: calibration retained for the textually demonstrable "
         "half, origin edge undetermined between rivals. PILOT. Every document here is the "
-        "origin or a correction -- the propagators (Vreeman & Carroll's web references "
-        "w1-w4) are unidentified, so the half of the graph that carries the myth forward is "
-        "absent. Results demonstrate the pipeline and A6's confound, and demonstrate nothing "
-        "about calibration."
+        "origin or a correction. The propagators are now IDENTIFIED -- not from Vreeman & "
+        "Carroll's w-list, which stayed behind a CAPTCHA, but from Valtin's own reference "
+        "list, which is better because Valtin QUOTES them (refs 3, 17, 42, 54). They are "
+        "still absent as nodes because every propagator excerpt available is RELAYED "
+        "through Valtin, and only HELD is committable. Results demonstrate the pipeline "
+        "and A6's confound, and demonstrate nothing about calibration."
     ),
     "sources": [
         ("fnb1945", "Food and Nutrition Board, National Academy of Sciences. Recommended Dietary Allowances, revised 1945. National Research Council, Reprint and Circular Series No. 122, 1945 (Aug), pp. 3-18.", "1945-08-01", "month", "origin candidate; contested (A10)"),
-        ("valtin2002", "Valtin, Heinz. \"'Drink at least eight glasses of water a day.' Really?\" American Journal of Physiology 283, no. 5 (2002): R993-R1004.", "2002-11-01", "month", "investigation; reports the FNB origin at two removes"),
+        ("valtin2002", "Valtin, Heinz. \"'Drink at least eight glasses of water a day.' Really?\" American Journal of Physiology 283, no. 5 (2002): R993-R1004.", "2002-11-01", "month", "investigation; reports the FNB origin at two removes and floats a SECOND, rival origin it then argues against"),
         ("vreeman2007", "Vreeman, Rachel C., and Aaron E. Carroll. \"Medical myths.\" BMJ 335, no. 7633 (22 December 2007): 1288-1289. Not commissioned; not externally peer reviewed.", "2007-12-22", "day", "correction; names Valtin (w8)"),
         ("carroll2015", "Carroll, Aaron E. \"No, You Do Not Have to Drink 8 Glasses of Water a Day.\" The New York Times (The Upshot), 24 August 2015. Print version 25 August 2015, Section A, p. 3, under a different headline.", "2015-08-24", "day", "correction; cites Valtin by hyperlink, never by name"),
     ],
@@ -82,22 +124,30 @@ SLOT_A: dict[str, Any] = {
         ("prepared_foods", "Most of this quantity is contained in prepared foods.", ["fnb1945", "valtin2002", "vreeman2007", "carroll2015"], None),
         ("allowance_liters", "A suitable allowance of water for adults is 2.5 liters daily in most instances.", ["fnb1945", "valtin2002"], "Stops at two documents: vreeman2007 carries the British 'litres' and 'millilitre'. That difference is the mutation; absorbing it into the span would erase it."),
         ("thirst_qualifier", A_FNB2, ["fnb1945"], "Attested in ONE document. Neither Valtin nor Vreeman & Carroll quote this sentence. The weakest excerpt in slot A, and the one carrying the second deletion."),
+        ("stare_6to8", "around 6 to 8 glasses per 24 hours", ["valtin2002", "vreeman2007"], "The rival origin's text, and it survives BOTH the web and print editions of vreeman2007 unchanged -- which is why the print variant does not break this span."),
+        ("stare_beverages", "in the form of coffee, tea, milk, soft drinks, beer, etc.", ["valtin2002", "vreeman2007"], "The clause that DEFEATS the rival origin: Stare allowed the caffeinated drinks 8x8 forbids. Both investigators quote it, and neither propagator does."),
     ],
     "instances": [
         ("A.fnb1945.rec1", "fnb1945", "§rec.1", 'under "Further recommendations:", sub-label "Water."; page within pp. 3-18 unresolved', A_FNB1, ["prepared_foods", "allowance_liters"], None, None),
         ("A.fnb1945.rec2", "fnb1945", "§rec.2", "same paragraph, final sentence", A_FNB2, ["thirst_qualifier"], None, None),
-        ("A.valtin2002.c1", "valtin2002", UNRESOLVED, None, A_VALTIN, ["prepared_foods", "allowance_liters"], None, None),
-        ("A.vreeman2007.c1", "vreeman2007", UNRESOLVED, "p. 1288 or 1289; PMC HTML carries no page breaks", A_VREEMAN, ["prepared_foods"], "Heinz Valtin", None),
+        ("A.valtin2002.c1", "valtin2002", "§POSSIBLE ORIGIN OF 8 × 8", "Section heading, HELD from the full text. The page within R993-R1004 stays unresolved -- the publisher's HTML carries no page breaks, the same limitation as vreeman2007.", A_VALTIN, ["prepared_foods", "allowance_liters"], None, None),
+        ("A.vreeman2007.c1", "vreeman2007", "§myth.1 (p. 1288)", "Page RESOLVED from the publisher PDF, which the PMC HTML could not give. Excerpt is the WEB edition. " + A_VREEMAN_PRINT_VARIANT, A_VREEMAN, ["prepared_foods"], "Heinz Valtin", None),
+        ("A.valtin2002.q_stare", "valtin2002", "§POSSIBLE ORIGIN OF 8 × 8", "The block quotation, one paragraph below A.valtin2002.c1's passage. Same document, same section, different locus -- and classify_support must decline the pair on source_id alone.", A_VALTIN_STARE, ["stare_6to8", "stare_beverages"], "Frederick J. Stare and Margaret McWilliams", "Valtin names BOTH coauthors, in the text and again in his reasons against."),
+        ("A.vreeman2007.q_stare", "vreeman2007", "§myth.1 (p. 1288)", "Excerpt is the WEB edition; the print drops 'once' and adds 'of'. Neither difference touches either span.", A_VREEMAN_STARE, ["stare_6to8", "stare_beverages"], "Frederick Stare", "The coauthor is GONE. Valtin's 'Drs. Stare and McWilliams' becomes 'a prominent nutritionist, Frederick Stare' -- a real attribution shift, five years and one hop downstream, and the second one slot A carries."),
         ("A.carroll2015.c1", "carroll2015", UNRESOLVED, "web article, no pagination", A_CARROLL, ["prepared_foods"], None, "Cited by hyperlink to Valtin's paper, never named in the body text. The field records what the document SAYS, and it says no name."),
     ],
     "assertions": [
-        ("hamblin_style_origin_claim", "valtin2002", "an unnamed prior recommendation -> the 8x8 claim", "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9)."),
+        ("thomas_asserts_fnb_origin", "valtin2002", "fnb1945 -> the 8x8 claim", "Reported at TWO REMOVES and now fully cited: Valtin ref 65 is Papai J, 'Eight glasses of water per day. An update', urbanlegends.com, and Papai relays P. Thomas, who is never cited at all. Valtin states the mechanism -- the last sentence of the FNB passage 'was not heeded' -- which is why `thirst_qualifier` and `prepared_foods` matter. The downstream endpoint, the propagated claim, is ABSENT from this corpus, so the edge cannot form (A9). cited_by is EXPLICIT: the default -- every instance of the asserting document -- silently gave this assertion two endpoints once A.valtin2002.q_stare existed, both in valtin2002, so it formed no edge AND dropped out of unresolved_assertions. An assertion that vanishes is the precise failure A9 was written to prevent, and the default reintroduced it the moment a second locus was added.", ["A.valtin2002.c1"]),
+        ("valtin_floats_stare_origin", "valtin2002", "stare1974 -> the 8x8 claim", "The RIVAL origin, and the one A10 said the corpus lacked. Valtin ref 81 is Stare FJ & McWilliams M, `Nutrition for Good Health`, Plycon, Fullerton CA, 1974, p. 175 -- reached not by search but through an OBITUARY (ref 77) and a former colleague (ref 82). Valtin quotes the passage in full, then gives four numbered reasons against it: undocumented, '6 to 8' is not 'at least eight', it ALLOWS caffeinated drinks, and it credits the regulation 8x8 denies. So the asserting document argues against its own assertion -- an edge no arm should draw with confidence. Upstream endpoint ABSENT: the Stare passage is RELAYED through Valtin, never HELD (A9).", ["A.valtin2002.q_stare"]),
+        ("vc_asserts_fnb_origin", "vreeman2007", "fnb1945 -> the 8x8 claim", "'One origin may be a 1945 recommendation' (w5), with the mechanism at w6: 'If the last, crucial sentence is ignored...'. A SECOND document asserting the same undetermined edge, five years after Valtin, and hedged the same way. Downstream endpoint still absent (A9).", ["A.vreeman2007.c1"]),
+        ("vc_asserts_stare_origin", "vreeman2007", "stare1974 -> the 8x8 claim", "'Another endorsement may have come from' (w7). Both investigators reached both candidates and neither picked one, which is the strongest evidence slot A has that the origin edge is genuinely undetermined rather than merely unresearched. Upstream endpoint absent (A9).", ["A.vreeman2007.q_stare"]),
     ],
     "known_gaps": [
-        "Propagators w1-w4 not identified; corpus is origin + corrections only.",
-        "stare1974, the rival origin, not obtained -- the undetermined origin edge has one candidate rather than two.",
-        "Three loci are §unresolved.",
+        "Propagators: ROLE held from vreeman2007's body text ('found throughout the popular press.w1-w4') and CITATIONS held from Valtin's list (3 = UCLA S-N-A-C pamphlet 2000; 17 = Brody, NY Times, 11 July 2000, p. D8; 42 = Hines, Am Fitness 19:23-25, 2001; 54 = Majette-Haynes, IBWA). They are still NOT NODES: every propagator sentence available is relayed through Valtin, and only HELD is committable. The bmj.com w-list, which would give w1-w4's own identities, is behind a CAPTCHA and was not obtained.",
+        "stare1974 itself not obtained. The rival origin now has textual substance -- two HELD documents quote it -- but the quoted document is absent, so both Stare assertions have an absent upstream endpoint.",
+        "One locus is §unresolved (carroll2015, which has no pagination to resolve). fnb1945's page within pp. 3-18 and valtin2002's page within R993-R1004 are section-resolved only.",
         "thirst_qualifier is attested in one document and corroborated by nothing.",
+        "vreeman2007 exists in TWO editions that differ inside slot A's own excerpts, and the corpus treats them as one source. Held as a decision, not an oversight: promoting the print run to its own source_id would add a fourth reading of the millilitre clause and a same-document pair the mechanism must decline. The key author owns that call, and carroll2015 has the identical fork.",
     ],
 }
 
