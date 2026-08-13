@@ -4,7 +4,7 @@
   "slot": "B",
   "status": "PILOT - INCOMPLETE",
   "generated_by": "evals/analysis/exp08/build_corpora.py",
-  "description": "Slot B, suspension. PILOT. The Einstein nodes are not obtained, so every assertion of the attribution has an absent upstream endpoint and resolves as unreported edge plus recorded assertion (A9). The investigations (Livio, O'Raifeartaigh & Mitton) are not HELD by the worksheet author, so the disagreement A11 rests on is not yet IN the corpus -- only in the pre-registration.",
+  "description": "Slot B, suspension. The Einstein nodes are still not obtained, so every assertion of the attribution has an absent upstream endpoint (A9). But A11's investigator disagreement is now IN THE CORPUS rather than only in the pre-registration: Livio and O'Raifeartaigh & Mitton quote the SAME two Gamow passages and reach OPPOSITE verdicts -- 'Gamow probably did make it up' against 'very likely that he labelled the term his biggest blunder'. Two more witnesses join too, Alpher and Wheeler, both held through O&M's reproduction of them. Eleven instances across seven documents.",
   "sources": [
     {
       "source_id": "gamow1956",
@@ -20,7 +20,15 @@
       "published": "1970-01-01",
       "date_resolution": "year",
       "role": "same author retelling, 14 years later",
-      "content_sha256": "b5a45c23416f156fecec73dd1582bb16a55ccbc03a51085e7e9a2cc2dbb80680"
+      "content_sha256": "6b02dd9084a3825f0e515edead17bff1c607d8b44c9909ea549a8d3256f7971c"
+    },
+    {
+      "source_id": "alpher1998",
+      "citation": "Alpher, Ralph A. Posting to the History of Astronomy Listserve (HASTRO-L), 1998, in reply to a query from Joseph S. Tenn. Reproduced in full as Figure 7 of O'Raifeartaigh & Mitton 2018.",
+      "published": "1998-01-01",
+      "date_resolution": "year",
+      "role": "third witness; NOT a publication -- an e-mail list posting, which is why A5 excluded it",
+      "content_sha256": "1b41d1d35c14725e156b1327bd675fe6dd7b98bb4f65e7f0ae8143d2098b43c3"
     },
     {
       "source_id": "wheeler2000",
@@ -29,6 +37,22 @@
       "date_resolution": "year",
       "role": "second claimed eyewitness, admitted by A5",
       "content_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102"
+    },
+    {
+      "source_id": "livio2013",
+      "citation": "Livio, Mario. Brilliant Blunders: From Darwin to Einstein. New York: Simon & Schuster, 2013, ch. 10.",
+      "published": "2013-01-01",
+      "date_resolution": "year",
+      "role": "investigation concluding the remark was NEVER MADE",
+      "content_sha256": "0130163df73ebd841217c56ddc394a32839c6845c16e8b9d5bfb88beb510bf72"
+    },
+    {
+      "source_id": "oraifeartaigh2018",
+      "citation": "O'Raifeartaigh, Cormac, and Simon Mitton. \"Interrogating the legend of Einstein's 'biggest blunder'.\" Physics in Perspective 20 (2018): 318-341. arXiv:1804.06768v2.",
+      "published": "2018-01-01",
+      "date_resolution": "year",
+      "role": "investigation concluding the remark was VERY LIKELY made -- the direct rival of livio2013",
+      "content_sha256": "cb7c697e6f7896763a06fabd6a8238800fe807ef419dd30257e86d58918e4bcb"
     }
   ],
   "spans": [
@@ -37,9 +61,29 @@
       "text": "was the biggest blunder he",
       "appears_in": [
         "gamow1956",
-        "gamow1970"
+        "gamow1970",
+        "livio2013",
+        "oraifeartaigh2018"
       ],
-      "note": "The longest verbatim run shared by the two Gamow tellings. wheeler2000 is DELIBERATELY ABSENT: it shares only 'biggest blunder', two tokens, which is the name of the legend. Recording that would produce a TEXTUAL edge contradicting Wheeler's own claim of independent hearing (A5)."
+      "note": "The longest verbatim run shared by the two Gamow tellings -- and now by both investigators, because each quotes both passages. wheeler2000 and alpher1998 are DELIBERATELY ABSENT: Wheeler shares only 'biggest blunder', two tokens, which is the name of the legend, and Alpher shares none of it. Recording either would produce a TEXTUAL edge contradicting their own claims of independent hearing (A5)."
+    },
+    {
+      "span_id": "wheeler_doorway",
+      "text": "Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow",
+      "appears_in": [
+        "wheeler2000",
+        "oraifeartaigh2018"
+      ],
+      "note": "Wheeler's testimony is now HELD, through O&M's verbatim reproduction of it. The span is the SCENE, not the quote -- it is the part no other witness could have copied, because it is Wheeler's own circumstance."
+    },
+    {
+      "span_id": "alpher_recall",
+      "text": "his introduction of the concept in his early work was a blunder",
+      "appears_in": [
+        "alpher1998",
+        "oraifeartaigh2018"
+      ],
+      "note": "Alpher's words, and note what is NOT in them: no superlative, no 'biggest', no 'of my life'. The weakest form of the claim, from the witness with the least to gain."
     }
   ],
   "asserted_descents": [
@@ -48,21 +92,83 @@
       "asserted_by": "gamow1956",
       "claims": "einstein -> the blunder phrase",
       "note": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9).",
-      "cited_by": "all instances of the asserting document"
+      "cited_by": [
+        "B.gamow1956.c1"
+      ]
     },
     {
       "assertion_id": "gamow1970_attributes_blunder_to_einstein",
       "asserted_by": "gamow1970",
       "claims": "einstein -> the blunder phrase",
       "note": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data.",
-      "cited_by": "all instances of the asserting document"
+      "cited_by": [
+        "B.gamow1970.c1"
+      ]
     },
     {
       "assertion_id": "wheeler_claims_direct_hearing",
       "asserted_by": "wheeler2000",
       "claims": "einstein -> the blunder phrase, on independent first-hand authority",
       "note": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try.",
-      "cited_by": "all instances of the asserting document"
+      "cited_by": [
+        "B.wheeler2000.c1"
+      ]
+    },
+    {
+      "assertion_id": "alpher_claims_direct_hearing",
+      "asserted_by": "alpher1998",
+      "claims": "einstein -> a blunder, on independent first-hand authority",
+      "note": "A THIRD claim of independent hearing, and the only one that hedges itself ('as I recall'). Upstream endpoint absent (A9).",
+      "cited_by": [
+        "B.alpher1998.c1"
+      ]
+    },
+    {
+      "assertion_id": "livio_concludes_fabrication",
+      "asserted_by": "livio2013",
+      "claims": "NO edge: gamow1956 has no ancestor in Einstein",
+      "note": "An assertion that a descent edge does NOT exist -- 'My conclusion is that Gamow probably did make it up'. The vocabulary has no way to record a negative edge, so it lands here, and that limitation is worth reporting: the corpus can hold 'X descends from Y, unproven' but not 'X descends from nothing, argued'.",
+      "cited_by": [
+        "B.livio2013.verdict"
+      ]
+    },
+    {
+      "assertion_id": "om_concludes_authentic",
+      "asserted_by": "oraifeartaigh2018",
+      "claims": "einstein -> the blunder phrase, on the weight of three independent reports",
+      "note": "The rival verdict. Note the ARGUMENT is about edges: O&M reason from the independence of Gamow, Wheeler and Alpher, which is precisely the structure the mechanism is being asked to derive.",
+      "cited_by": [
+        "B.oraifeartaigh2018.verdict"
+      ]
+    },
+    {
+      "assertion_id": "om_raises_gamow_to_wheeler",
+      "asserted_by": "oraifeartaigh2018",
+      "claims": "gamow1956 -> wheeler2000, EXPLICITLY UNDETERMINED",
+      "note": "O&M state it themselves and decline to settle it: 'It is of course possible that both Wheeler and Alpher were influenced by Gamow's recollections. However, it seems a stretch to accuse three different scientists of invention.' BOTH endpoints are in the corpus, so this produces a TESTIMONY edge -- and that OVERSTATES the source. The vocabulary can say 'a third document asserts this descent'; it cannot say 'a third document raises this descent and declines to affirm it'. The key must mark this edge undetermined, and the gap between what O&M wrote and what the graph can hold is a finding for results.md, not something to hide by dropping the assertion.",
+      "cited_by": [
+        "B.gamow1956.c1",
+        "B.wheeler2000.c1"
+      ]
+    },
+    {
+      "assertion_id": "om_raises_gamow_to_alpher",
+      "asserted_by": "oraifeartaigh2018",
+      "claims": "gamow1956 -> alpher1998, EXPLICITLY UNDETERMINED",
+      "note": "The second half of the same sentence, recorded separately because the two witnesses are independent of each other and an arm may well suspend on one and not the other. Same overstatement caveat as om_raises_gamow_to_wheeler.",
+      "cited_by": [
+        "B.gamow1956.c1",
+        "B.alpher1998.c1"
+      ]
+    },
+    {
+      "assertion_id": "livio_asserts_segre_folsing_repeat",
+      "asserted_by": "livio2013",
+      "claims": "gamow1970 -> segre2011 and gamow1970 -> folsing1997",
+      "note": "The propagation half, asserted but not holdable: Livio names Segre as concluding the remark was made during 'World War II Princeton talks' and Folsing as having 'repeated the alleged biggest blunder citation'. Neither book is obtained and neither is quoted verbatim, so both downstream endpoints are absent (A9).",
+      "cited_by": [
+        "B.livio2013.verdict"
+      ]
     }
   ],
   "evidence": [
@@ -81,12 +187,56 @@
       "summary": "span 'blunder_phrase' attested in gamow1970"
     },
     {
+      "evidence_id": "ev_B_blunder_phrase_livio2013",
+      "source_id": "livio2013",
+      "span_id": "blunder_phrase",
+      "record_kind": "span",
+      "summary": "span 'blunder_phrase' attested in livio2013"
+    },
+    {
+      "evidence_id": "ev_B_blunder_phrase_oraifeartaigh2018",
+      "source_id": "oraifeartaigh2018",
+      "span_id": "blunder_phrase",
+      "record_kind": "span",
+      "summary": "span 'blunder_phrase' attested in oraifeartaigh2018"
+    },
+    {
+      "evidence_id": "ev_B_wheeler_doorway_wheeler2000",
+      "source_id": "wheeler2000",
+      "span_id": "wheeler_doorway",
+      "record_kind": "span",
+      "summary": "span 'wheeler_doorway' attested in wheeler2000"
+    },
+    {
+      "evidence_id": "ev_B_wheeler_doorway_oraifeartaigh2018",
+      "source_id": "oraifeartaigh2018",
+      "span_id": "wheeler_doorway",
+      "record_kind": "span",
+      "summary": "span 'wheeler_doorway' attested in oraifeartaigh2018"
+    },
+    {
+      "evidence_id": "ev_B_alpher_recall_alpher1998",
+      "source_id": "alpher1998",
+      "span_id": "alpher_recall",
+      "record_kind": "span",
+      "summary": "span 'alpher_recall' attested in alpher1998"
+    },
+    {
+      "evidence_id": "ev_B_alpher_recall_oraifeartaigh2018",
+      "source_id": "oraifeartaigh2018",
+      "span_id": "alpher_recall",
+      "record_kind": "span",
+      "summary": "span 'alpher_recall' attested in oraifeartaigh2018"
+    },
+    {
       "evidence_id": "ev_B_assert_gamow1956_attributes_blunder_to_einstein",
       "source_id": "gamow1956",
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase",
       "summary": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9).",
-      "cited_by": []
+      "cited_by": [
+        "B.gamow1956.c1"
+      ]
     },
     {
       "evidence_id": "ev_B_assert_gamow1970_attributes_blunder_to_einstein",
@@ -94,7 +244,9 @@
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase",
       "summary": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data.",
-      "cited_by": []
+      "cited_by": [
+        "B.gamow1970.c1"
+      ]
     },
     {
       "evidence_id": "ev_B_assert_wheeler_claims_direct_hearing",
@@ -102,7 +254,71 @@
       "record_kind": "assertion",
       "claims": "einstein -> the blunder phrase, on independent first-hand authority",
       "summary": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try.",
-      "cited_by": []
+      "cited_by": [
+        "B.wheeler2000.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_alpher_claims_direct_hearing",
+      "source_id": "alpher1998",
+      "record_kind": "assertion",
+      "claims": "einstein -> a blunder, on independent first-hand authority",
+      "summary": "A THIRD claim of independent hearing, and the only one that hedges itself ('as I recall'). Upstream endpoint absent (A9).",
+      "cited_by": [
+        "B.alpher1998.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_livio_concludes_fabrication",
+      "source_id": "livio2013",
+      "record_kind": "assertion",
+      "claims": "NO edge: gamow1956 has no ancestor in Einstein",
+      "summary": "An assertion that a descent edge does NOT exist -- 'My conclusion is that Gamow probably did make it up'. The vocabulary has no way to record a negative edge, so it lands here, and that limitation is worth reporting: the corpus can hold 'X descends from Y, unproven' but not 'X descends from nothing, argued'.",
+      "cited_by": [
+        "B.livio2013.verdict"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_om_concludes_authentic",
+      "source_id": "oraifeartaigh2018",
+      "record_kind": "assertion",
+      "claims": "einstein -> the blunder phrase, on the weight of three independent reports",
+      "summary": "The rival verdict. Note the ARGUMENT is about edges: O&M reason from the independence of Gamow, Wheeler and Alpher, which is precisely the structure the mechanism is being asked to derive.",
+      "cited_by": [
+        "B.oraifeartaigh2018.verdict"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_om_raises_gamow_to_wheeler",
+      "source_id": "oraifeartaigh2018",
+      "record_kind": "assertion",
+      "claims": "gamow1956 -> wheeler2000, EXPLICITLY UNDETERMINED",
+      "summary": "O&M state it themselves and decline to settle it: 'It is of course possible that both Wheeler and Alpher were influenced by Gamow's recollections. However, it seems a stretch to accuse three different scientists of invention.' BOTH endpoints are in the corpus, so this produces a TESTIMONY edge -- and that OVERSTATES the source. The vocabulary can say 'a third document asserts this descent'; it cannot say 'a third document raises this descent and declines to affirm it'. The key must mark this edge undetermined, and the gap between what O&M wrote and what the graph can hold is a finding for results.md, not something to hide by dropping the assertion.",
+      "cited_by": [
+        "B.gamow1956.c1",
+        "B.wheeler2000.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_om_raises_gamow_to_alpher",
+      "source_id": "oraifeartaigh2018",
+      "record_kind": "assertion",
+      "claims": "gamow1956 -> alpher1998, EXPLICITLY UNDETERMINED",
+      "summary": "The second half of the same sentence, recorded separately because the two witnesses are independent of each other and an arm may well suspend on one and not the other. Same overstatement caveat as om_raises_gamow_to_wheeler.",
+      "cited_by": [
+        "B.gamow1956.c1",
+        "B.alpher1998.c1"
+      ]
+    },
+    {
+      "evidence_id": "ev_B_assert_livio_asserts_segre_folsing_repeat",
+      "source_id": "livio2013",
+      "record_kind": "assertion",
+      "claims": "gamow1970 -> segre2011 and gamow1970 -> folsing1997",
+      "summary": "The propagation half, asserted but not holdable: Livio names Segre as concluding the remark was made during 'World War II Princeton talks' and Folsing as having 'repeated the alleged biggest blunder citation'. Neither book is obtained and neither is quoted verbatim, so both downstream endpoints are absent (A9).",
+      "cited_by": [
+        "B.livio2013.verdict"
+      ]
     }
   ],
   "claim_instances": [
@@ -110,7 +326,7 @@
       "instance_id": "B.gamow1956.c1",
       "source_id": "gamow1956",
       "locus": "§unresolved",
-      "locus_note": "page within pp. 136-156 not established; JSTOR access CAPTCHA'd",
+      "locus_note": "Page within pp. 136-156 not established; JSTOR access CAPTCHA'd. The two investigators disagree on this document's own MONTH -- Livio says September 1956, O&M say May 1956 -- and `published` is the only ordering channel the mechanism has.",
       "excerpt": "Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.",
       "excerpt_sha256": "32b2e0aeebe5bffadf1659e485a18a80b4d80b0e7c2c6aad69c243fc8b2b9e46",
       "excerpt_status": "HELD",
@@ -120,8 +336,12 @@
       "proposition": "[gamow1956 §unresolved] Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.",
       "evidence_ids": [
         "ev_B_assert_gamow1956_attributes_blunder_to_einstein",
+        "ev_B_assert_om_raises_gamow_to_alpher",
+        "ev_B_assert_om_raises_gamow_to_wheeler",
         "ev_B_blunder_phrase_gamow1956",
-        "ev_B_blunder_phrase_gamow1970"
+        "ev_B_blunder_phrase_gamow1970",
+        "ev_B_blunder_phrase_livio2013",
+        "ev_B_blunder_phrase_oraifeartaigh2018"
       ]
     },
     {
@@ -139,14 +359,49 @@
       "evidence_ids": [
         "ev_B_assert_gamow1970_attributes_blunder_to_einstein",
         "ev_B_blunder_phrase_gamow1956",
-        "ev_B_blunder_phrase_gamow1970"
+        "ev_B_blunder_phrase_gamow1970",
+        "ev_B_blunder_phrase_livio2013",
+        "ev_B_blunder_phrase_oraifeartaigh2018"
+      ]
+    },
+    {
+      "instance_id": "B.gamow1970.c2",
+      "source_id": "gamow1970",
+      "locus": "§p44.cont",
+      "locus_note": "The sentence immediately after B.gamow1970.c1, listed as a known gap until Livio's chapter supplied it verbatim. Shares NO span with c1 -- so the mechanism must decline its own document's two loci, which it does on source_id.",
+      "excerpt": "But this \"blunder,\" rejected by Einstein, is still sometimes used by cosmologists even today, and the cosmological constant denoted by the Greek letter \"Λ\" rears its ugly head again and again.",
+      "excerpt_sha256": "dde6bd65d1d81b20dbe8dcafda04937b45e8b6d223f15d1fdf8d93bc11163956",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein",
+      "attribution_note": "The QUOTATION MARKS around 'blunder' are Livio's central evidence that Gamow meant to be quoting rather than paraphrasing -- and Livio still concludes against authenticity.",
+      "belief_key": "b.inst.c2.gamow1970",
+      "proposition": "[gamow1970 §p44.cont] But this \"blunder,\" rejected by Einstein, is still sometimes used by cosmologists even today, and the cosmological constant denoted by the Greek letter \"Λ\" rears its ugly head again and again.",
+      "evidence_ids": []
+    },
+    {
+      "instance_id": "B.alpher1998.c1",
+      "source_id": "alpher1998",
+      "locus": "§hastro-l",
+      "locus_note": "Held through O&M's Figure 7. Two spaces after 'constant.' in the source are normalised to one; the excerpt is hashed, so the normalisation is recorded rather than silent.",
+      "excerpt": "A way to fix this was to reactivate the cosmological constant. Einstein did not like this very much, and, as I recall, said his introduction of the concept in his early work was a blunder",
+      "excerpt_sha256": "1b41d1d35c14725e156b1327bd675fe6dd7b98bb4f65e7f0ae8143d2098b43c3",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein",
+      "attribution_note": "Hedged at the source -- 'as I recall' -- by the only witness who hedges.",
+      "belief_key": "b.inst.c1.alpher1998",
+      "proposition": "[alpher1998 §hastro-l] A way to fix this was to reactivate the cosmological constant. Einstein did not like this very much, and, as I recall, said his introduction of the concept in his early work was a blunder",
+      "evidence_ids": [
+        "ev_B_alpher_recall_alpher1998",
+        "ev_B_alpher_recall_oraifeartaigh2018",
+        "ev_B_assert_alpher_claims_direct_hearing",
+        "ev_B_assert_om_raises_gamow_to_alpher"
       ]
     },
     {
       "instance_id": "B.wheeler2000.c1",
       "source_id": "wheeler2000",
       "locus": "§pG-11",
-      "locus_note": "Locus RELAYED from O'Raifeartaigh et al. 2017 fn. 48, which cites 'Taylor and Wheeler 2000 pG-11'. A pointer rather than an excerpt, so an error here surfaces on fetch. Which of the two named authors speaks in the first person is still unresolved.",
+      "locus_note": "Locus RELAYED from O'Raifeartaigh et al. 2017 fn. 48; the TEXT is now HELD through O&M 2018's verbatim reproduction. Which of the two named authors speaks in the first person is still unresolved.",
       "excerpt": "Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
       "excerpt_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102",
       "excerpt_status": "HELD",
@@ -155,7 +410,115 @@
       "belief_key": "b.inst.c1.wheeler2000",
       "proposition": "[wheeler2000 §pG-11] Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
       "evidence_ids": [
-        "ev_B_assert_wheeler_claims_direct_hearing"
+        "ev_B_assert_om_raises_gamow_to_wheeler",
+        "ev_B_assert_wheeler_claims_direct_hearing",
+        "ev_B_wheeler_doorway_oraifeartaigh2018",
+        "ev_B_wheeler_doorway_wheeler2000"
+      ]
+    },
+    {
+      "instance_id": "B.livio2013.q_gamow",
+      "source_id": "livio2013",
+      "locus": "§ch10",
+      "locus_note": "Livio quotes gamow1956 verbatim and dates it SEPTEMBER 1956.",
+      "excerpt": "In an article entitled \"The Evolutionary Universe,\" published in the September 1956 issue of Scientific American, Gamow wrote, \"Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.\"",
+      "excerpt_sha256": "d03af85a63108cf1a42339fc93171fb9734d6eaa5e3e870358b515fb609ad73e",
+      "excerpt_status": "HELD",
+      "attributed_to": "George Gamow",
+      "attribution_note": null,
+      "belief_key": "b.inst.q_gamow.livio2013",
+      "proposition": "[livio2013 §ch10] In an article entitled \"The Evolutionary Universe,\" published in the September 1956 issue of Scientific American, Gamow wrote, \"Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.\"",
+      "evidence_ids": [
+        "ev_B_blunder_phrase_gamow1956",
+        "ev_B_blunder_phrase_gamow1970",
+        "ev_B_blunder_phrase_livio2013",
+        "ev_B_blunder_phrase_oraifeartaigh2018"
+      ]
+    },
+    {
+      "instance_id": "B.livio2013.verdict",
+      "source_id": "livio2013",
+      "locus": "§ch10.verdict",
+      "locus_note": "Same document, different locus. Carries no span at all -- a conclusion shares no text with the thing it concludes about, which is exactly why suspension cannot be read off the graph.",
+      "excerpt": "my best guess, based on the entire body of evidence, is that while Einstein may have had a \"bad conscience\" about the introduction of the cosmological constant, especially since he missed the chance to predict the cosmic expansion, he never actually called it \"the biggest blunder\" that he \"had ever made.\"",
+      "excerpt_sha256": "48f856a3b9fa60b279e7ba5d7c42720cce05dfbe62d3f998ec3a3eef4ae7b410",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": "Livio names NO ONE as the source of the phrase except Gamow himself, and calls it 'Gamow's own hyperbole'.",
+      "belief_key": "b.inst.verdict.livio2013",
+      "proposition": "[livio2013 §ch10.verdict] my best guess, based on the entire body of evidence, is that while Einstein may have had a \"bad conscience\" about the introduction of the cosmological constant, especially since he missed the chance to predict the cosmic expansion, he never actually called it \"the biggest blunder\" that he \"had ever made.\"",
+      "evidence_ids": [
+        "ev_B_assert_livio_asserts_segre_folsing_repeat",
+        "ev_B_assert_livio_concludes_fabrication"
+      ]
+    },
+    {
+      "instance_id": "B.oraifeartaigh2018.q_gamow",
+      "source_id": "oraifeartaigh2018",
+      "locus": "§4",
+      "locus_note": "O&M quote the SAME gamow1956 sentence and date it MAY 1956. Same source document, same sentence, two investigators, two months.",
+      "excerpt": "In a substantial article on 'big bang' cosmology published in Scientific American in May 1956, the Russian émigré physicist George Gamow reported: \"Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life\"",
+      "excerpt_sha256": "ea0a677e5a468ea52566878913502b130955d70352046cd51f0c034dadc75687",
+      "excerpt_status": "HELD",
+      "attributed_to": "George Gamow",
+      "attribution_note": null,
+      "belief_key": "b.inst.q_gamow.oraifeartaigh2018",
+      "proposition": "[oraifeartaigh2018 §4] In a substantial article on 'big bang' cosmology published in Scientific American in May 1956, the Russian émigré physicist George Gamow reported: \"Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life\"",
+      "evidence_ids": [
+        "ev_B_blunder_phrase_gamow1956",
+        "ev_B_blunder_phrase_gamow1970",
+        "ev_B_blunder_phrase_livio2013",
+        "ev_B_blunder_phrase_oraifeartaigh2018"
+      ]
+    },
+    {
+      "instance_id": "B.oraifeartaigh2018.q_wheeler",
+      "source_id": "oraifeartaigh2018",
+      "locus": "§6.iv",
+      "locus_note": null,
+      "excerpt": "Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
+      "excerpt_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein, via John Archibald Wheeler",
+      "attribution_note": null,
+      "belief_key": "b.inst.q_wheeler.oraifeartaigh2018",
+      "proposition": "[oraifeartaigh2018 §6.iv] Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
+      "evidence_ids": [
+        "ev_B_wheeler_doorway_oraifeartaigh2018",
+        "ev_B_wheeler_doorway_wheeler2000"
+      ]
+    },
+    {
+      "instance_id": "B.oraifeartaigh2018.q_alpher",
+      "source_id": "oraifeartaigh2018",
+      "locus": "§6.iv",
+      "locus_note": null,
+      "excerpt": "A way to fix this was to reactivate the cosmological constant. Einstein did not like this very much, and, as I recall, said his introduction of the concept in his early work was a blunder",
+      "excerpt_sha256": "1b41d1d35c14725e156b1327bd675fe6dd7b98bb4f65e7f0ae8143d2098b43c3",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein, via Ralph Alpher",
+      "attribution_note": null,
+      "belief_key": "b.inst.q_alpher.oraifeartaigh2018",
+      "proposition": "[oraifeartaigh2018 §6.iv] A way to fix this was to reactivate the cosmological constant. Einstein did not like this very much, and, as I recall, said his introduction of the concept in his early work was a blunder",
+      "evidence_ids": [
+        "ev_B_alpher_recall_alpher1998",
+        "ev_B_alpher_recall_oraifeartaigh2018"
+      ]
+    },
+    {
+      "instance_id": "B.oraifeartaigh2018.verdict",
+      "source_id": "oraifeartaigh2018",
+      "locus": "§abstract",
+      "locus_note": "The direct contradiction of B.livio2013.verdict, five years later, on the same evidence plus two witnesses Livio did not use.",
+      "excerpt": "We conclude that there is little doubt that Einstein came to view the introduction of the cosmological constant term a serious error and that it is very likely that he labelled the term his \"biggest blunder\" on at least one occasion.",
+      "excerpt_sha256": "91aa60b63b74cebc61b791b2f85fe3b97aa035dab04c0bb201a3d670691f5272",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": null,
+      "belief_key": "b.inst.verdict.oraifeartaigh2018",
+      "proposition": "[oraifeartaigh2018 §abstract] We conclude that there is little doubt that Einstein came to view the introduction of the cosmological constant term a serious error and that it is very likely that he labelled the term his \"biggest blunder\" on at least one occasion.",
+      "evidence_ids": [
+        "ev_B_assert_om_concludes_authentic"
       ]
     }
   ],
@@ -171,17 +534,18 @@
     "pinned_by": "tests/test_exp08_properties.py::test_mutation_precedence_is_fixed"
   },
   "expect": {
-    "instance_count": 3,
-    "source_count": 3,
-    "span_count": 1,
-    "assertion_count": 3,
+    "instance_count": 11,
+    "source_count": 6,
+    "span_count": 3,
+    "assertion_count": 9,
     "note": "Structural only. No expected edge, support kind or mutation appears here -- those live in key_B.json, authored by hand and separately (FR-2)."
   },
   "known_gaps": [
-    "einstein1917 and einstein1931 not obtained -- every attribution assertion therefore has an absent upstream endpoint.",
-    "livio2013 and oraifeartaigh2018 not HELD by the author, so A11's investigator disagreement is not represented in the corpus.",
-    "Segre, Folsing and Leahy -- the repeaters Livio names -- not obtained.",
-    "gamow1956's page unresolved; wheeler2000's speaker unresolved.",
-    "gamow1970's continuation, where Gamow puts 'blunder' in quotation marks, is not HELD and is omitted."
+    "einstein1917 and einstein1931 not obtained -- every attribution assertion therefore has an absent upstream endpoint. This is the gap that keeps slot B a suspension test rather than a recovery test.",
+    "Segre 2011, Folsing 1997 and Leahy 2001 not obtained. Livio names all three and quotes only Leahy, so the propagation half of slot B is asserted but not built.",
+    "gamow1956's page is unresolved AND its month is disputed between the two investigations (Livio: September; O&M: May). The corpus records September, from Livio, who gives the article title as well.",
+    "wheeler2000's speaker unresolved -- the book has two named authors and the testimony is in the first person.",
+    "alpher1998 is a mailing-list posting held only through O&M's reproduction; the list archive itself was not consulted.",
+    "The two witness-dependence edges are recorded as TESTIMONY, which is stronger than what O'Raifeartaigh & Mitton actually wrote. They raise the possibility that Wheeler and Alpher were influenced by Gamow and then argue against it. The record vocabulary has no way to mark an asserted edge as raised-but-declined, so the key must carry that and results.md must report the limitation."
   ]
 }
