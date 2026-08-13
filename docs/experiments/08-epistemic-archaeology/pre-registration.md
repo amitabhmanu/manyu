@@ -539,3 +539,66 @@ and inventing an order to force an edge would author the dependent variable thro
 date field, which is the specific failure A3's convention exists to prevent.
 
 Recorded before slot C is transcribed, and before any slot C edge has been seen.
+
+### A8 — 2026-08-13: slot C is cut, and A7 is thereby moot
+
+**Decision: slot C is removed from the corpus.** The scored slate is A, B, D and E.
+
+**Why, and it is not cost.** Slot C's step 2 worksheet — written before any Sanskrit was
+transcribed — established that the slot cannot measure what §7.3 charters it to measure.
+Every scored dimension collapses:
+
+| Dimension | Slot C |
+|---|---|
+| Edge precision / recall | Direction is **assigned** from declared relations under A7, not derived. Scoring it reads back the experimenter's own input. And the root-phrase span connects **every layer to every layer**, because glossing its root is what a commentary *is* |
+| Restraint | Slot D only |
+| Suspension | Slot B only |
+| Discrimination | The hostile-witness span is **degenerate** — the quoted position and its refutation share a physical page, so the pair declines on a shared ordinal by construction |
+| Mutation labelling | The only survivor |
+
+So slot C reduces to a mutation-labelling test, and slot A tests mutation more cleanly:
+its deletion is checkable because the ancestor survives independently.
+
+**The decisive point is the hostile witness.** That structure was the slot's entire reason
+for existing (§7.3), and it produces an **expected decline** — derivable from the design
+without transcribing a word. A null you can predict from the fixture's shape is not a result
+that needs running.
+
+**What is withdrawn.**
+
+- **P9 is withdrawn.** It registered slot C degrading with neither arm above 0.6 recall and
+  a smaller between-arm gap than slot D. There will be no slot C measurement to compare it
+  against. A withdrawn prediction is recorded, never deleted.
+- **§7.3's charter** ("stress — heavy mutation, hostile witnesses") no longer describes any
+  slot in the experiment. The stress question is unanswered, and the results must say so
+  rather than let the remaining four slots imply it was covered.
+- **A7 is moot**, since it governs only slot C's `published` semantics.
+- **A6's fourth consequence** — slot C reported explicitly under the text-versus-endorsement
+  limitation — falls away. **A6 itself stands**: slots A and B both exhibit the confound and
+  it is reportable from them.
+- Stage 3 becomes **slots B and E** rather than B, C and E.
+
+**A7 was also incomplete, recorded because it would matter if slot C ever returns.** It
+licenses ordinals from declared relations but never says that direction must therefore go
+**unscored**. Assigned direction scored back is a read-back — the defect A2 refused when it
+made edges derived rather than stored. Any future reinstatement of slot C must close that
+gap before transcription, not after.
+
+**What this decision does NOT claim.** It is not a finding about commentarial traditions,
+which are richly ordered and self-documenting. It is a finding about **what this mechanism
+can measure on them**: a reconstructor whose only direction signal is a date field cannot
+derive descent in a corpus whose ordering is declared rather than dated, and whose shared
+text is universal by genre.
+
+**Why cutting is legitimate now and would not be later.** No slot C data exists. Not one
+excerpt was transcribed, no key was authored, and no edge was ever reconstructed. Removing a
+slot before any of its data exists is scope management; removing it after seeing its numbers
+would be selection on the dependent variable, and would invalidate everything the other
+slots report. The distinction is the entire reason this amendment is dated today rather than
+during analysis.
+
+This is the offline stages working exactly as chartered. Requirements §9 gives each rung the
+power to end the experiment; the same discipline applied to a single slot ends the slot. The
+cost avoided — four layers of Sanskrit, an unresolved edition question, and a translation
+that would have made the mutation operator measure the translator — is a benefit and is not
+the reason.

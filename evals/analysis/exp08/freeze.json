@@ -1,7 +1,8 @@
 {
   "_note": "Experiment 8. Slot D's corpus and key are GENERATED, not transcribed (FR-8), so the generator is frozen under `standards` rather than `mechanisms`: easing the null after seeing what an arm drew on it is the defect this freeze exists to catch, and it would be done by editing the generator.",
   "_enforcement": "verify_fixture_freeze(experiment=\"8\") on files, called by a runner before anything else; verify_standards_freeze on standards, called by a scored run and deliberately not by the test suite — a guard that fires constantly gets deleted.",
-  "_partial_note": "Slots A, B, C and E are ABSENT from this freeze because they have not been transcribed. That is a statement about the corpus, not an oversight: FR-9 requires citation, content hash and minimal excerpt taken from the documents themselves, and a model-recalled excerpt would put fabricated primary text into the fixture the hand-authored keys are built from. This file is extended, and re-dated, when those slots land.",
+  "_slot_c_note": "Slot C was CUT on 2026-08-13 (amendment A8) before any excerpt was transcribed. It never had fixtures and never will under this experiment. The scored slate is A, B, D, E.",
+  "_partial_note": "Slots A, B and E are ABSENT from this freeze because they have not been transcribed. That is a statement about the corpus, not an oversight: FR-9 requires citation, content hash and minimal excerpt taken from the documents themselves, and a model-recalled excerpt would put fabricated primary text into the fixture the hand-authored keys are built from. This file is extended, and re-dated, when those slots land.",
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
@@ -15,8 +16,8 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "dcfce673418a742155f8551fdb4fef4d13c070f648fee028aeb47d50375afb8b",
-      "amendments_at_freeze": ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]
+      "sha256": "ff0b70cbffffeaa816564a55edc2767bcdd10cc55b954a72b7e7c567302336d1",
+      "amendments_at_freeze": ["A1", "A2", "A3", "A4", "A5", "A6", "A7 (moot)", "A8"]
     }
   },
   "files": {

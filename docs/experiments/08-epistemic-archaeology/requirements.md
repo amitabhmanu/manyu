@@ -263,7 +263,7 @@ differently. A case that cannot fail in a way no other case can is cut.
 |---|---|---|---|
 | A | Eight glasses of water | Calibration — recover a lineage objectively in the record | High |
 | B | Einstein's "biggest blunder" | Suspension — refuse to collapse where the record is silent | High (the *absence* is well established) |
-| C | Commentarial chain | Stress — heavy mutation, hostile witnesses | Low, and that is the point |
+| ~~C~~ | ~~Commentarial chain~~ | **CUT 2026-08-13 — [amendment A8](pre-registration.md).** Every scored dimension collapsed: direction is assigned rather than derived, the root-phrase span connects every layer to every layer, and the hostile-witness case declines by construction. The stress question is now unanswered by any slot | — |
 | D | Hand-built synthetic pair | Restraint — no edge exists | **Certain** |
 | E | Spinach and iron | Discrimination — testimony vs. evidence of descent | Structural only (§7.5) |
 
@@ -295,7 +295,12 @@ has.
 Sits in the cosmology domain experiment 5 already engages, so the framing is not
 foreign to the store.
 
-### 7.3 Slot C — stress
+### 7.3 Slot C — stress ~~(CUT — [amendment A8](pre-registration.md), 2026-08-13)~~
+
+> **This section is retained unedited below, and is no longer in force.** It records what
+> the slot was chartered to do, which is what makes the cut auditable. The stress question
+> — heavy mutation under hostile witnesses — is **unanswered by any remaining slot**, and
+> `results.md` must say so rather than let A, B, D and E imply it was covered.
 
 A commentarial transmission chain — sūtra → bhāṣya → vārttika → ṭīkā.
 
@@ -393,7 +398,7 @@ Each rung can end the experiment. The ordering is the design.
 | 0 — reconstruction over hand-encoded fixtures | none | 1 | Graph recovery where extraction is bypassed and claim-instances are hand-encoded. Includes slot D end to end | **Yes** — an algorithm that cannot recover a hand-fed graph will not recover a read one |
 | 1 — extraction fidelity **and identity stability**, slot A only | yes | pilot | Can either arm read the corpus into claim-instances at all — and does the same source, extracted twice, declare the same identity granularity? §5.3 relocates that hazard to here | **Yes** — if extraction is the bottleneck, or identity is unstable run to run, this is an extraction experiment and should say so |
 | 2 — both arms, slots A and D | yes | pilot + ~10 | Calibration and the null, scored. **The first rung where the control arm means anything** | **Yes** — a tie on both reweights the experiment onto §8's first outcome |
-| 3 — both arms, slots B, C, E | yes | ~10 each | The discriminating cases. Suspension, stress, discrimination | No — this is the experiment |
+| 3 — both arms, slots B and E | yes | ~10 each | The discriminating cases. Suspension and discrimination. **Stress is no longer among them** — slot C cut, [amendment A8](pre-registration.md) | No — this is the experiment |
 | 4 — the tooling | — | — | Whatever §1.1's *leaves behind* survives stages 0–3, surfaced on core/CLI/MCP | No |
 
 Stages −1 and 0 are deterministic under `FrozenClock` and consume no provider, so
