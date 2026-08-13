@@ -23,10 +23,15 @@ evals/analysis/exp08/        artifacts, one directory per stage
 Stage −1 emits a single artifact answering the three questions requirements §9
 assigns it, each as a **demonstration or a refutation** rather than prose:
 
-1. **`belief_key` merge behaviour.** Feed the slot A variants — the 1945 original
-   and each downstream restatement — through the normal creation path and record
-   how many distinct beliefs survive. If they merge, requirements §5.3 is
-   confirmed as a blocker and §6's option (b) is forced.
+1. **Identity delegation, demonstrated.** Feed the slot A variants — the 1945
+   original and each downstream restatement — through the normal creation path
+   twice: once declaring one key for all of them, once declaring a distinct key
+   per variant. Both should succeed, and that is the point. `belief_key`
+   normalisation collapses case and whitespace only
+   ([schemas.py:400](../../../src/manyu/schemas.py)), so the substrate imposes no
+   identity rule and the caller decides how much mutation the corpus contains
+   (requirements §5.3). Recording this as a demonstration is what moves the
+   hazard onto stage 1's extractor measurement rather than leaving it implicit.
 2. **Claim-instance representability.** Attempt a claim-instance encoding using
    only existing schemas. Report the encoding, or report precisely which field is
    missing. Following experiment 6's stage −1, which passed 7/7 with no new

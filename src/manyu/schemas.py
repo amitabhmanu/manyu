@@ -648,6 +648,21 @@ class ReportTargetKind(str, Enum):
     BELIEF = "belief"
     APPRAISAL = "appraisal"
     POSITION = "position"
+    #: Experiment 8, FR-7. Freezes an ingested corpus of claim-instances and the
+    #: evidence records behind them, so a scored reconstruction can name the
+    #: corpus it consumed.
+    #:
+    #: Unlike the other three this target is never *reported* on — it exists to
+    #: be cited by an analysis run, not to be described by a Reporter. The
+    #: honesty scorer's path is unaffected: `reporting.rank_causes` returns `[]`
+    #: for a kind it does not handle, and `tests/test_exp08_substrate.py` pins
+    #: that so a later caller cannot quietly turn a corpus snapshot into an
+    #: honesty score.
+    #:
+    #: Added rather than storing a corpus digest elsewhere because it inherits
+    #: `LogSnapshot`, the `log_snapshots` table and that table's exemption from
+    #: redact/reset (store.py:68) for free — no migration, no new table.
+    CORPUS = "corpus"
 
 
 class ReporterKind(str, Enum):

@@ -1,0 +1,54 @@
+{
+  "_note": "Experiment 8. Slot D's corpus and key are GENERATED, not transcribed (FR-8), so the generator is frozen under `standards` rather than `mechanisms`: easing the null after seeing what an arm drew on it is the defect this freeze exists to catch, and it would be done by editing the generator.",
+  "_enforcement": "verify_fixture_freeze(experiment=\"8\") on files, called by a runner before anything else; verify_standards_freeze on standards, called by a scored run and deliberately not by the test suite — a guard that fires constantly gets deleted.",
+  "_partial_note": "Slots A, B, C and E are ABSENT from this freeze because they have not been transcribed. That is a statement about the corpus, not an oversight: FR-9 requires citation, content hash and minimal excerpt taken from the documents themselves, and a model-recalled excerpt would put fabricated primary text into the fixture the hand-authored keys are built from. This file is extended, and re-dated, when those slots land.",
+  "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
+  "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it.",
+  "frozen_at": "2026-08-12",
+  "git_commit_at_freeze": "ed94bffeb91a29d2e3170751106c7c043e42b89c",
+  "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
+  "pre_registration": {
+    "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
+      "sha256": "76bf85dd35ae8957acc9ea7877871ababc7325ca569e8c2819b9611a3b2aaa65",
+      "amendments_at_freeze": ["A1", "A2", "A3"]
+    }
+  },
+  "files": {
+    "evals/fixtures/exp08/corpus_D.json": {
+      "sha256": "1688351c299b99fe7c2c7f9784af6d4efb6b54a1b539884d65ee0d752571f3b0",
+      "role": "the_null_two_families_sharing_no_record"
+    },
+    "evals/fixtures/exp08/key_D.json": {
+      "sha256": "f7c740028674ad3da44fdd117042819fdb0199fe18ab19363f1685b6af91d33a",
+      "role": "the_only_certain_key_in_the_corpus_zero_edges"
+    }
+  },
+  "standards": {
+    "tests/test_exp08_substrate.py": {
+      "sha256": "aeda19d2a7cc201475c9002afbddc61d85032bcbec1cd834d9af53c6e99a0a3a",
+      "role": "stage_minus1_standard_written_before_the_mechanism"
+    },
+    "tests/test_exp08_mutants.py": {
+      "sha256": "6387ddfb9ac4bf2130311553634980ab768927827eade78270250ab3ad78624c",
+      "role": "defect_battery_including_the_section_6_3_capability_check"
+    },
+    "tests/test_exp08_properties.py": {
+      "sha256": "d2f70c907af5f008061754f66aa52d5bd3f4bdcb443cf1b2d866a9354486de76",
+      "role": "structural_prohibitions_no_aggregate_no_threshold_no_arm_branch"
+    },
+    "evals/analysis/exp08/generate_slot_d.py": {
+      "sha256": "860ae9345335c93738b2677e6e3d30b734970ce92d2bd37334c02dcd87c6dace",
+      "role": "emits_the_null_and_its_key_from_one_function_easing_it_must_trip_this"
+    }
+  },
+  "mechanisms": {
+    "src/manyu/descent.py": {
+      "sha256": "e5f7d503a700c3c4ab5e2a3e134dff2bcc43309586a88a746d82e3f8006ba9d1",
+      "role": "derivation_and_scoring_no_threshold_declared"
+    },
+    "src/manyu/descent_mutants.py": {
+      "sha256": "8381cf67fcbbac1d7494f65146602ac3fdb941f1f9b7df14286ec9fe3232fcfc",
+      "role": "eight_mutants_none_documented_as_equivalent"
+    }
+  }
+}

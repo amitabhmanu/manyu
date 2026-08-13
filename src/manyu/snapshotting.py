@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Any
 from uuid import uuid4
 
@@ -15,6 +17,64 @@ from manyu.store import ManyuStore
 
 def _id(prefix: str) -> str:
     return f"{prefix}_{uuid4().hex[:12]}"
+
+
+#: The `metadata["corpus"]` tag a record must carry to be swept into a CORPUS
+#: snapshot. A literal rather than an import from the experiment module, because
+#: `snapshotting` is substrate and must not depend on an experiment.
+CORPUS_TAG = "exp08"
+
+
+def _corpus_digest(payload: dict[str, Any]) -> str:
+    """Content hash over what was *ingested*, not over what the store *assigned*.
+
+    The distinction is the whole design. A digest over the raw payload varies
+    between two ingests of a byte-identical corpus, because `belief_id` is minted
+    from `uuid4` and `created_at` from the clock — so it would certify the run
+    rather than the corpus, which is the defect this function exists to avoid and
+    which `uuid4` snapshot ids already have.
+
+    Projected out, therefore: store-minted identifiers, timestamps, and the
+    ingest arithmetic (`confidence`, `stability`, `status`). None of them is the
+    corpus. A confidence that moved because `blend_confidence` changed is not a
+    re-transcription, and FR-7 guards re-transcription.
+
+    Projected in: the documents, the evidence records, and each instance's
+    declared identity, text and citations.
+
+    **Constraint on the loader, stated because it is load-bearing:** evidence ids
+    must be caller-supplied and content-derived. A corpus ingested with
+    `uuid4`-minted evidence ids cannot produce a stable digest, and the freeze
+    would silently degrade to a timestamp.
+
+    `sort_keys` and fixed separators make the rendering reproducible across
+    processes. Truncated to 16 hex characters on `counterfactual.build_receipt`'s
+    precedent.
+    """
+    material = {
+        "slot": payload["slot"],
+        "documents": payload["documents"],
+        "evidence": [
+            {key: value for key, value in record.items() if key not in _VOLATILE_RECORD_FIELDS}
+            for record in payload["evidence"]
+        ],
+        "claim_instances": [
+            {
+                "belief_key": instance.get("belief_key"),
+                "proposition": instance["proposition"],
+                "belief_type": instance["belief_type"],
+                "scope": instance["scope"],
+                "evidence_ids": sorted(instance["evidence_ids"]),
+            }
+            for instance in payload["claim_instances"]
+        ],
+    }
+    canonical = json.dumps(material, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+#: Assigned by the store or the clock rather than carried by the document.
+_VOLATILE_RECORD_FIELDS = frozenset({"created_at"})
 
 
 # How many word-overlap-matched beliefs a position snapshot may draw evidence
@@ -50,13 +110,36 @@ class SnapshotBuilder:
             payload = self._appraisal_payload(agent_id, target)
         elif target.kind == ReportTargetKind.POSITION:
             payload = self._position_payload(agent_id, target)
+        elif target.kind == ReportTargetKind.CORPUS:
+            payload = self._corpus_payload(agent_id, target)
         else:
             raise ValueError(f"unsupported target kind: {target.kind}")
-        payload["affect_state"] = self._affect_state(agent_id)
-        payload["active_mood"] = self._active_mood(agent_id)
-        payload["recent_inner_voice"] = self._recent_inner_voice(agent_id)
+
+        if target.kind == ReportTargetKind.CORPUS:
+            # Two deliberate asymmetries, and they depend on each other.
+            #
+            # The affect trio is omitted. A corpus snapshot certifies *which
+            # documents were ingested*; the agent's mood while ingesting them is
+            # not part of that, and it is mutable. Carrying a mutable field under
+            # a content-derived id would make the id claim a sameness the payload
+            # contradicts.
+            #
+            # The id is then derived from the payload rather than minted from
+            # `uuid4`. With `uuid4`, two runs over a byte-identical corpus get
+            # different ids, so the id certifies *when* rather than *what* — and
+            # FR-7 exists precisely to detect a re-transcription, which
+            # requirements section 5.2 shows the store performs in place with no
+            # revision trail. A uuid there would make the requirement decorative.
+            # Follows `counterfactual.build_receipt`'s `cfr_{sha256[:16]}`.
+            snapshot_id = f"snap_{_corpus_digest(payload)}"
+        else:
+            payload["affect_state"] = self._affect_state(agent_id)
+            payload["active_mood"] = self._active_mood(agent_id)
+            payload["recent_inner_voice"] = self._recent_inner_voice(agent_id)
+            snapshot_id = _id("snap")
+
         snapshot = LogSnapshot(
-            snapshot_id=_id("snap"),
+            snapshot_id=snapshot_id,
             agent_id=agent_id,
             target=target,
             payload=payload,
@@ -64,6 +147,60 @@ class SnapshotBuilder:
         )
         self.store.save_log_snapshot(snapshot)
         return snapshot
+
+    def _corpus_payload(self, agent_id: str, target: ReportTarget) -> dict[str, Any]:
+        """Freeze one slot's claim-instances and the records behind them.
+
+        `target.id_or_text` is the slot label. Selection is by
+        `metadata["corpus"]` and `metadata["slot"]` — never by word overlap.
+        `_position_payload`'s matching heuristic would make the payload depend on
+        the target *string*, and a snapshot whose contents shift with its own
+        label cannot certify anything.
+
+        Everything is sorted, because a digest over store iteration order is a
+        digest over nothing (`underdetermination.find_rival_sets` states the
+        general form of this rule).
+        """
+        slot = target.id_or_text
+        records = [
+            record
+            for record in self.store.list_belief_evidence(agent_id)
+            if record.metadata.get("corpus") == CORPUS_TAG and record.metadata.get("slot") == slot
+        ]
+        records.sort(key=lambda record: record.evidence_id)
+        record_ids = {record.evidence_id for record in records}
+
+        instances = [
+            belief
+            for belief in self.store.list_beliefs(agent_id, include_inactive=True)
+            if record_ids.intersection(belief.evidence_ids)
+        ]
+        # Sorted by *declared* key, not by `belief_id`. `belief_id` is minted from
+        # `uuid4`, so ordering by it would make the list order — and therefore the
+        # digest — vary between two ingests of an identical corpus. That is the
+        # same defect as digesting the id itself, arriving through sequence
+        # instead of through content.
+        instances.sort(key=lambda belief: (belief.belief_key or "", belief.proposition))
+
+        documents: dict[str, dict[str, Any]] = {}
+        for record in records:
+            entry = documents.setdefault(
+                record.source_id,
+                {
+                    "citation": record.metadata.get("citation"),
+                    "published": record.metadata.get("published"),
+                    "content_sha256": record.metadata.get("content_sha256"),
+                    "records": 0,
+                },
+            )
+            entry["records"] += 1
+
+        return {
+            "slot": slot,
+            "claim_instances": [belief.model_dump(mode="json") for belief in instances],
+            "evidence": [record.model_dump(mode="json") for record in records],
+            "documents": {key: documents[key] for key in sorted(documents)},
+        }
 
     def _belief_payload(self, agent_id: str, target: ReportTarget) -> dict[str, Any]:
         belief_id = self._resolve_belief_id(agent_id, target.id_or_text)

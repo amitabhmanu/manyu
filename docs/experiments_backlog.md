@@ -31,7 +31,7 @@ Related reading:
 | 5 | Underdetermination as first-class belief | **in-progress** — stages −1 to 4 offline and complete; collapse clears its bar by 0.0033 and the state survives one disconfirmation; Stage 5 paid | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | **in-progress** — Stage −1 passed 7/7 with no new production code; the dose model reproduces experiment 5's trajectory to 0.0005 against the driven substrate, and `r = 1` corroboration is confirmed unfalsifiable in principle | 3 (load-bearing), 5 (test subject) | Counterfactual receipts |
 | 7 | Can a transparent agent scheme? | **in-progress** — every offline stage complete (−1, 0, 1, 2); **six** channels confirmed against the substrate and a seventh retracted as never having been one; the 3/3 substrate-versus-agent split is the headline; stages 3–5 (paid) not run | 1, 3 (**not 6** — that is stage 5 only) | Safety result, bounded: provenance is immutable exactly where a snapshot was taken first |
-| 8 | Epistemic archaeology | not-started | 3, 5, 6 | Cross-source provenance tooling |
+| 8 | Epistemic archaeology | **in-progress** — both offline stages complete: a claim-instance needs no new production code, testimony separates from textual descent on records alone (so no edge type may be authored), and the null draws zero while being shown *capable* of drawing more; slots A/B/C/E untranscribed | 3, 5, 6 (offline halves only) | Cross-source provenance tooling — **conditional**, plus the first ablation pointed outside Manyu |
 | 9 | Society of Manyus | not-started | 8 | Multi-agent belief propagation |
 | 10 | Rebirth / identity narration | not-started | everything | Capstone — bridge to *Twice Born* |
 
@@ -1309,21 +1309,90 @@ depends on. It is a design question this experiment surfaces and does not answer
 
 ## 8. Epistemic archaeology
 
-**Status:** not-started
-**Depends on:** 3, 5, 6
+**Status:** in-progress (2026-08-12) — **both offline stages complete and
+passing**: stage −1 (11/11) and stage 0's offline half (6/6). Stages 1–3 are paid
+and unrun. Spec at
+[requirements](experiments/08-epistemic-archaeology/requirements.md) ·
+[methodology](experiments/08-epistemic-archaeology/methodology.md) ·
+[pre-registration](experiments/08-epistemic-archaeology/pre-registration.md)
+**Depends on:** 3, 5, 6 — but see the sequencing decision below
 **Crux ref:** #7
 **Question:** Can Manyu reconstruct the provenance graph of how an idea
-descended and mutated across sources?
+descended and mutated across sources — **and does having a belief substrate make
+it better at that than a model with no substrate at all?**
 
 **Why here:** Extends the machinery from self-observation to external
 sources. Precondition for #9.
 
 **Leaves behind:** Cross-source provenance tooling. Intellectual genealogy
-made mechanical.
+made mechanical. **Conditional on the arms not tying** — pre-registration §7
+commits in advance to reconsidering the tooling rather than shipping it if the
+bare-model arm matches, because building tooling whose measured contribution is
+zero would be building it because it was promised.
 
 **Notes:**
 
-_none yet_
+**The entry's second clause is new, and it is the experiment.** A stock model
+with the same corpus writes a creditable genealogy essay, so the deliverable
+alone is not a result. Stage 2 runs a **bare-model control arm** on a
+byte-identical corpus and key — the first ablation in this project pointed
+*outside* Manyu. Every prior one (`ignore_own_evidence`, `DecayMode.FIXED`,
+`ContradictionPricing.FIXED`) lifts a rule *inside* it.
+
+**Sequencing decided 2026-08-12: proceeds on the offline halves of 5 and 6**,
+which are complete and validated, rather than waiting on their paid stages. What
+this experiment consumes is the belief shape that refuses to collapse and the
+dose model — not the live-model results those stages produce.
+
+**Five corpus slots, each able to fail differently:** A eight-glasses-of-water
+(calibration, clean deletion), B Einstein's "biggest blunder" (suspension —
+a confident answer is the *failure*), C a commentarial chain (stress, hostile
+witnesses, keyed partially on settleable edges only), D a generated synthetic
+pair (**the null — the only certain key in the corpus**), E spinach/iron
+(testimony *about* descent vs. evidence *of* descent).
+
+**What the offline rungs established.**
+
+- **P1 held.** A claim-instance is representable with **no new schema, no new
+  table, no new column** — a declared per-instance `belief_key` plus
+  `BeliefEvidence.metadata`, verified across a real process boundary.
+- **P2 held, so FR-1 binds.** Testimony separates from textual descent on
+  `evidence_ids` cardinality *together with* `source_id` distinctness. No edge
+  type may be authored to win slot E.
+- **P4 held — slot D draws exactly zero edges**, structurally: provenance is
+  mandatory, an edge needs a shared record, the generator emits none. **And the
+  null is shown capable of failing** — `draws_edges_from_similarity` does draw
+  edges there — which is what makes the zero a result rather than an easy
+  fixture (pre-registration §6.3).
+- **FR-7 works.** A corpus freeze rides a new `ReportTargetKind.CORPUS` with
+  **zero store migration**, and its id is content-derived rather than `uuid4` —
+  otherwise the id certifies *when* rather than *what* and cannot detect the
+  in-place evidence rewrite §5.2 raises.
+
+**Three findings that corrected the spec, all before any code ran** (amendments
+A1–A3):
+
+- **§0.1 named a value the substrate does not produce.** `_trust_from_source`
+  maps `OPERATOR_NOTE` → `OPERATOR_INPUT`; no branch returns `UNTRUSTED_TEXT`.
+  The *conclusion* — zero discrimination across the corpus — survives.
+- **P1's falsifier contradicted §2's escape** over whether a descent edge is
+  stored or derived, and the reading decided whether the experiment ended at
+  stage −1. Resolved to **derived**: a stored edge is a declared edge, and a
+  declared edge makes reconstruction a read-back — experiment 5's reason for
+  keeping `rivals` off `BeliefCandidate`.
+- **§5.3 is stronger than registered.** `_find_existing` merges verbatim
+  repetition across *distinct declared keys* (services.py:817). Identity is
+  delegated to the caller **and then overridden**, and the merged instances are
+  exactly those with mutation-distance zero — so it would have deleted the
+  corpus's repetition nodes silently, in the direction that flatters precision.
+
+**Open, and it is the schedule risk:** slots A, B, C and E are untranscribed.
+FR-9 requires citation, content hash and minimal excerpt taken from the
+documents; FR-2 reserves the answer keys to a human. Both are deliberate — a
+model-recalled "excerpt" would put fabricated primary text into the fixture the
+keys are authored from, which is the failure mode slot E exists to study.
+`freeze.json` records their absence explicitly rather than letting the slots look
+forgotten.
 
 ---
 

@@ -389,9 +389,9 @@ Each rung can end the experiment. The ordering is the design.
 
 | Stage | LLM | n | Establishes | Can end it? |
 |---|---|---|---|---|
-| −1 — what the substrate forces | none | 1 | §5 executed as code: `belief_key` merge behaviour on near-identical propositions; whether a claim-instance is representable without new production code (§6); whether testimony/evidence separates on `evidence_ids` cardinality and `source_id` distinctness alone (§2) | **Yes** — if claim-instances are unrepresentable, the experiment is a schema project first |
+| −1 — what the substrate forces | none | 1 | §5 executed as code: that `belief_key` constrains nothing and identity is wholly delegated to the caller (§5.3); whether a claim-instance is representable without new production code (§6); whether testimony/evidence separates on `evidence_ids` cardinality and `source_id` distinctness alone (§2) | **Yes** — if claim-instances are unrepresentable, the experiment is a schema project first |
 | 0 — reconstruction over hand-encoded fixtures | none | 1 | Graph recovery where extraction is bypassed and claim-instances are hand-encoded. Includes slot D end to end | **Yes** — an algorithm that cannot recover a hand-fed graph will not recover a read one |
-| 1 — extraction fidelity, slot A only | yes | pilot | Can either arm read the corpus into claim-instances at all? Measured before anything is scored | **Yes** — if extraction is the bottleneck, this is an extraction experiment and should say so |
+| 1 — extraction fidelity **and identity stability**, slot A only | yes | pilot | Can either arm read the corpus into claim-instances at all — and does the same source, extracted twice, declare the same identity granularity? §5.3 relocates that hazard to here | **Yes** — if extraction is the bottleneck, or identity is unstable run to run, this is an extraction experiment and should say so |
 | 2 — both arms, slots A and D | yes | pilot + ~10 | Calibration and the null, scored. **The first rung where the control arm means anything** | **Yes** — a tie on both reweights the experiment onto §8's first outcome |
 | 3 — both arms, slots B, C, E | yes | ~10 each | The discriminating cases. Suspension, stress, discrimination | No — this is the experiment |
 | 4 — the tooling | — | — | Whatever §1.1's *leaves behind* survives stages 0–3, surfaced on core/CLI/MCP | No |
