@@ -1,0 +1,170 @@
+{
+  "fixture_id": "corpus_B",
+  "role": "corpus",
+  "slot": "B",
+  "status": "PILOT - INCOMPLETE",
+  "generated_by": "evals/analysis/exp08/build_corpora.py",
+  "description": "Slot B, suspension. PILOT. The Einstein nodes are not obtained, so every assertion of the attribution has an absent upstream endpoint and resolves as unreported edge plus recorded assertion (A9). The investigations (Livio, O'Raifeartaigh & Mitton) are not HELD by the worksheet author, so the disagreement A11 rests on is not yet IN the corpus -- only in the pre-registration.",
+  "sources": [
+    {
+      "source_id": "gamow1956",
+      "citation": "Gamow, George. \"The Evolutionary Universe.\" Scientific American 195, no. 3 (September 1956): 136-156.",
+      "published": "1956-09-01",
+      "date_resolution": "month",
+      "role": "origin of the attribution (A5)",
+      "content_sha256": "32b2e0aeebe5bffadf1659e485a18a80b4d80b0e7c2c6aad69c243fc8b2b9e46"
+    },
+    {
+      "source_id": "gamow1970",
+      "citation": "Gamow, George. My World Line: An Informal Autobiography. New York: Viking Press, 1970, p. 44.",
+      "published": "1970-01-01",
+      "date_resolution": "year",
+      "role": "same author retelling, 14 years later",
+      "content_sha256": "b5a45c23416f156fecec73dd1582bb16a55ccbc03a51085e7e9a2cc2dbb80680"
+    },
+    {
+      "source_id": "wheeler2000",
+      "citation": "Taylor, Edwin F., and John Archibald Wheeler. Exploring Black Holes: Introduction to General Relativity. San Francisco: Addison Wesley Longman, 2000.",
+      "published": "2000-01-01",
+      "date_resolution": "year",
+      "role": "second claimed eyewitness, admitted by A5",
+      "content_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102"
+    }
+  ],
+  "spans": [
+    {
+      "span_id": "blunder_phrase",
+      "text": "was the biggest blunder he",
+      "appears_in": [
+        "gamow1956",
+        "gamow1970"
+      ],
+      "note": "The longest verbatim run shared by the two Gamow tellings. wheeler2000 is DELIBERATELY ABSENT: it shares only 'biggest blunder', two tokens, which is the name of the legend. Recording that would produce a TEXTUAL edge contradicting Wheeler's own claim of independent hearing (A5)."
+    }
+  ],
+  "asserted_descents": [
+    {
+      "assertion_id": "gamow1956_attributes_blunder_to_einstein",
+      "asserted_by": "gamow1956",
+      "claims": "einstein -> the blunder phrase",
+      "note": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9)."
+    },
+    {
+      "assertion_id": "gamow1970_attributes_blunder_to_einstein",
+      "asserted_by": "gamow1970",
+      "claims": "einstein -> the blunder phrase",
+      "note": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data."
+    },
+    {
+      "assertion_id": "wheeler_claims_direct_hearing",
+      "asserted_by": "wheeler2000",
+      "claims": "einstein -> the blunder phrase, on independent first-hand authority",
+      "note": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try."
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev_B_blunder_phrase_gamow1956",
+      "source_id": "gamow1956",
+      "span_id": "blunder_phrase",
+      "record_kind": "span",
+      "summary": "span 'blunder_phrase' attested in gamow1956"
+    },
+    {
+      "evidence_id": "ev_B_blunder_phrase_gamow1970",
+      "source_id": "gamow1970",
+      "span_id": "blunder_phrase",
+      "record_kind": "span",
+      "summary": "span 'blunder_phrase' attested in gamow1970"
+    },
+    {
+      "evidence_id": "ev_B_assert_gamow1956_attributes_blunder_to_einstein",
+      "source_id": "gamow1956",
+      "record_kind": "assertion",
+      "claims": "einstein -> the blunder phrase",
+      "summary": "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9)."
+    },
+    {
+      "evidence_id": "ev_B_assert_gamow1970_attributes_blunder_to_einstein",
+      "source_id": "gamow1970",
+      "record_kind": "assertion",
+      "claims": "einstein -> the blunder phrase",
+      "summary": "The same author asserting the same thing 14 years later, differently. Recorded separately because that is itself data."
+    },
+    {
+      "evidence_id": "ev_B_assert_wheeler_claims_direct_hearing",
+      "source_id": "wheeler2000",
+      "record_kind": "assertion",
+      "claims": "einstein -> the blunder phrase, on independent first-hand authority",
+      "summary": "An assertion of independent origin made 44 years after gamow1956 put the phrase in print. The mechanism cannot adjudicate it and must not try."
+    }
+  ],
+  "claim_instances": [
+    {
+      "instance_id": "B.gamow1956.c1",
+      "source_id": "gamow1956",
+      "locus": "§unresolved",
+      "locus_note": "page within pp. 136-156 not established; JSTOR access CAPTCHA'd",
+      "excerpt": "Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.",
+      "excerpt_sha256": "32b2e0aeebe5bffadf1659e485a18a80b4d80b0e7c2c6aad69c243fc8b2b9e46",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein",
+      "attribution_note": null,
+      "belief_key": "b.inst.c1.gamow1956",
+      "proposition": "[gamow1956 §unresolved] Einstein remarked to me many years ago that the cosmic repulsion idea was the biggest blunder he had made in his entire life.",
+      "evidence_ids": [
+        "ev_B_assert_gamow1956_attributes_blunder_to_einstein",
+        "ev_B_blunder_phrase_gamow1956",
+        "ev_B_blunder_phrase_gamow1970"
+      ]
+    },
+    {
+      "instance_id": "B.gamow1970.c1",
+      "source_id": "gamow1970",
+      "locus": "§p44",
+      "locus_note": null,
+      "excerpt": "Much later, when I was discussing cosmological problems with Einstein, he remarked that the introduction of the cosmological term was the biggest blunder he ever made in his life.",
+      "excerpt_sha256": "b5a45c23416f156fecec73dd1582bb16a55ccbc03a51085e7e9a2cc2dbb80680",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein",
+      "attribution_note": null,
+      "belief_key": "b.inst.c1.gamow1970",
+      "proposition": "[gamow1970 §p44] Much later, when I was discussing cosmological problems with Einstein, he remarked that the introduction of the cosmological term was the biggest blunder he ever made in his life.",
+      "evidence_ids": [
+        "ev_B_assert_gamow1970_attributes_blunder_to_einstein",
+        "ev_B_blunder_phrase_gamow1956",
+        "ev_B_blunder_phrase_gamow1970"
+      ]
+    },
+    {
+      "instance_id": "B.wheeler2000.c1",
+      "source_id": "wheeler2000",
+      "locus": "§unresolved",
+      "locus_note": "which of the two named authors speaks in the first person is unresolved",
+      "excerpt": "Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
+      "excerpt_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102",
+      "excerpt_status": "HELD",
+      "attributed_to": "Albert Einstein",
+      "attribution_note": "Claimed FIRST-HAND, not via Gamow, while placing Gamow at the scene.",
+      "belief_key": "b.inst.c1.wheeler2000",
+      "proposition": "[wheeler2000 §unresolved] Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
+      "evidence_ids": [
+        "ev_B_assert_wheeler_claims_direct_hearing"
+      ]
+    }
+  ],
+  "expect": {
+    "instance_count": 3,
+    "source_count": 3,
+    "span_count": 1,
+    "assertion_count": 3,
+    "note": "Structural only. No expected edge, support kind or mutation appears here -- those live in key_B.json, authored by hand and separately (FR-2)."
+  },
+  "known_gaps": [
+    "einstein1917 and einstein1931 not obtained -- every attribution assertion therefore has an absent upstream endpoint.",
+    "livio2013 and oraifeartaigh2018 not HELD by the author, so A11's investigator disagreement is not represented in the corpus.",
+    "Segre, Folsing and Leahy -- the repeaters Livio names -- not obtained.",
+    "gamow1956's page unresolved; wheeler2000's speaker unresolved.",
+    "gamow1970's continuation, where Gamow puts 'blunder' in quotation marks, is not HELD and is omitted."
+  ]
+}

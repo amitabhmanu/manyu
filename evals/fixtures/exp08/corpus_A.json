@@ -1,0 +1,250 @@
+{
+  "fixture_id": "corpus_A",
+  "role": "corpus",
+  "slot": "A",
+  "status": "PILOT - INCOMPLETE",
+  "generated_by": "evals/analysis/exp08/build_corpora.py",
+  "description": "Slot A as narrowed by A10: calibration retained for the textually demonstrable half, origin edge undetermined between rivals. PILOT. Every document here is the origin or a correction -- the propagators (Vreeman & Carroll's web references w1-w4) are unidentified, so the half of the graph that carries the myth forward is absent. Results demonstrate the pipeline and A6's confound, and demonstrate nothing about calibration.",
+  "sources": [
+    {
+      "source_id": "fnb1945",
+      "citation": "Food and Nutrition Board, National Academy of Sciences. Recommended Dietary Allowances, revised 1945. National Research Council, Reprint and Circular Series No. 122, 1945 (Aug), pp. 3-18.",
+      "published": "1945-08-01",
+      "date_resolution": "month",
+      "role": "origin candidate; contested (A10)",
+      "content_sha256": "1c0afa8cb17184965213c4ba7657b587b5c06196e995f303eaa6f814e0776249"
+    },
+    {
+      "source_id": "valtin2002",
+      "citation": "Valtin, Heinz. \"'Drink at least eight glasses of water a day.' Really?\" American Journal of Physiology 283, no. 5 (2002): R993-R1004.",
+      "published": "2002-11-01",
+      "date_resolution": "month",
+      "role": "investigation; reports the FNB origin at two removes",
+      "content_sha256": "ee65f48955658e20e8f55edf995866e95d640f8597f9e21c0ded4bb58e4db55d"
+    },
+    {
+      "source_id": "vreeman2007",
+      "citation": "Vreeman, Rachel C., and Aaron E. Carroll. \"Medical myths.\" BMJ 335, no. 7633 (22 December 2007): 1288-1289. Not commissioned; not externally peer reviewed.",
+      "published": "2007-12-22",
+      "date_resolution": "day",
+      "role": "correction; names Valtin (w8)",
+      "content_sha256": "bcc85e9524a30a99c6991408a59755371cde4f606e5b3807b97c6aa8d98d31d9"
+    },
+    {
+      "source_id": "carroll2015",
+      "citation": "Carroll, Aaron E. \"No, You Do Not Have to Drink 8 Glasses of Water a Day.\" The New York Times (The Upshot), 24 August 2015. Print version 25 August 2015, Section A, p. 3, under a different headline.",
+      "published": "2015-08-24",
+      "date_resolution": "day",
+      "role": "correction; cites Valtin by hyperlink, never by name",
+      "content_sha256": "de54280cc60b1a2741014a8434c9e85aa0e5c1420fce5744d752b5b0929d182a"
+    }
+  ],
+  "spans": [
+    {
+      "span_id": "prepared_foods",
+      "text": "Most of this quantity is contained in prepared foods.",
+      "appears_in": [
+        "fnb1945",
+        "valtin2002",
+        "vreeman2007",
+        "carroll2015"
+      ],
+      "note": null
+    },
+    {
+      "span_id": "allowance_liters",
+      "text": "A suitable allowance of water for adults is 2.5 liters daily in most instances.",
+      "appears_in": [
+        "fnb1945",
+        "valtin2002"
+      ],
+      "note": "Stops at two documents: vreeman2007 carries the British 'litres' and 'millilitre'. That difference is the mutation; absorbing it into the span would erase it."
+    },
+    {
+      "span_id": "thirst_qualifier",
+      "text": "Water should be allowed ad libitum, since sensations of thirst usually serve as adequate guides to intake except for infants and sick persons.",
+      "appears_in": [
+        "fnb1945"
+      ],
+      "note": "Attested in ONE document. Neither Valtin nor Vreeman & Carroll quote this sentence. The weakest excerpt in slot A, and the one carrying the second deletion."
+    }
+  ],
+  "asserted_descents": [
+    {
+      "assertion_id": "hamblin_style_origin_claim",
+      "asserted_by": "valtin2002",
+      "claims": "an unnamed prior recommendation -> the 8x8 claim",
+      "note": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9)."
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev_A_prepared_foods_fnb1945",
+      "source_id": "fnb1945",
+      "span_id": "prepared_foods",
+      "record_kind": "span",
+      "summary": "span 'prepared_foods' attested in fnb1945"
+    },
+    {
+      "evidence_id": "ev_A_prepared_foods_valtin2002",
+      "source_id": "valtin2002",
+      "span_id": "prepared_foods",
+      "record_kind": "span",
+      "summary": "span 'prepared_foods' attested in valtin2002"
+    },
+    {
+      "evidence_id": "ev_A_prepared_foods_vreeman2007",
+      "source_id": "vreeman2007",
+      "span_id": "prepared_foods",
+      "record_kind": "span",
+      "summary": "span 'prepared_foods' attested in vreeman2007"
+    },
+    {
+      "evidence_id": "ev_A_prepared_foods_carroll2015",
+      "source_id": "carroll2015",
+      "span_id": "prepared_foods",
+      "record_kind": "span",
+      "summary": "span 'prepared_foods' attested in carroll2015"
+    },
+    {
+      "evidence_id": "ev_A_allowance_liters_fnb1945",
+      "source_id": "fnb1945",
+      "span_id": "allowance_liters",
+      "record_kind": "span",
+      "summary": "span 'allowance_liters' attested in fnb1945"
+    },
+    {
+      "evidence_id": "ev_A_allowance_liters_valtin2002",
+      "source_id": "valtin2002",
+      "span_id": "allowance_liters",
+      "record_kind": "span",
+      "summary": "span 'allowance_liters' attested in valtin2002"
+    },
+    {
+      "evidence_id": "ev_A_thirst_qualifier_fnb1945",
+      "source_id": "fnb1945",
+      "span_id": "thirst_qualifier",
+      "record_kind": "span",
+      "summary": "span 'thirst_qualifier' attested in fnb1945"
+    },
+    {
+      "evidence_id": "ev_A_assert_hamblin_style_origin_claim",
+      "source_id": "valtin2002",
+      "record_kind": "assertion",
+      "claims": "an unnamed prior recommendation -> the 8x8 claim",
+      "summary": "Reported at two removes: 'According to J. Papai, P. Thomas has suggested...', where Papai is a page on urbanlegends.com and Thomas is never fully cited. The downstream endpoint -- the propagated claim -- is ABSENT from this corpus, so the edge cannot form (A9)."
+    }
+  ],
+  "claim_instances": [
+    {
+      "instance_id": "A.fnb1945.rec1",
+      "source_id": "fnb1945",
+      "locus": "§rec.1",
+      "locus_note": "under \"Further recommendations:\", sub-label \"Water.\"; page within pp. 3-18 unresolved",
+      "excerpt": "A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is one milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "excerpt_sha256": "7e5f9cafb894a2c81b9b6b587e39f68601c8c335745b898915b38c8dfd7138e4",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": null,
+      "belief_key": "a.inst.rec1.fnb1945",
+      "proposition": "[fnb1945 §rec.1] A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is one milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "evidence_ids": [
+        "ev_A_allowance_liters_fnb1945",
+        "ev_A_allowance_liters_valtin2002",
+        "ev_A_prepared_foods_carroll2015",
+        "ev_A_prepared_foods_fnb1945",
+        "ev_A_prepared_foods_valtin2002",
+        "ev_A_prepared_foods_vreeman2007"
+      ]
+    },
+    {
+      "instance_id": "A.fnb1945.rec2",
+      "source_id": "fnb1945",
+      "locus": "§rec.2",
+      "locus_note": "same paragraph, final sentence",
+      "excerpt": "Water should be allowed ad libitum, since sensations of thirst usually serve as adequate guides to intake except for infants and sick persons.",
+      "excerpt_sha256": "5e1e41d24eb8d87c6cff8bc002994dac9f0f2f6611ad31da3083d30d39b771c4",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": null,
+      "belief_key": "a.inst.rec2.fnb1945",
+      "proposition": "[fnb1945 §rec.2] Water should be allowed ad libitum, since sensations of thirst usually serve as adequate guides to intake except for infants and sick persons.",
+      "evidence_ids": [
+        "ev_A_thirst_qualifier_fnb1945"
+      ]
+    },
+    {
+      "instance_id": "A.valtin2002.c1",
+      "source_id": "valtin2002",
+      "locus": "§unresolved",
+      "locus_note": null,
+      "excerpt": "A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is 1 milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "excerpt_sha256": "ee65f48955658e20e8f55edf995866e95d640f8597f9e21c0ded4bb58e4db55d",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": null,
+      "belief_key": "a.inst.c1.valtin2002",
+      "proposition": "[valtin2002 §unresolved] A suitable allowance of water for adults is 2.5 liters daily in most instances. An ordinary standard for diverse persons is 1 milliliter for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "evidence_ids": [
+        "ev_A_allowance_liters_fnb1945",
+        "ev_A_allowance_liters_valtin2002",
+        "ev_A_assert_hamblin_style_origin_claim",
+        "ev_A_prepared_foods_carroll2015",
+        "ev_A_prepared_foods_fnb1945",
+        "ev_A_prepared_foods_valtin2002",
+        "ev_A_prepared_foods_vreeman2007"
+      ]
+    },
+    {
+      "instance_id": "A.vreeman2007.c1",
+      "source_id": "vreeman2007",
+      "locus": "§unresolved",
+      "locus_note": "p. 1288 or 1289; PMC HTML carries no page breaks",
+      "excerpt": "A suitable allowance of water for adults is 2.5 litres daily in most instances. An ordinary standard for diverse persons is 1 millilitre for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "excerpt_sha256": "bcc85e9524a30a99c6991408a59755371cde4f606e5b3807b97c6aa8d98d31d9",
+      "excerpt_status": "HELD",
+      "attributed_to": "Heinz Valtin",
+      "attribution_note": null,
+      "belief_key": "a.inst.c1.vreeman2007",
+      "proposition": "[vreeman2007 §unresolved] A suitable allowance of water for adults is 2.5 litres daily in most instances. An ordinary standard for diverse persons is 1 millilitre for each calorie of food. Most of this quantity is contained in prepared foods.",
+      "evidence_ids": [
+        "ev_A_prepared_foods_carroll2015",
+        "ev_A_prepared_foods_fnb1945",
+        "ev_A_prepared_foods_valtin2002",
+        "ev_A_prepared_foods_vreeman2007"
+      ]
+    },
+    {
+      "instance_id": "A.carroll2015.c1",
+      "source_id": "carroll2015",
+      "locus": "§unresolved",
+      "locus_note": "web article, no pagination",
+      "excerpt": "Most of this quantity is contained in prepared foods.",
+      "excerpt_sha256": "de54280cc60b1a2741014a8434c9e85aa0e5c1420fce5744d752b5b0929d182a",
+      "excerpt_status": "HELD",
+      "attributed_to": null,
+      "attribution_note": "Cited by hyperlink to Valtin's paper, never named in the body text. The field records what the document SAYS, and it says no name.",
+      "belief_key": "a.inst.c1.carroll2015",
+      "proposition": "[carroll2015 §unresolved] Most of this quantity is contained in prepared foods.",
+      "evidence_ids": [
+        "ev_A_prepared_foods_carroll2015",
+        "ev_A_prepared_foods_fnb1945",
+        "ev_A_prepared_foods_valtin2002",
+        "ev_A_prepared_foods_vreeman2007"
+      ]
+    }
+  ],
+  "expect": {
+    "instance_count": 5,
+    "source_count": 4,
+    "span_count": 3,
+    "assertion_count": 1,
+    "note": "Structural only. No expected edge, support kind or mutation appears here -- those live in key_A.json, authored by hand and separately (FR-2)."
+  },
+  "known_gaps": [
+    "Propagators w1-w4 not identified; corpus is origin + corrections only.",
+    "stare1974, the rival origin, not obtained -- the undetermined origin edge has one candidate rather than two.",
+    "Three loci are §unresolved.",
+    "thirst_qualifier is attested in one document and corroborated by nothing."
+  ]
+}
