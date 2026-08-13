@@ -397,3 +397,145 @@ silence is externally established rather than chosen.
 
 This also materially reduces what must be transcribed in the most expensive slot
 in the corpus, which is a real benefit but is not the reason.
+
+### A4 — 2026-08-13: the mutation vocabulary was incomplete, and `NONE` was two facts
+
+**What contact with real sources found.** Slot B's step 2 transcription established
+that Gamow told the "biggest blunder" story twice — in 1956 and again in 1970 — and
+that the second telling moves *"the cosmic repulsion idea"* to *"the introduction of
+the cosmological term"*. That changes what the claim is **about**.
+
+`classify_mutation` returned `NONE`. Identically to a verbatim copy.
+
+**The defect.** `MutationOp.NONE` meant two different things at once:
+
+1. the excerpt is unchanged, and
+2. the excerpt changed in a way the vocabulary has no operator for.
+
+The scored mutation dimension cannot separate those, so a corpus of substantive
+rewordings and a corpus of verbatim copies produce the same numbers. For an
+experiment whose dependent variable **is** mutation, that is not a gap in coverage —
+it is the measurement failing on the most common case.
+
+**The amendment.**
+
+- `NONE` is tightened to mean **unchanged**, modulo whitespace and case — the same
+  leniency `_normalize_belief_key` applies
+  ([schemas.py:400](../../../src/manyu/schemas.py)), on the grounds that line breaks
+  and capitalisation are accidents of transcription rather than changes a source made.
+- `REWORDING` is added as the **residual**: the excerpts differ and no more specific
+  operator applies.
+
+**Why this readmits no free constant.** `REWORDING` is defined by the *absence* of the
+other operators, not by a similarity score. Two excerpts are either the same string or
+they are not. No threshold is introduced, and
+`test_the_module_declares_no_similarity_threshold` still passes.
+
+The named operators keep precedence — attribution shift, then deletion, then
+qualification, then the residual — so nothing that carried information before now
+collapses into it.
+
+**A correction to the corpus-design guidance, recorded because it changed what slot B
+must contain.** The step 1 "check 2" (*two instances with near-identical wording*) was
+written as a per-slot requirement. It is a **portfolio** requirement: the
+verbatim-repetition case must exist somewhere in the corpus, most naturally in slot A
+where propagation is heavy. Slot B does not need downstream repeaters to satisfy it.
+Recorded because the error was mine and it was actively directing transcription effort
+at documents the experiment does not need.
+
+### A5 — 2026-08-13: slot B admits a second claimed eyewitness, and gains a second question
+
+**What transcription found.** The attribution does not rest on Gamow alone. Wheeler, in
+Taylor & Wheeler's *Exploring Black Holes* (2000), claims to have **heard the remark
+himself**, while placing Gamow at the same scene. That is not a repetition of Gamow — it
+is a first-person claim of independent origin, made decades after the event and 44 years
+after Gamow first put the phrase in print.
+
+**Why this needs an amendment rather than a decision.** §7.2 registers slot B as a clean
+single-origin suspension case. Admitting a competing independent-origin claim changes
+what the slot measures: it now also tests whether the mechanism keeps an **asserted
+independent origin** separable from **textual descent**. Deciding that after seeing the
+reconstruction would be choosing what the slot tests once its answer is known.
+
+**Decided: admit it.** Suspension is not displaced — it is enriched, because the corpus
+now carries two edges the record cannot settle rather than one. And the competing-witness
+structure is the honest historical situation; excluding it would produce a tidier slot
+that misrepresents its own subject.
+
+**How it is encoded, and this is not optional.** Wheeler is handled through an *asserted
+descent*, never a shared span. Measured against the mechanism, his wording shares exactly
+two tokens with Gamow's — *"biggest blunder"* — which is the name of the legend itself.
+Recording that as a span produces a `TEXTUAL` edge from Gamow to Wheeler that
+**contradicts Wheeler's own claim**, and any rule admitting it would admit every document
+that mentions the story. Verified both ways against `reconstruct` before this amendment
+was written.
+
+`alpher1998` — a third reported recollection, on a mailing list — is **excluded** unless
+the post proves retrievable. An unretrievable post is not a document.
+
+### A6 — 2026-08-13: the graph traces descent of text, not endorsement of claim
+
+**The confound, found independently in three slots.** Correcting a claim requires quoting
+it. So a correction shares a distinctive span with the thing it corrects, and the
+mechanism reads that as `TEXTUAL` descent — which by the ordinary meaning of the word it
+is, and by the meaning the experiment cares about it is not.
+
+- **Slot A** — the 1945 origin and its modern corrections share the qualifier, because
+  quoting it is how the correction works.
+- **Slot B** — the investigations share Einstein's own wording, because investigating the
+  attribution requires quoting what he actually wrote.
+- **Slot C** — a hostile witness preserves an opponent's position *only* by quoting it in
+  order to demolish it. There the confound is not incidental: it is the slot's entire
+  source of evidence.
+
+**What is not done.** No polarity or stance field is added. That would author a capability
+to win a slot, which is what FR-1 exists to prevent, and it would replace a measurement
+with a declaration.
+
+**What is recorded instead.**
+
+> A reconstructed edge asserts that **text descended**. It does not assert that the
+> descendant **endorsed** the claim. A refutation, a correction and a repetition are
+> indistinguishable to this mechanism, and all three are real descent of text.
+
+Consequences that bind:
+
+1. The keys mark these edges as ordinary textual descent. They are not exceptions.
+2. `results.md` must state the limitation in the headline rather than in a caveat, on
+   FR-11's pattern — an unmeasurable is reported as unmeasurable, not as absent.
+3. The corpus must not omit a correction in order to avoid the edge. Omitting it would
+   suppress the finding, which is worse than reporting it.
+4. **Slot C is reported under this limitation explicitly**, because there the mechanism
+   can see a position's survival but never that it survived inside a refutation.
+
+This is a genuine limitation of the design surfaced by transcription — which is what the
+offline stages exist to surface — and not a defect to be patched before the run.
+
+### A7 — 2026-08-13: `published` means position in the declared chain, for slot C only
+
+**The problem.** `reconstruct` takes edge direction **only** from
+`metadata["published"]`, and declines any pair sharing a date as *"direction
+undecidable."* But dates for Sanskrit commentarial texts are scholarly estimates spanning
+decades or centuries. They are precisely the *inferred, not held* dates the corpus
+discipline rejects, and slot C cannot supply anything better.
+
+Read strictly, slot C is untranscribable.
+
+**The resolution.** A commentarial chain **documents its own order**. A *bhāṣya* declares
+what it comments on; a *vārttika* declares which *bhāṣya*. The ordering is stated in the
+documents rather than reconstructed from chronology — which makes it *better* evidence of
+direction than a publication date, not worse.
+
+> **For slot C, `published` encodes position in the declared commentarial chain, not
+> calendar date.** Every slot C corpus file must carry
+> `"published_semantics": "declared_chain_position"` so no later reader mistakes the field
+> for chronology.
+
+**What this does not license.** Nominal ordering dates may encode **only** relations a
+document declares. Where the chain is silent — two sub-commentaries on the same *bhāṣya*,
+or rival schools with no commentarial relation — they take the same nominal position and
+the mechanism declines the pair. That decline is correct: the documents do not order them,
+and inventing an order to force an edge would author the dependent variable through the
+date field, which is the specific failure A3's convention exists to prevent.
+
+Recorded before slot C is transcribed, and before any slot C edge has been seen.

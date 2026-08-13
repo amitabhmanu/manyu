@@ -43,7 +43,7 @@ import test_exp08_mutants as T  # noqa: E402
 import test_exp08_substrate as S  # noqa: E402
 
 from manyu import descent_mutants as M  # noqa: E402
-from manyu.descent import reconstruct, score, verify_freeze  # noqa: E402
+from manyu.descent import mechanism_drift, reconstruct, score, verify_freeze  # noqa: E402
 from manyu.schemas import ReportTarget, ReportTargetKind  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "stage0.jsonl"
@@ -77,6 +77,25 @@ def _ingest_slot_d(core: Any) -> None:
 
 def _rows() -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
+
+    drifted = mechanism_drift()
+    rows.append(
+        {
+            "stage": 0,
+            "check": "freeze__mechanism_digest",
+            "pins": "freeze.json `mechanisms`",
+            "drifted": drifted,
+            "note": (
+                "NO VERDICT — reported, not enforced. `verify_fixture_freeze` checks "
+                "`files` only and `verify_standards_freeze` checks `standards`; nothing in "
+                "the substrate reads `mechanisms` (salience.py:770, :793). Non-raising here "
+                "for the reason `verify_standards_freeze` gives about itself: a guard firing "
+                "on every development run gets deleted. THE PAID RUNNER MUST ENFORCE THIS — "
+                "a silently loosened support rule is exactly the defect that would "
+                "manufacture this experiment's restraint headline."
+            ),
+        }
+    )
 
     # --- FR-7: the corpus freeze, driven end to end --------------------------
     core = S._core()

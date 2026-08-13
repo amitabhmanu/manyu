@@ -197,6 +197,66 @@ def test_deletion_is_detected_from_the_excerpt() -> None:
     assert classify_mutation(ancestor, descendant) is MutationOp.DELETION
 
 
+def test_none_means_unchanged_and_rewording_means_changed() -> None:
+    """Amendment A4. The conflation slot B's step 2 exposed.
+
+    Before A4, a verbatim copy and Gamow's substantive retelling both returned
+    `NONE`, so the scored mutation dimension could not tell "unchanged" from
+    "changed in a way I have no operator for".
+    """
+    same = "The allowance is two and a half units."
+    identical_a = ClaimInstance("X.a", "x.a", "doc_a", "1900-01-01", same, ("ev1",))
+    identical_b = ClaimInstance("X.b", "x.b", "doc_b", "1950-01-01", same, ("ev1",))
+    assert classify_mutation(identical_a, identical_b) is MutationOp.NONE
+
+    # The real pair from slot B, which the classifier previously called NONE.
+    earlier = ClaimInstance(
+        "B.a", "b.a", "gamow1956", "1956-09-01",
+        "Einstein remarked to me many years ago that the cosmic repulsion idea was the "
+        "biggest blunder he had made in his entire life.",
+        ("ev1",), attributed_to="Albert Einstein",
+    )
+    later = ClaimInstance(
+        "B.b", "b.b", "gamow1970", "1970-01-01",
+        "Much later, when I was discussing cosmological problems with Einstein, he remarked "
+        "that the introduction of the cosmological term was the biggest blunder he ever "
+        "made in his life.",
+        ("ev1",), attributed_to="Albert Einstein",
+    )
+    assert classify_mutation(earlier, later) is MutationOp.REWORDING
+
+
+def test_rewording_normalizes_whitespace_and_case_only() -> None:
+    """A line break is a transcription accident, not a change a source made.
+
+    Anything beyond whitespace and case would be a similarity judgement, and
+    this module makes none.
+    """
+    base = ClaimInstance("X.a", "x.a", "doc_a", "1900-01-01", "The allowance is two units.", ("ev1",))
+    retyped = ClaimInstance(
+        "X.b", "x.b", "doc_b", "1950-01-01", "the   allowance\nis two units.", ("ev1",)
+    )
+    assert classify_mutation(base, retyped) is MutationOp.NONE
+
+
+def test_rewording_is_the_residual_and_never_outranks_a_named_operator() -> None:
+    """A4 must not swallow the operators that carry real information."""
+    ancestor = ClaimInstance(
+        "X.a", "x.a", "doc_a", "1900-01-01",
+        "The allowance is two units. Most of it comes from food.", ("ev1",),
+    )
+    dropped = ClaimInstance(
+        "X.b", "x.b", "doc_b", "1950-01-01", "The allowance is two units.", ("ev1",),
+    )
+    assert classify_mutation(ancestor, dropped) is MutationOp.DELETION
+
+    reattributed = ClaimInstance(
+        "X.c", "x.c", "doc_c", "1960-01-01",
+        "Something else entirely.", ("ev1",), attributed_to="a named authority",
+    )
+    assert classify_mutation(ancestor, reattributed) is MutationOp.ATTRIBUTION_SHIFT
+
+
 def test_attribution_shift_outranks_deletion() -> None:
     """Order matters: a claim can shed a sentence *and* change hands, and for a
     genealogy the change of hands is the more consequential of the two."""
@@ -224,3 +284,53 @@ def test_the_module_declares_no_similarity_threshold() -> None:
 
 def test_support_kinds_are_exhaustive_over_the_discriminator() -> None:
     assert {k.value for k in SupportKind} == {"textual", "testimony", "none"}
+
+
+# --- two loci of one document are siblings ------------------------------------
+
+
+def _one_document_pair() -> tuple[ClaimInstance, ClaimInstance, dict[str, str]]:
+    """Slot A's origin split: one paragraph, two claim-instances, one document."""
+    shared = ("ev_s1", "ev_s2")
+    first = ClaimInstance(
+        "A.fnb.rec1", "a.inst.fnb.rec1", "fnb1945", "1945-08-01",
+        "A suitable allowance of water for adults is 2.5 liters daily.", shared,
+    )
+    second = ClaimInstance(
+        "A.fnb.rec2", "a.inst.fnb.rec2", "fnb1945", "1945-08-01",
+        "Water should be allowed ad libitum, since thirst is an adequate guide.", shared,
+    )
+    return first, second, {"ev_s1": "fnb1945", "ev_s2": "umich2015"}
+
+
+def test_two_loci_of_one_document_are_never_a_descent_edge() -> None:
+    """Regression. Found by probing slot A's origin-node split.
+
+    Without the source-identity check, `endpoints` collapses to a singleton and
+    `set(sources) >= endpoints` is satisfied by any record from that document, so
+    the pair classifies as TEXTUAL — a document descending from itself.
+    """
+    first, second, sources = _one_document_pair()
+    kind, shared, srcs = descent.classify_support(first, second, sources)
+    assert kind is SupportKind.NONE
+    assert shared == () and srcs == ()
+
+
+def test_the_same_document_guard_does_not_rely_on_the_date_guard() -> None:
+    """The two guards must be independent.
+
+    Today every pair of loci in one document also shares a publication date, so
+    the date guard masks the defect. That is incidental — a revised edition would
+    lift it — and a regression here would be invisible until a corpus happened to
+    contain one.
+    """
+    first, second, sources = _one_document_pair()
+    redated = ClaimInstance(
+        second.instance_id, second.belief_key, second.source_id,
+        "1950-08-01", second.excerpt, second.evidence_ids,
+    )
+    assert descent.classify_support(first, redated, sources)[0] is SupportKind.NONE
+
+    recon = reconstruct([first, redated], sources, slot="A", arm="m", snapshot_id="s")
+    assert recon.edges == ()
+    assert recon.declined[0][2] == "same source document: siblings, not a descent relation"

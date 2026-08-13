@@ -104,6 +104,12 @@ class MutationOp(str, Enum):
     result, which FR-3 forbids.
     """
 
+    #: The excerpt is **unchanged**, modulo whitespace and case.
+    #:
+    #: Tightened by amendment A4. It previously meant both "unchanged" and
+    #: "changed in a way I have no operator for", which are different facts that
+    #: the scored mutation dimension could not tell apart — a verbatim copy and a
+    #: substantive rewording both landed here.
     NONE = "none"
     #: The descendant's excerpt drops a sentence the ancestor carried. Slot A's
     #: operator, and the cleanest available: the original survives, so the drift
@@ -114,6 +120,18 @@ class MutationOp(str, Enum):
     #: `metadata["attributed_to"]` differs — the claim acquired or changed an
     #: attributed author without its text changing.
     ATTRIBUTION_SHIFT = "attribution_shift"
+    #: The excerpts differ and no more specific operator applies.
+    #:
+    #: Added by amendment A4, after slot B's step 2 found the vocabulary
+    #: incomplete: Gamow's own retelling moves "the cosmic repulsion idea" to
+    #: "the introduction of the cosmological term", changing what the claim is
+    #: *about*, and the classifier called it `NONE` — identical to a verbatim
+    #: copy.
+    #:
+    #: **Derived, not measured.** This is a residual category defined by the
+    #: absence of the other operators, so it introduces no similarity score and
+    #: no threshold. Two excerpts are either the same string or they are not.
+    REWORDING = "rewording"
 
 
 @dataclass(frozen=True)
@@ -293,6 +311,21 @@ def classify_support(
     `source_id` distinctness alone does not either. The conjunction does, and
     stage -1 measured it before this function existed.
     """
+    # Two loci of ONE document are siblings, not ancestor and descendant. Checked
+    # first because the rest of this function cannot express it: `endpoints`
+    # would collapse to a singleton, `set(sources) >= endpoints` would be
+    # trivially satisfied by any record from that document, and the pair would
+    # classify as TEXTUAL on the strength of sharing a source with itself.
+    #
+    # Found by probing the origin-node split in slot A's step 2 worksheet, where
+    # one paragraph yields two claim-instances. `reconstruct`'s same-date guard
+    # happens to mask this today — two loci of one document share a publication
+    # date — but that is incidental protection: a revised edition, or any corpus
+    # where one `source_id` carries instances with different dates, would produce
+    # a spurious descent edge inside a single document.
+    if left.source_id == right.source_id:
+        return SupportKind.NONE, (), ()
+
     shared = shared_records(left, right)
     if not shared:
         return SupportKind.NONE, (), ()
@@ -312,6 +345,17 @@ _SENTENCE = re.compile(r"(?<=[.!?])\s+")
 
 def _sentences(text: str) -> list[str]:
     return [part.strip() for part in _SENTENCE.split(text.strip()) if part.strip()]
+
+
+def _normalize_excerpt(text: str) -> str:
+    """Collapse whitespace and case, and nothing else.
+
+    Deliberately the same leniency as `_normalize_belief_key`
+    (schemas.py:400): line breaks and capitalisation are typographic
+    accidents of a transcription, not changes a source made. Anything
+    beyond that would be a similarity judgement, and this module makes none.
+    """
+    return " ".join(text.split()).strip().lower()
 
 
 def classify_mutation(
@@ -338,6 +382,12 @@ def classify_mutation(
         in_after = {h for h in hedge_set if h in descendant.excerpt.lower()}
         if in_before != in_after:
             return MutationOp.QUALIFICATION
+
+    # The residual (A4). Reached only when nothing more specific applies, so it
+    # names "the text changed" without measuring how much. `NONE` below is now
+    # reserved for an excerpt that did not change at all.
+    if _normalize_excerpt(ancestor.excerpt) != _normalize_excerpt(descendant.excerpt):
+        return MutationOp.REWORDING
 
     return MutationOp.NONE
 
@@ -369,6 +419,16 @@ def reconstruct(
 
     for index, ancestor in enumerate(ordered):
         for descendant in ordered[index + 1 :]:
+            if ancestor.source_id == descendant.source_id:
+                declined.append(
+                    (
+                        ancestor.instance_id,
+                        descendant.instance_id,
+                        "same source document: siblings, not a descent relation",
+                    )
+                )
+                continue
+
             if ancestor.published == descendant.published:
                 declined.append(
                     (ancestor.instance_id, descendant.instance_id, "same publication date: direction undecidable")
@@ -538,3 +598,29 @@ def verify_freeze() -> None:
     from manyu.salience import verify_fixture_freeze
 
     verify_fixture_freeze(FREEZE_PATH, experiment="8")
+
+
+def mechanism_drift(path: Path | str = FREEZE_PATH) -> list[str]:
+    """Report drift in the frozen `mechanisms` block **without raising**.
+
+    `verify_fixture_freeze` checks `files` only, and `verify_standards_freeze`
+    checks `standards`; **nothing in the substrate reads `mechanisms` at all**
+    (salience.py:770, :793). Experiment 7 freezes its detector and verifies it in
+    its own paid runner. This is experiment 8's equivalent, and it exists because
+    a `mechanisms` block that no code reads is a claim the freeze file makes and
+    cannot keep.
+
+    Non-raising on purpose, and the reason is the same one
+    `verify_standards_freeze`'s docstring gives: a guard that fires on every
+    development run gets deleted. Offline stages report the drift into their
+    artifact so it is visible; the paid runner must **enforce** it, because a
+    silently loosened support rule is precisely the defect that would manufacture
+    this experiment's restraint headline.
+    """
+    import json
+
+    from manyu.salience import _drift
+
+    freeze = json.loads(Path(path).read_text(encoding="utf-8"))
+    drifted, missing = _drift(freeze.get("mechanisms", {}))
+    return sorted(drifted + missing)
