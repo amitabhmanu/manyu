@@ -27,7 +27,7 @@
       "citation": "Alpher, Ralph A. Posting to the History of Astronomy Listserve (HASTRO-L), 1998, in reply to a query from Joseph S. Tenn. Reproduced in full as Figure 7 of O'Raifeartaigh & Mitton 2018.",
       "published": "1998-01-01",
       "date_resolution": "year",
-      "role": "third witness; NOT a publication -- an e-mail list posting, which is why A5 excluded it",
+      "role": "third witness; NOT a publication -- an e-mail list posting. A5 EXCLUDED it unless the post proved retrievable; it never did, and A14 admits it anyway on the reproduction, which is a different route to the same protection",
       "content_sha256": "1b41d1d35c14725e156b1327bd675fe6dd7b98bb4f65e7f0ae8143d2098b43c3"
     },
     {
@@ -545,7 +545,7 @@
     "Segre 2011, Folsing 1997 and Leahy 2001 not obtained. Livio names all three and quotes only Leahy, so the propagation half of slot B is asserted but not built.",
     "gamow1956's page is unresolved AND its month is disputed between the two investigations (Livio: September; O&M: May). The corpus records September, from Livio, who gives the article title as well.",
     "wheeler2000's speaker unresolved -- the book has two named authors and the testimony is in the first person.",
-    "alpher1998 is a mailing-list posting held only through O&M's reproduction; the list archive itself was not consulted.",
+    "alpher1998 is a mailing-list posting held only through O&M's reproduction; the HASTRO-L archive itself was NOT consulted, so A5's literal condition -- that the post prove retrievable -- is still unmet. A14 admits it on the reproduction and says so. Consulting the archive would close this properly.",
     "The two witness-dependence edges are recorded as TESTIMONY, which is stronger than what O'Raifeartaigh & Mitton actually wrote. They raise the possibility that Wheeler and Alpher were influenced by Gamow and then argue against it. The record vocabulary has no way to mark an asserted edge as raised-but-declined, so the key must carry that and results.md must report the limitation."
   ]
 }

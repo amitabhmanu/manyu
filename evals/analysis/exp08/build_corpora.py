@@ -212,7 +212,7 @@ SLOT_B: dict[str, Any] = {
     "sources": [
         ("gamow1956", "Gamow, George. \"The Evolutionary Universe.\" Scientific American 195, no. 3 (September 1956): 136-156.", "1956-09-01", "month", "origin of the attribution (A5)"),
         ("gamow1970", "Gamow, George. My World Line: An Informal Autobiography. New York: Viking Press, 1970, p. 44.", "1970-01-01", "year", "same author retelling, 14 years later"),
-        ("alpher1998", "Alpher, Ralph A. Posting to the History of Astronomy Listserve (HASTRO-L), 1998, in reply to a query from Joseph S. Tenn. Reproduced in full as Figure 7 of O'Raifeartaigh & Mitton 2018.", "1998-01-01", "year", "third witness; NOT a publication -- an e-mail list posting, which is why A5 excluded it"),
+        ("alpher1998", "Alpher, Ralph A. Posting to the History of Astronomy Listserve (HASTRO-L), 1998, in reply to a query from Joseph S. Tenn. Reproduced in full as Figure 7 of O'Raifeartaigh & Mitton 2018.", "1998-01-01", "year", "third witness; NOT a publication -- an e-mail list posting. A5 EXCLUDED it unless the post proved retrievable; it never did, and A14 admits it anyway on the reproduction, which is a different route to the same protection"),
         ("wheeler2000", "Taylor, Edwin F., and John Archibald Wheeler. Exploring Black Holes: Introduction to General Relativity. San Francisco: Addison Wesley Longman, 2000.", "2000-01-01", "year", "second claimed eyewitness, admitted by A5"),
         ("livio2013", "Livio, Mario. Brilliant Blunders: From Darwin to Einstein. New York: Simon & Schuster, 2013, ch. 10.", "2013-01-01", "year", "investigation concluding the remark was NEVER MADE"),
         ("oraifeartaigh2018", "O'Raifeartaigh, Cormac, and Simon Mitton. \"Interrogating the legend of Einstein's 'biggest blunder'.\" Physics in Perspective 20 (2018): 318-341. arXiv:1804.06768v2.", "2018-01-01", "year", "investigation concluding the remark was VERY LIKELY made -- the direct rival of livio2013"),
@@ -256,7 +256,7 @@ SLOT_B: dict[str, Any] = {
         "Segre 2011, Folsing 1997 and Leahy 2001 not obtained. Livio names all three and quotes only Leahy, so the propagation half of slot B is asserted but not built.",
         "gamow1956's page is unresolved AND its month is disputed between the two investigations (Livio: September; O&M: May). The corpus records September, from Livio, who gives the article title as well.",
         "wheeler2000's speaker unresolved -- the book has two named authors and the testimony is in the first person.",
-        "alpher1998 is a mailing-list posting held only through O&M's reproduction; the list archive itself was not consulted.",
+        "alpher1998 is a mailing-list posting held only through O&M's reproduction; the HASTRO-L archive itself was NOT consulted, so A5's literal condition -- that the post prove retrievable -- is still unmet. A14 admits it on the reproduction and says so. Consulting the archive would close this properly.",
         "The two witness-dependence edges are recorded as TESTIMONY, which is stronger than what O'Raifeartaigh & Mitton actually wrote. They raise the possibility that Wheeler and Alpher were influenced by Gamow and then argue against it. The record vocabulary has no way to mark an asserted edge as raised-but-declined, so the key must carry that and results.md must report the limitation.",
     ],
 }

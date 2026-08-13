@@ -839,3 +839,63 @@ keys authored under the old order:
 The ladder is also carried in every corpus file's `key_authoring_note`, because that is where
 a key author will be looking, and a rule that lives only in the pre-registration is a rule
 someone applies from memory.
+
+### A14 — 2026-08-14: `alpher1998` is admitted, and this amendment is late
+
+**Decision: `alpher1998` enters slot B.** A5 excluded it. That exclusion is lifted.
+
+**A5's condition, and what actually happened.** A5 wrote:
+
+> `alpher1998` — a third reported recollection, on a mailing list — is **excluded** unless
+> the post proves retrievable. An unretrievable post is not a document.
+
+The post did **not** prove retrievable. The HASTRO-L archive was never consulted. What was
+obtained is a *reproduction*: O'Raifeartaigh & Mitton print Alpher's recollection verbatim as
+Figure 7 of their 2018 paper, in *Physics in Perspective*, under peer review.
+
+So A5's literal condition is **not met**. Its purpose is. The condition was protecting
+against a claim that could not be checked — a recollection reachable only through someone's
+paraphrase of a vanished e-mail. A verbatim reproduction in a peer-reviewed paper fixes the
+text, dates it, and makes it checkable by anyone with the paper. That is the same protection
+by a different route, and it is the route slot A already relies on for Stare & McWilliams and
+slot E relies on for Larsson: **a witness's words live in the document that reproduces them.**
+
+**This amendment is late, and that is a defect in the record.** `alpher1998` was added to
+`corpus_B.json` and committed in `0445906` *before* this amendment was written. The amendment
+discipline exists so that a decision is on the record before its effect is visible, and here
+the effect — slot B at 11 instances and 10 edges, two of them testimony — was visible first.
+
+What limits the damage, stated so a later reader can weigh it rather than take reassurance:
+
+- **No arm has run and no key exists.** Nothing about a *result* informed this. The scored
+  dimensions have never been computed on any slot B corpus, with or without Alpher.
+- What *was* seen first is the corpus **shape**: that admitting Alpher yields one more
+  textual edge (`alpher1998 → oraifeartaigh2018.q_alpher`) and one more testimony edge.
+- A reader who thinks that is enough contamination to matter should discount this amendment
+  and read the pre-Alpher corpus at `1bb76aa`. Both states are in the history on purpose.
+
+**What changes.** §7.2 registered slot B as a clean single-origin suspension case; A5 made it
+two claimed origins; this makes it **three**. That is not decoration — O'Raifeartaigh &
+Mitton's published argument turns on exactly this: *"it seems a stretch to accuse three
+different scientists of invention."* The count of independent reports is load-bearing in the
+literature the slot is drawn from, so a corpus holding two of three misrepresents the dispute
+it exists to encode.
+
+**How it is encoded, and this is not optional — the same constraint A5 imposed on Wheeler.**
+`alpher_recall` is *"his introduction of the concept in his early work was a blunder"*. It
+shares **no** distinctive run with `blunder_phrase`; Alpher has no superlative at all — no
+*biggest*, no *of my life*. No span therefore connects Alpher to Gamow, and no `TEXTUAL` edge
+between them can form. Verified against `reconstruct` before this amendment was written: the
+`gamow1956 → alpher1998` pair declines on `no shared evidence record` until an assertion
+carries it.
+
+**A limitation this creates, recorded rather than fixed.** O'Raifeartaigh & Mitton *raise*
+the possibility that Wheeler and Alpher were influenced by Gamow and then argue against it.
+The record vocabulary can say *"a third document asserts this descent"*; it cannot say
+*"raises it and declines to affirm it"*. Both edges therefore come out `TESTIMONY`, which is
+**stronger than what the source wrote**. The key must mark them undetermined, and `results.md`
+must report the gap between what O&M wrote and what the graph can hold.
+
+**A5 is not withdrawn.** Its reasoning stands, including its refusal to record a Gamow →
+Wheeler span; only its exclusion clause is superseded, and its condition is the reason this
+amendment had to be written at all.
