@@ -134,7 +134,7 @@ SLOT_B: dict[str, Any] = {
     "instances": [
         ("B.gamow1956.c1", "gamow1956", UNRESOLVED, "page within pp. 136-156 not established; JSTOR access CAPTCHA'd", B_G1956, ["blunder_phrase"], "Albert Einstein", None),
         ("B.gamow1970.c1", "gamow1970", "§p44", None, B_G1970, ["blunder_phrase"], "Albert Einstein", None),
-        ("B.wheeler2000.c1", "wheeler2000", UNRESOLVED, "which of the two named authors speaks in the first person is unresolved", B_WHEELER, [], "Albert Einstein", "Claimed FIRST-HAND, not via Gamow, while placing Gamow at the scene."),
+        ("B.wheeler2000.c1", "wheeler2000", "§pG-11", "Locus RELAYED from O'Raifeartaigh et al. 2017 fn. 48, which cites 'Taylor and Wheeler 2000 pG-11'. A pointer rather than an excerpt, so an error here surfaces on fetch. Which of the two named authors speaks in the first person is still unresolved.", B_WHEELER, [], "Albert Einstein", "Claimed FIRST-HAND, not via Gamow, while placing Gamow at the scene."),
     ],
     "assertions": [
         ("gamow1956_attributes_blunder_to_einstein", "gamow1956", "einstein -> the blunder phrase", "Gamow offers NO source. The upstream endpoint is not in the corpus, so the edge cannot form and the assertion is reported (A9)."),

@@ -145,15 +145,15 @@
     {
       "instance_id": "B.wheeler2000.c1",
       "source_id": "wheeler2000",
-      "locus": "§unresolved",
-      "locus_note": "which of the two named authors speaks in the first person is unresolved",
+      "locus": "§pG-11",
+      "locus_note": "Locus RELAYED from O'Raifeartaigh et al. 2017 fn. 48, which cites 'Taylor and Wheeler 2000 pG-11'. A pointer rather than an excerpt, so an error here surfaces on fetch. Which of the two named authors speaks in the first person is still unresolved.",
       "excerpt": "Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
       "excerpt_sha256": "ba2cf242a0f56dd31563e405c7497fa82d855e5c4e2729f72f246dbad2481102",
       "excerpt_status": "HELD",
       "attributed_to": "Albert Einstein",
       "attribution_note": "Claimed FIRST-HAND, not via Gamow, while placing Gamow at the scene.",
       "belief_key": "b.inst.c1.wheeler2000",
-      "proposition": "[wheeler2000 §unresolved] Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
+      "proposition": "[wheeler2000 §pG-11] Going into the doorway of the Institute for Advanced Study's Fuld Hall with Einstein and George Gamow, I heard Einstein say to Gamow about the cosmological constant, \"That was my biggest blunder of my life.\"",
       "evidence_ids": [
         "ev_B_assert_wheeler_claims_direct_hearing"
       ]
