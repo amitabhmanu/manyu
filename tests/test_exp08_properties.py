@@ -286,6 +286,86 @@ def test_support_kinds_are_exhaustive_over_the_discriminator() -> None:
     assert {k.value for k in SupportKind} == {"textual", "testimony", "none"}
 
 
+# --- A9: an assertion pointing at nothing --------------------------------------
+
+
+def _hamblin_shaped() -> tuple[list[ClaimInstance], dict[str, str], dict[str, str]]:
+    """Slot E's case: a document asserts descent and names no upstream document."""
+    asserting = ClaimInstance(
+        "E.hamblin.c1", "e.hamblin", "hamblin1981", "1981-12-19",
+        "German chemists had shown the original workers put the decimal point in the "
+        "wrong place.",
+        ("ev_assertion",),
+    )
+    other = ClaimInstance(
+        "E.rep1965.c1", "e.rep1965", "rep1965", "1965-01-01",
+        "Spinach is exceptionally rich in iron.", ("ev_iron_claim",),
+    )
+    sources = {"ev_assertion": "hamblin1981", "ev_iron_claim": "rep1965"}
+    kinds = {"ev_assertion": descent.ASSERTION_RECORD}
+    return [asserting, other], sources, kinds
+
+
+def test_an_assertion_with_no_named_endpoint_is_reported_not_silent() -> None:
+    """A9. Encoded the obvious way this assertion disappeared entirely.
+
+    No pair could share the record, so no edge formed, and the pair's `declined`
+    reason read "no shared evidence record" — which is false. A record exists;
+    it has one end. FR-5 requires that be countable rather than invisible.
+    """
+    instances, sources, kinds = _hamblin_shaped()
+
+    silent = reconstruct(instances, sources, slot="E", arm="m", snapshot_id="s")
+    assert silent.unresolved_assertions == (), "no record_kinds supplied means nothing to report"
+
+    reported = reconstruct(
+        instances, sources, slot="E", arm="m", snapshot_id="s", record_kinds=kinds
+    )
+    assert len(reported.unresolved_assertions) == 1
+    record_id, asserter, reason = reported.unresolved_assertions[0]
+    assert record_id == "ev_assertion"
+    assert asserter == "hamblin1981"
+    assert "not in the corpus" in reason
+
+    assert reported.edges == (), "the edge still must not form"
+    assert "unresolved_assertions" in reported.as_dict()
+
+
+def test_a_resolved_assertion_is_not_reported_as_unresolved() -> None:
+    """The report must not fire on the ordinary testimony case, or it says nothing."""
+    left = ClaimInstance("E.a", "e.a", "doc_a", "1900-01-01", "left", ("ev_assert",))
+    right = ClaimInstance("E.b", "e.b", "doc_b", "1950-01-01", "right", ("ev_assert",))
+    sources = {"ev_assert": "doc_c"}
+    kinds = {"ev_assert": descent.ASSERTION_RECORD}
+
+    result = reconstruct(
+        [left, right], sources, slot="E", arm="m", snapshot_id="s", record_kinds=kinds
+    )
+    assert result.unresolved_assertions == ()
+    assert [e.support_kind for e in result.edges] == [SupportKind.TESTIMONY]
+
+
+def test_record_kind_never_reaches_the_discriminator() -> None:
+    """FR-1 holds. A declared kind steering `classify_support` would be its
+    violation wearing a different name."""
+    assert "record_kind" not in _identifiers(descent.classify_support)
+    assert "ASSERTION_RECORD" not in _identifiers(descent.classify_support)
+    assert "record_kinds" not in _identifiers(descent.score)
+
+
+def test_unresolved_assertions_do_not_move_a_scored_dimension() -> None:
+    """Diagnostic only."""
+    instances, sources, kinds = _hamblin_shaped()
+    key = AnswerKey.from_dict({"slot": "E", "edges": []})
+
+    without = score(reconstruct(instances, sources, slot="E", arm="m", snapshot_id="s"), key)
+    with_report = score(
+        reconstruct(instances, sources, slot="E", arm="m", snapshot_id="s", record_kinds=kinds),
+        key,
+    )
+    assert without.as_dict() == with_report.as_dict()
+
+
 # --- two loci of one document are siblings ------------------------------------
 
 

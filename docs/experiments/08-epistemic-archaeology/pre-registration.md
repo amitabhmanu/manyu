@@ -602,3 +602,60 @@ power to end the experiment; the same discipline applied to a single slot ends t
 cost avoided — four layers of Sanskrit, an unresolved edition question, and a translation
 that would have made the mutation operator measure the translator — is a benefit and is not
 the reason.
+
+### A9 — 2026-08-13: an assertion pointing at nothing must be countable
+
+**What slot E's step 2 found.** Hamblin (1981) asserts that the spinach claim descends from
+a decimal-point error, and **names no document**: only "German chemists" and "the original
+workers". No von Wolff, no Bunge, no date, no citation. That emptiness is confirmed by a
+peer-reviewed source and is one of slot E's findings rather than a gap in the corpus.
+
+An assertion whose upstream endpoint is never named is not an edge case here. It is the
+**commonest situation in a contested genealogy**, and slot B has the same shape — Gamow
+asserting a remembered conversation.
+
+**The defect, verified against the mechanism before this was written.** Encoded the obvious
+way — record the assertion, let the edge not form — the assertion **disappears entirely**:
+
+- no pair can share a record only one instance cites, so no edge forms;
+- the pair's `declined` reason reads `"no shared evidence record"`, which is **false**, since
+  a record exists and has one end;
+- the record appears nowhere in `Reconstruction.as_dict()`.
+
+FR-5 exists precisely so that nothing vanishes without a record: *an edge that vanishes
+without a record is indistinguishable from one never considered*. A silent assertion is the
+same failure a step earlier.
+
+**The amendment.** `Reconstruction` gains `unresolved_assertions` — assertion records
+reaching fewer than two claim-instances, reported as
+`(record_id, asserting_source_id, reason)`. Step 3a stamps
+`metadata["record_kind"] = "assertion"` on records generated from a worksheet's `ASSERTED
+DESCENTS` block.
+
+**Why this is not FR-1's violation**, which is the question that matters:
+
+1. **`classify_support` never reads `record_kind`.** The discriminator still derives
+   `TESTIMONY` from shared-record cardinality together with `source_id` distinctness, exactly
+   as P2 registered and stage −1 measured. Pinned by
+   `test_record_kind_never_reaches_the_discriminator`.
+2. **`score` never reads it either**, and no scored dimension moves. Pinned by
+   `test_unresolved_assertions_do_not_move_a_scored_dimension`.
+3. It **reports** something already present in the corpus rather than adding a signal that
+   decides an edge.
+
+FR-1 forbids authoring an edge type to win slot E's discrimination. This authors no edge
+type, wins nothing, and touches no scored quantity.
+
+**What it deliberately refuses to do.** Absent a `record_kinds` map, nothing is reported.
+Guessing which singly-cited records were *meant* as assertions would invent the finding — and
+most singly-cited records are ordinary span records, so a heuristic here would fire
+constantly and mean nothing.
+
+**The option not taken.** A placeholder node standing in for Hamblin's unnamed source was
+considered and refused. It would be a node with no document, no excerpt and no date —
+exactly what A5 refused when it kept Weinstein's unattested German original out of slot B.
+The same rule gives the same answer, which is what makes it a rule rather than a preference.
+
+The correct output is that **the edge does not form and the assertion is reported.** A
+genealogy that shows an assertion pointing at nothing is more informative than one that
+shows nothing at all.

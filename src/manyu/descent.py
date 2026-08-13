@@ -77,6 +77,17 @@ METRIC_VERSION = "exp08.scoring.v1"
 #: declared separately because substrate must not import an experiment.
 CORPUS_TAG = "exp08"
 
+#: `metadata["record_kind"]` marking a record generated from an *asserted
+#: descent* — a document claiming that one text descends from another — as
+#: opposed to a span record attesting that text appears somewhere.
+#:
+#: **Read by the unresolved-assertion report and by nothing else** (A9).
+#: `classify_support` never consults it: the discriminator still derives
+#: `TESTIMONY` from shared-record cardinality together with `source_id`
+#: distinctness, exactly as P2 registered. A declared kind that steered the
+#: discriminator would be FR-1's violation wearing a different name.
+ASSERTION_RECORD = "assertion"
+
 
 class SupportKind(str, Enum):
     """What a reconstructed edge rests on.
@@ -198,6 +209,23 @@ class Reconstruction:
     #: Every pair considered and refused, with the reason. FR-5: an edge that
     #: vanishes without a record is indistinguishable from one never considered.
     declined: tuple[tuple[str, str, str], ...]
+    #: Assertion records reaching fewer than two claim-instances — a document
+    #: claiming a descent whose other end is not in the corpus (A9).
+    #:
+    #: Added after slot E's step 2 found Hamblin asserting descent from "German
+    #: chemists" and "the original workers" while naming no document at all.
+    #: Encoded the obvious way, that assertion **disappeared**: no pair could
+    #: share the record, so no edge formed, and the pair's `declined` reason read
+    #: "no shared evidence record" — which is false, since a record exists and
+    #: has one end.
+    #:
+    #: An assertion pointing at nothing is a real epistemic situation and the
+    #: commonest one in a contested genealogy. FR-5 requires it be countable
+    #: rather than invisible.
+    #:
+    #: **Diagnostic only.** `score` reads `edges`, so nothing here moves a scored
+    #: dimension.
+    unresolved_assertions: tuple[tuple[str, str, str], ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -207,6 +235,7 @@ class Reconstruction:
             "nodes": list(self.nodes),
             "edges": [edge.as_dict() for edge in self.edges],
             "declined": [list(item) for item in self.declined],
+            "unresolved_assertions": [list(item) for item in self.unresolved_assertions],
         }
 
 
@@ -401,6 +430,7 @@ def reconstruct(
     snapshot_id: str,
     hedges: Iterable[str] = (),
     undetermined_pairs: Iterable[tuple[str, str]] = (),
+    record_kinds: dict[str, str] | None = None,
 ) -> Reconstruction:
     """Derive the descent graph.
 
@@ -470,6 +500,51 @@ def reconstruct(
         nodes=tuple(item.instance_id for item in ordered),
         edges=tuple(edges),
         declined=tuple(declined),
+        unresolved_assertions=unresolved_assertions(ordered, record_sources, record_kinds),
+    )
+
+
+def unresolved_assertions(
+    instances: Iterable[ClaimInstance],
+    record_sources: dict[str, str],
+    record_kinds: dict[str, str] | None = None,
+) -> tuple[tuple[str, str, str], ...]:
+    """Assertion records that reach fewer than two claim-instances (A9).
+
+    A document asserting a descent produces one record, cited by **both**
+    endpoints. When the upstream end is never named — Hamblin's "German
+    chemists", Gamow's remembered conversation — only one instance can cite it,
+    no pair shares it, and the assertion leaves no trace in the output at all.
+
+    Returned as `(record_id, asserting_source_id, reason)`. Sorted, because a
+    report whose order depends on iteration order cannot be re-derived from its
+    own artifact.
+
+    `record_kinds` is a caller-supplied map from record id to
+    `metadata["record_kind"]`. Absent it, nothing is reported: a corpus that does
+    not distinguish assertion records from span records cannot have this
+    measured, and guessing which single-cited records were meant as assertions
+    would invent the finding.
+    """
+    if not record_kinds:
+        return ()
+
+    citers: dict[str, int] = {}
+    for instance in instances:
+        for record_id in instance.evidence_ids:
+            citers[record_id] = citers.get(record_id, 0) + 1
+
+    return tuple(
+        sorted(
+            (
+                record_id,
+                record_sources.get(record_id, "<unknown source>"),
+                f"asserted descent reaches {citers.get(record_id, 0)} claim-instance(s); "
+                "the other endpoint is not in the corpus",
+            )
+            for record_id, kind in record_kinds.items()
+            if kind == ASSERTION_RECORD and citers.get(record_id, 0) < 2
+        )
     )
 
 
