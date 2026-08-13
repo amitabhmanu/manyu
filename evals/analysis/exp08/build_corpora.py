@@ -271,6 +271,16 @@ E_HAMBLIN = ("German chemists reinvestigating the iron content of spinach had sh
              "1930s that the original workers had put the decimal point in the wrong place "
              "and made a tenfold overestimate of its value.")
 
+# LAYER 1, the gap slot E was built with. Rekdal writes the SAME sentence three times in
+# one article, changing only what follows it, in order to demonstrate what each citation
+# practice costs. The corpus gets, for free, three claim-instances identical to the
+# character that differ ONLY in attribution -- the cleanest possible statement that
+# ATTRIBUTION_SHIFT is about attribution and not about text. He does it deliberately; the
+# article is about citation, so the variants are the argument rather than an accident.
+E_REKDAL_CLAIM = ("The idea that spinach is a good source of iron is a myth that was born in "
+                  "the 1930s, due to a misplaced decimal point, causing the concentration to "
+                  "appear ten times higher than its real value")
+
 SLOT_E: dict[str, Any] = {
     "slot": "E",
     "description": (
@@ -281,34 +291,46 @@ SLOT_E: dict[str, Any] = {
         "arm that labels everything TESTIMONY. Note the shape: the endpoints of the testimony "
         "edges share only 'decimal point', two tokens, deliberately not recorded as a span -- "
         "so no textual reading competes with the testimony one, which is the clean case P2 "
-        "registered. Still a pilot: three of five Bender nodes are missing, layer 1 is absent "
-        "entirely, and no key exists."
+        "registered. LAYER 1 IS NOW PRESENT: Rekdal writes the same sentence three times in "
+        "one article, changing only the citation after it -- none, Larsson, then Hamblin, a "
+        "source he states plainly he never read. Three instances identical to the character "
+        "that differ ONLY in attribution. Still a pilot: three of five Bender nodes are "
+        "missing, larsson1995 is named and paginated but not obtained, and no key exists."
     ),
     "sources": [
         ("bender1972", "Bender, Arnold E. The Wider Knowledge of Nutrition. Inaugural Lecture, 24 October 1972, Queen Elizabeth College, University of London. London: Castle Cary Press, 1972, p. 11.", "1972-10-24", "day", "origin of the decimal-point story (A12)"),
         ("bender1977", "Bender, Arnold E. \"Iron in spinach.\" The Spectator, 9 July 1977, p. 18.", "1977-07-09", "day", "same author, hedge weakened"),
         ("hamblin1981", "Hamblin, T. J. \"Fake!\" British Medical Journal 283, no. 6307 (19-26 December 1981): 1671-1674.", "1981-12-19", "day", "the assertion; names no source"),
-        ("rekdal2014", "Rekdal, Ole Bjorn. \"Academic urban legends.\" Social Studies of Science 44, no. 4 (2014): 638-654. DOI 10.1177/0306312714535679. OnlineFirst 12 June 2014.", "2014-06-12", "day", "investigation; contributes the central testimony assertion WITHOUT a claim-instance of its own"),
+        ("larsson1995", "Larsson, Hans. Cited by Rekdal as Larsson 1995: 448-449. The intermediate link Rekdal names between Hamblin and himself. NOT OBTAINED.", "1995-01-01", "year", "layer 2; named and paginated but absent -- no excerpt is held"),
+        ("rekdal2014", "Rekdal, Ole Bjorn. \"Academic urban legends.\" Social Studies of Science 44, no. 4 (2014): 638-654. DOI 10.1177/0306312714535679. OnlineFirst 12 June 2014.", "2014-06-12", "day", "investigation; contributes the central testimony assertion AND, now, layer 1"),
     ],
     "spans": [
         ("fame_of_spinach", "fame of spinach", ["bender1972", "bender1977"], None),
         ("misplaced_decimal_point", "a misplaced decimal point", ["bender1972", "bender1977"], None),
+        ("rekdal_myth_sentence", E_REKDAL_CLAIM, ["rekdal2014"], "Attested in ONE document -- but three times within it, which is why it earns a span anyway. It connects nothing, and that is the point: layer 1 shares no wording with the Bender layer it descends from, so the whole descent is asserted rather than textual."),
     ],
     "instances": [
         ("E.bender1972.c1", "bender1972", "§p11", None, E_B1972, ["fame_of_spinach", "misplaced_decimal_point"], None, None),
         ("E.bender1977.c1", "bender1977", "§p18", None, E_B1977, ["fame_of_spinach", "misplaced_decimal_point"], None, None),
         ("E.hamblin1981.c1", "hamblin1981", "§p1671", "NARROWED to one continuous sentence. The worksheet excerpt carried ellipses and could not be hashed or diffed; the fuller passage remains un-obtained.", E_HAMBLIN, [], None, "Names NO ONE -- only 'German chemists' and 'the original workers'. Confirmed by a peer-reviewed source."),
+        # Layer 1, three times over. Same sentence, three attributions, one document.
+        ("E.rekdal2014.p640_bare", "rekdal2014", "§p640.a", "Rekdal's paraphrase of Larsson, presented with NO reference at all, as the first of four citation practices he walks through.", E_REKDAL_CLAIM + ".", ["rekdal_myth_sentence"], None, "Attributed to NOBODY. Rekdal's point is that a reader would take him for the discoverer."),
+        ("E.rekdal2014.p640_larsson", "rekdal2014", "§p640.b", "The same sentence, same page, with the source he actually read.", E_REKDAL_CLAIM + " (Larsson, 1995: 448-449).", ["rekdal_myth_sentence"], "Hans Larsson", "The HONEST citation, and the one Rekdal endorses."),
+        ("E.rekdal2014.p642_hamblin", "rekdal2014", "§p642", "The same sentence again, two pages later, now crediting a source Rekdal states plainly he has NOT read: 'I have plagiarized the Hamblin reference from Larsson.'", E_REKDAL_CLAIM + " (Hamblin, 1981).", ["rekdal_myth_sentence"], "T. J. Hamblin", "A citation the author DECLARES to be false while making it. The corpus records what the document says, and what it says is Hamblin."),
     ],
     "assertions": [
-        ("hamblin_asserts_decimal_origin", "hamblin1981", "an UNNAMED 19th-century analysis -> the iron-rich claim", "Hamblin gives no reference, no names, no dates. BOTH endpoints are absent from this corpus -- the upstream because he names none, the downstream because no layer-1 instance is obtained. The canonical A9 case.", ["E.hamblin1981.c1"]),
-        ("rekdal_asserts_bender_to_hamblin", "rekdal2014", "bender1972/1977 -> hamblin1981", "THE CENTRAL TESTIMONY EDGE. Rekdal is a THIRD document, neither endpoint, so this resolves as TESTIMONY rather than textual -- which is correct, because the endpoints share only 'decimal point', two tokens, deliberately not recorded as a span. rekdal2014 contributes this record WITHOUT being a claim-instance: an assertion lives in the asserting document, and that document need not itself make a first-order claim in the corpus.", ["E.bender1972.c1", "E.bender1977.c1", "E.hamblin1981.c1"]),
+        ("hamblin_asserts_decimal_origin", "hamblin1981", "an UNNAMED 19th-century analysis -> the iron-rich claim", "Hamblin gives no reference, no names, no dates. BOTH endpoints are still absent -- the upstream because he names none, the downstream because Hamblin's descendant is the IRON-RICH claim itself, and the three layer-1 instances now in the corpus assert the opposite (that the claim is a myth). Adding layer 1 did not close this gap, and saying so is the point: a corpus can grow without the assertion it was supposed to ground getting any nearer to an edge. The canonical A9 case.", ["E.hamblin1981.c1"]),
+        ("rekdal_asserts_bender_to_hamblin", "rekdal2014", "bender1972/1977 -> hamblin1981", "THE CENTRAL TESTIMONY EDGE. Rekdal is a THIRD document, neither endpoint, so this resolves as TESTIMONY rather than textual -- which is correct, because the endpoints share only 'decimal point', two tokens, deliberately not recorded as a span. rekdal2014 contributes this record WITHOUT being a claim-instance: an assertion lives in the asserting document, and that document need not itself make a first-order claim in the corpus. It now makes three, and this assertion is unaffected because its cited_by was written explicitly.", ["E.bender1972.c1", "E.bender1977.c1", "E.hamblin1981.c1"]),
+        ("rekdal_asserts_hamblin_to_larsson", "rekdal2014", "hamblin1981 -> larsson1995", "The first link of the chain Rekdal states about himself: 'I put my trust in Larsson that he has read and interpreted Hamblin correctly.' larsson1995 is named and PAGINATED (448-449) but not obtained, so the downstream endpoint is absent (A9).", ["E.hamblin1981.c1"]),
+        ("rekdal_asserts_larsson_to_himself", "rekdal2014", "larsson1995 -> rekdal2014", "The second link, and the rare case of an author documenting his own position in a descent chain: 'my statement is the last and therefore the least trustworthy link in a chain of sources'. Upstream endpoint absent for the same reason.", ["E.rekdal2014.p640_larsson"]),
     ],
     "known_gaps": [
         "bender1975a (p. 15), bender1975b (p. 142) and bender&bender1982 (p. 55) not obtained; the lineage is 2 of 5 nodes.",
         "bender&bender1982 missing means the SECOND undetermined edge -- the one Rekdal states himself -- cannot be built.",
         "sutton2010a and 2010b not obtained, so layer 3 has no dispute in the corpus.",
-        "larsson1995 not obtained.",
-        "No layer-1 instance, so Hamblin's assertion has no downstream endpoint and discrimination has no TEXTUAL half from layer 1 -- though the Bender span now supplies one.",
+        "larsson1995 named and PAGINATED by Rekdal (448-449) but not obtained, so both links of the chain Rekdal states about his own writing have an absent endpoint.",
+        "Layer 1 is present but did NOT close Hamblin's assertion. Hamblin's descendant is the iron-rich claim; Rekdal's three instances assert the opposite. The corpus grew and that assertion got no nearer to an edge -- worth reporting, because a growing corpus looks like progress on every gap at once.",
+        "The three Rekdal instances share their span with NO other document, so layer 1 connects to the Bender layer by assertion only. That is faithful -- Rekdal paraphrases rather than quotes -- but it means layer 1 adds nodes and no edges.",
         "hamblin1981's excerpt is a narrowed continuous span, not the full passage.",
     ],
 }
