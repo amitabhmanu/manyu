@@ -31,7 +31,7 @@ Related reading:
 | 5 | Underdetermination as first-class belief | **in-progress** — stages −1 to 4 offline and complete; collapse clears its bar by 0.0033 and the state survives one disconfirmation; Stage 5 paid | 3, 4 | Belief shape that refuses to collapse under equal evidence |
 | 6 | "What would change my mind" engine | **in-progress** — Stage −1 passed 7/7 with no new production code; the dose model reproduces experiment 5's trajectory to 0.0005 against the driven substrate, and `r = 1` corroboration is confirmed unfalsifiable in principle | 3 (load-bearing), 5 (test subject) | Counterfactual receipts |
 | 7 | Can a transparent agent scheme? | **in-progress** — every offline stage complete (−1, 0, 1, 2); **six** channels confirmed against the substrate and a seventh retracted as never having been one; the 3/3 substrate-versus-agent split is the headline; stages 3–5 (paid) not run | 1, 3 (**not 6** — that is stage 5 only) | Safety result, bounded: provenance is immutable exactly where a snapshot was taken first |
-| 8 | Epistemic archaeology | **in-progress** — both offline stages complete: a claim-instance needs no new production code, testimony separates from textual descent on records alone (so no edge type may be authored), and the null draws zero while being shown *capable* of drawing more; slots A/B/C/E untranscribed | 3, 5, 6 (offline halves only) | Cross-source provenance tooling — **conditional**, plus the first ablation pointed outside Manyu |
+| 8 | Epistemic archaeology | **in-progress** — both offline stages complete: a claim-instance needs no new production code, testimony separates from textual descent on records alone (so no edge type may be authored), and the null draws zero while being shown *capable* of drawing more. Slots A, B and E transcribed from real documents; **slot C cut (A8)**, taking P9 and the stress question with it. Three arms built and frozen, **none captured**. Keys are model-drafted and provisional (A15/A18), so **P3 is not confirmed** despite slot A returning its exact 1.00/1.00 criterion | 3, 5, 6 (offline halves only) | Cross-source provenance tooling — **conditional**, plus the first ablation pointed outside Manyu |
 | 9 | Society of Manyus | not-started | 8 | Multi-agent belief propagation |
 | 10 | Rebirth / identity narration | not-started | everything | Capstone — bridge to *Twice Born* |
 
@@ -1309,13 +1309,20 @@ depends on. It is a design question this experiment surfaces and does not answer
 
 ## 8. Epistemic archaeology
 
-**Status:** in-progress (2026-08-12) — **both offline stages complete and
-passing**: stage −1 (11/11) and stage 0's offline half (6/6). Stages 1–3 are paid
-and unrun. Spec at
+**Status:** in-progress (2026-08-14) — **both offline stages complete and
+passing**: stage −1 (11/11) and stage 0's offline half (6/6). Stages 1–3 are
+**built and frozen but uncaptured**: `arms.py`, `capture_arms.py` (dry by
+default) and `run_stages.py` exist, and **no provider has been called**.
+Twenty amendments (A1–A20); [results.md](experiments/08-epistemic-archaeology/results.md)
+written. Spec at
 [requirements](experiments/08-epistemic-archaeology/requirements.md) ·
 [methodology](experiments/08-epistemic-archaeology/methodology.md) ·
-[pre-registration](experiments/08-epistemic-archaeology/pre-registration.md)
+[pre-registration](experiments/08-epistemic-archaeology/pre-registration.md) ·
+[results](experiments/08-epistemic-archaeology/results.md)
 **Depends on:** 3, 5, 6 — but see the sequencing decision below
+**Blocked on:** hand-authored keys. Everything scoreable today rests on
+model-drafted keys frozen for drift only (A20), so no number is reportable except
+slot D's zero.
 **Crux ref:** #7
 **Question:** Can Manyu reconstruct the provenance graph of how an idea
 descended and mutated across sources — **and does having a belief substrate make
@@ -1338,6 +1345,15 @@ alone is not a result. Stage 2 runs a **bare-model control arm** on a
 byte-identical corpus and key — the first ablation in this project pointed
 *outside* Manyu. Every prior one (`ignore_own_evidence`, `DecayMode.FIXED`,
 `ContradictionPricing.FIXED`) lifts a rule *inside* it.
+
+**A third arm was registered (A19) before any arm ran:** `bare_agent`, the same
+model inside an agent harness with the documents on disk. It is an *addition*,
+never a substitution — running the harness instead of the single-pass control
+would swap the question from *what does the substrate add over a stock model* to
+*over an agent harness* without the pre-registration saying so. Two constraints
+are load-bearing: **no retrieval** (§4 excludes it as a confound), and the arm
+gets the **documents, never the corpus files**, whose evidence block is the
+discriminator it is being asked to reproduce.
 
 **Sequencing decided 2026-08-12: proceeds on the offline halves of 5 and 6**,
 which are complete and validated, rather than waiting on their paid stages. What
