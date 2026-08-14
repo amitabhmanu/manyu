@@ -4,12 +4,14 @@
 **Date:** 2026-08-14
 **Requirements:** [requirements.md](requirements.md) · **Methodology:** [methodology.md](methodology.md) · **Pre-registration:** [pre-registration.md](pre-registration.md)
 **Artifacts:** `evals/analysis/exp08/{stage_minus1,stage0}.jsonl` · `freeze.json`
-**Amendments at time of writing:** A1–A19.
+**Amendments at time of writing:** A1–A20.
 
 > **Nothing in this document is a measurement of reconstruction accuracy.** The
 > answer keys for slots A, B and E were drafted by a language model and validated
-> by hand (A15, A18); they are not hand-authored and are not frozen. Every score
-> below is reported as a diagnostic of the pipeline and is void as a result.
+> by hand (A15, A18); they are not hand-authored. They are **frozen for drift
+> detection only** (A20) — a digest is evidence a file did not change and has
+> never been evidence that it is right. Every score below is reported as a
+> diagnostic of the pipeline and is void as a result.
 
 ## 1. Headline
 
@@ -31,7 +33,7 @@ restraint, not about recovery.
 |---|---|---|
 | −1 — substrate survey | 11/11 | Gate passed. **P1 held**: a claim-instance needs no new schema, table or column. **P2 held**, so FR-1 binds — no edge type may be authored to win slot E |
 | 0 — reconstruction | 6/6 | **P4 held** (0 spurious edges on the null). Null shown capable (mutant draws 15/15). **P3 deliberately unscored** — registered against slot A, which had no corpus when the stage ran |
-| 1–3 — the arms | not run | Requires a provider. `arms.py`, `run_stages.py`, `make_plots.py` do not exist |
+| 1–3 — the arms | **built, not run** | `arms.py`, `capture_arms.py` and `run_stages.py` exist and are frozen. Nothing has been captured and no provider has been called. `make_plots.py` does not exist |
 
 ## 3. Four slots had a premise refuted by their own sources
 

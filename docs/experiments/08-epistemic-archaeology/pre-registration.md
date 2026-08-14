@@ -1145,3 +1145,48 @@ mean the harness adds nothing on the dimension it most plausibly should.
 actually used — if the tool surface cannot be restricted to the transcribed documents — then
 `bare_agent` is measuring retrieval and must not be run at all. Recorded now so that
 discovering it later is a withdrawal rather than a footnote.
+
+### A20 — 2026-08-14: the corpora and the provisional keys are frozen, for drift and not for record
+
+**Decision: `corpus_{A,B,E}.json` and `key_{A,B,E}.json` enter `freeze.json`'s `files` block.**
+A15 and A18 said the keys were *"deliberately NOT frozen"* because *"freezing is the commitment
+step"*. That is amended here, by separating two jobs the one mechanism has been doing.
+
+**Freezing has two meanings and this experiment has been using only one.**
+
+- **Drift detection** — nothing changed under us between a capture and the score that reads it.
+  This is a mechanical property and it is wanted *whatever* the file's status is. An unfrozen
+  key can be edited between a paid run and its scoring with nothing to notice.
+- **Commitment** — this is the artifact of record, and a result may be reported against it.
+
+A15 refused the second and, having only one lever, got neither. The refusal was right and its
+consequence was not: **the three least trustworthy files in the experiment were also the only
+ones nothing was watching.**
+
+**How the separation is carried.** Each provisional entry's `role` string states it outright —
+frozen for drift detection, provisional under A15/A18, not an artifact of record. A digest is
+evidence a file did not change; it has never been evidence that a file is right, and no reader
+may take one for the other.
+
+**The corpora are frozen too, and that is the more important half.** A key is meaningless
+except against a specific corpus. Slots A, B and E each moved several times on 14 August — slot
+E went from 3 edges to 9 on A16 alone — and a key pinned to a moving corpus pins nothing. Both
+sides go in together or neither does.
+
+**What is NOT resolved by this, and stays visible.**
+
+- **Nine of `key_B`'s eighteen edges claim `textual` descent where the corpus records no shared
+  evidence at all.** Slot B's recall is therefore substantially a measurement of key error
+  rather than of any arm. Flagged, affirmed by the experimenter, frozen as-is, and repeated
+  here because a freeze makes a file harder to change and easier to trust.
+- **P3 remains unconfirmed.** Slot A's 1.00/1.00 is unaffected by freezing: the objection was
+  never that the file might change, it was that the key agrees with the mechanism because both
+  read the same documents the same way.
+- `suspension_correct` is `None` on slots A and E, whose keys mark nothing undetermined, so
+  **P8 is exercised on slot B alone**. That is as registered; slot E's second undetermined edge
+  needs `bender&bender1982`, which is not obtained.
+
+**What lifting this looks like.** Hand-authored keys replace these files, the `role` strings
+lose the provisional clause, and A15's suspension of FR-2 ends. The digests change and the
+freeze log records it, which is the same path any re-freeze takes — the point of freezing them
+now is that the change will be *visible* rather than silent.

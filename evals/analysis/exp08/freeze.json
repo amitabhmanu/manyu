@@ -2,10 +2,11 @@
   "_note": "Experiment 8. Slot D's corpus and key are GENERATED, not transcribed (FR-8), so the generator is frozen under `standards` rather than `mechanisms`: easing the null after seeing what an arm drew on it is the defect this freeze exists to catch, and it would be done by editing the generator.",
   "_enforcement": "verify_fixture_freeze on `files` and verify_standards_freeze on `standards`, from salience. `mechanisms` and `pre_registration` are now enforced too, by descent.verify_mechanism_freeze and descent.verify_pre_registration_freeze — both raising, both called by a SCORED run and deliberately not by the test suite, on the split verify_standards_freeze already draws: a guard that fires on every development run gets deleted. The offline stages keep reporting drift non-raisingly into their artifacts. All four blocks are now backed by code; none is documentation any more. Digests go through salience._frozen_digest, which normalises CRLF to LF — required, not cosmetic: this file briefly stored a pre-registration hash taken over raw CRLF bytes, which would have failed the guard on every LF clone with nothing tampered with.",
   "_slot_c_note": "Slot C was CUT on 2026-08-13 (amendment A8) before any excerpt was transcribed. It never had fixtures and never will under this experiment. The scored slate is A, B, D, E.",
-  "_partial_note": "Slots A, B and E are ABSENT from `files` and that is now a STATEMENT, not a backlog item. Their corpora are transcribed and their keys exist -- but the keys are PROVISIONAL and model-authored under A15's suspension of FR-2, and freezing is the commitment step. Committing to a key no human wrote is the one thing this file exists to prevent. They enter `files` when hand-authored keys replace them, from the worksheets under docs/experiments/08-epistemic-archaeology/key-worksheets/.",
+  "_partial_note": "All four slots' corpora and keys are now in `files` (A20). The three real slots' keys are PROVISIONAL and say so in their `role`: frozen so nothing moves under a capture, NOT adopted as artifacts of record. A15 refused to freeze them because freezing was the commitment step, and having only one lever got neither -- leaving the three least trustworthy files as the only ones nothing was watching. The corpora go in with them because a key pinned to a moving corpus pins nothing.",
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-14 (p) A20: corpus_{A,B,E}.json and key_{A,B,E}.json enter `files`. Freezing had been doing two jobs under one name -- DRIFT DETECTION (nothing moved between a capture and its score) and COMMITMENT (this is the artifact of record). A15 refused the second and, with one lever, got neither, so the three least trustworthy files were also the only ones nothing watched. The provisional entries carry the distinction in their `role` strings. The corpora go in too and that is the more important half: slot E moved 3 edges -> 9 on A16 alone, and a key pinned to a moving corpus pins nothing. Nine of key_B's edges still claim textual descent with no shared evidence and are frozen as-is, repeated in the amendment because a freeze makes a file harder to change and easier to trust. P3 still unconfirmed. Nothing captured; no provider has been called.",
     "2026-08-14 (o) arms.py added to `mechanisms` and test_exp08_arms.py to `standards`. arms.py is frozen because document_bundle is where an answer would leak: it is built by WHITELIST, so a corpus field added later cannot reach an arm by default, and loosening that to a blacklist is the one edit that would hand a bare arm the discriminator it is being asked to reproduce (A17's lapse condition, A19 constraint 2). The stages runner is offline and reads captures, so it needs no freeze of its own. NOTHING HAS BEEN CAPTURED and no provider has been called.",
     "2026-08-14 (n) re-frozen for A19, which registers a THIRD arm -- bare_agent, a model inside an agent harness with the transcribed documents on disk -- while arms.py does not exist and no arm has been scored. It is an ADDITION, never a substitution: running the harness instead of section 8's single-pass arm would swap the question from 'what does the substrate add over a stock model' to 'over an agent harness' without the pre-registration saying so. Two constraints are load-bearing rather than stylistic: network denied, because section 4 excludes retrieval as a confound between corpus quality and reconstruction quality; and the arm gets the DOCUMENTS, never corpus_*.json, because A17 states that handing a bare arm the evidence records kills the suspension dimension, and this is the arm with a filesystem. P11 registered with it. Still no scored arm run.",
     "2026-08-14 (m) key_D.json re-frozen, and the guard is what forced it. Removing the dead `suspended_edges` block changed the file's bytes and verify_fixture_freeze refused stage 0 -- correctly, since it cannot know a removed field was dead. THE SCORED CONTENT IS UNCHANGED: `edges` was and remains empty, so slot D's key still says exactly zero edges and P4's published numbers are unaffected. Digest f7c740028674 -> b7bd988649eb. Recorded rather than quietly re-hashed, because 'the change was harmless' is what every unjustified re-freeze says about itself.",
@@ -29,7 +30,7 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "ad563b3d49208eacb82519ef419c690843a3b762ccc653fb0ed8a18fb5a1abde",
+      "sha256": "c3231e39fc7ee7f8bfa425943b3bacf79c7660042835b50efce2edc96f609afd",
       "amendments_at_freeze": [
         "A1",
         "A2",
@@ -49,18 +50,43 @@
         "A16",
         "A17",
         "A18",
-        "A19"
+        "A19",
+        "A20"
       ]
     }
   },
   "files": {
+    "evals/fixtures/exp08/corpus_A.json": {
+      "sha256": "fbdf740b5f57d191d91c34c5baffc87e0c4556c172774b8d1729c72d28007910",
+      "role": "slot A corpus, pilot. Calibration narrowed by A10; propagators identified but not held."
+    },
+    "evals/fixtures/exp08/corpus_B.json": {
+      "sha256": "236d4ac827927aa58e6ad3a98f52e61b781150c37ce7cd81e016e19bfb889187",
+      "role": "slot B corpus, pilot. Carries A11's investigator disagreement and A17's two raised-and-declined assertions."
+    },
     "evals/fixtures/exp08/corpus_D.json": {
       "sha256": "1688351c299b99fe7c2c7f9784af6d4efb6b54a1b539884d65ee0d752571f3b0",
       "role": "the_null_two_families_sharing_no_record"
     },
+    "evals/fixtures/exp08/corpus_E.json": {
+      "sha256": "264256f57b8f9be60d4e65637b6874f09bcbd40502c16bfb005038ae3d5e53dd",
+      "role": "slot E corpus, pilot. Layer 1 present three times over; the Rekdal span recorded by A16."
+    },
+    "evals/fixtures/exp08/key_A.json": {
+      "sha256": "50164109a05bde88a033d1bee0294c6077ad7f84d7807631bd8e51fca972a62a",
+      "role": "PROVISIONAL under A15/A18 — model-drafted, hand-validated, NOT an artifact of record. Frozen under A20 for DRIFT DETECTION only: a digest is evidence a file did not change and has never been evidence that it is right. Slot A returns 1.00/1.00 against it, which is P3's criterion and is VOID."
+    },
+    "evals/fixtures/exp08/key_B.json": {
+      "sha256": "eac3f4213f8a6a86bdc884f09b0d4ef4510c4c8d1cbec369fd7a01cab3de8f5e",
+      "role": "PROVISIONAL under A15/A18 — model-drafted, hand-validated, NOT an artifact of record. Frozen under A20 for DRIFT DETECTION only: a digest is evidence a file did not change and has never been evidence that it is right. NINE of its eighteen edges claim textual descent where the corpus records no shared evidence."
+    },
     "evals/fixtures/exp08/key_D.json": {
       "sha256": "b7bd988649eb27155c2c42ac13f00058a6125cae7278085058febd0144a6cabb",
       "role": "the_only_certain_key_in_the_corpus_zero_edges"
+    },
+    "evals/fixtures/exp08/key_E.json": {
+      "sha256": "901d5253a6d7004f306887af06b9d82d99273ed6b8ea730155b2a5d258163fec",
+      "role": "PROVISIONAL under A15/A18 — model-drafted, hand-validated, NOT an artifact of record. Frozen under A20 for DRIFT DETECTION only: a digest is evidence a file did not change and has never been evidence that it is right."
     }
   },
   "standards": {
