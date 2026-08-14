@@ -4,7 +4,7 @@
 **Date:** 2026-08-14
 **Requirements:** [requirements.md](requirements.md) · **Methodology:** [methodology.md](methodology.md) · **Pre-registration:** [pre-registration.md](pre-registration.md)
 **Artifacts:** `evals/analysis/exp08/{stage_minus1,stage0}.jsonl` · `freeze.json`
-**Amendments at time of writing:** A1–A18.
+**Amendments at time of writing:** A1–A19.
 
 > **Nothing in this document is a measurement of reconstruction accuracy.** The
 > answer keys for slots A, B and E were drafted by a language model and validated
@@ -200,4 +200,10 @@ of slot E's five Bender loci are missing.
 - **The bare arm's inputs.** A17's flag is a structured form of a sentence
   already in the corpus as text. *If a bare arm is ever handed the evidence
   records rather than the documents, the suspension dimension stops measuring
-  anything.*
+  anything.* A19 makes this binding on `bare_agent` first, since that is the arm
+  with a filesystem.
+- **A third arm, registered before any ran.** A19 adds `bare_agent` — a model in
+  an agent harness with the documents on disk — as an **addition to** and never a
+  substitution for §8's single-pass control. It carries **P11**: on slot D
+  `bare_agent` draws fewer spurious edges than `bare`, and more than zero. Both
+  halves can fail independently and each failure is informative.

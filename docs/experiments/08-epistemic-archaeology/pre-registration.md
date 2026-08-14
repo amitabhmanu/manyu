@@ -1083,3 +1083,65 @@ a key author who used it would have lost the entire suspension dimension with no
 per-edge flag; `from_dict` now raises on the block rather than ignoring it, and the empty one
 is removed from `key_D.json`. Supporting both spellings was the alternative and would have let
 them disagree.
+
+### A19 — 2026-08-14: a third arm, `bare_agent`, registered before any arm runs
+
+**Decision: a third arm is added.** The slate becomes `manyu`, `bare`, `bare_agent`. It is
+registered now, while `arms.py` does not exist and no arm has been scored, because an arm
+added after a result is a result chosen.
+
+**What it is.** The same corpus, the same key, the same metric — but the model runs inside an
+agent harness (Claude Code CLI, or the Agent SDK) with the transcribed sources on disk, tools,
+and a multi-turn loop, instead of §8's single pass.
+
+**Why it is worth a third arm rather than a substitution.** §8 names three ways the comparison
+can land and calls the third the most useful: *"The bare model handles A and C but cannot hold
+B underdetermined or separate testimony in E. This localises the contribution precisely."*
+`bare_agent` sharpens exactly that axis. If a stock model fabricates edges on slot D and an
+agent with the same documents on disk does not, then the substrate's contribution on that slot
+is bookkeeping and working memory rather than reasoning — which is a narrower and more useful
+claim than either arm alone can support.
+
+**What it is NOT: a replacement for `bare`.** Running the harness *instead of* the registered
+single-pass arm would silently swap the question from *what does the substrate add over a
+stock model* to *what does it add over an agent harness*. **If `bare` does not run, the
+registered comparison did not happen**, and no `bare_agent` number may stand in for it.
+
+**Four binding constraints, and the first two are not stylistic.**
+
+1. **No retrieval. Network access denied.** §4 puts retrieval out of scope explicitly: *"The
+   corpus is hand-transcribed and closed. Searching for sources is a different capability and
+   would confound corpus quality with reconstruction quality."* An agent that can search the
+   web can find Valtin's paper and read past the transcription — which is the confound §4
+   excluded, arriving through the arm instead of through the corpus.
+2. **The same documents as `bare`, never the evidence records.** `bare_agent` gets the
+   transcribed excerpts, citations and dates. It must **not** be given `corpus_*.json`, whose
+   `evidence` block encodes shared-span structure, assertion records, and — since A17 — the
+   `undetermined` flag. A17 states the lapse condition in terms: *"If a bare arm is ever handed
+   the evidence records rather than the documents, the suspension dimension stops measuring
+   anything."* That applies to this arm first, because it is the one with a filesystem.
+3. **The harness configuration is part of the arm and must be captured.** Model id pinned as
+   the house does it (`AnthropicAPIJSONProvider` pins `claude-opus-5`); system prompt, tool
+   list and any `CLAUDE.md` in reach recorded verbatim into the artifact and hashed into
+   `freeze.json`. An unpinned harness would be the loosest thing in a design that freezes the
+   mechanism, the standards, the pre-registration and the fixtures.
+4. **Scoring does not change.** FR-4 requires one scoring function applied without branching on
+   arm, already pinned by `test_score_does_not_branch_on_arm`. A third arm is a third
+   `Reconstruction`, nothing more. `priced_prediction` stays a **string**; an agent's cost
+   accounting differs in kind from a single call's and must not be coerced into a number that
+   enters an average.
+
+**P11, registered here and therefore later than P1–P10, but before any arm has run.**
+
+> On slot D, `bare_agent` draws **fewer** spurious edges than `bare` and **more than zero**.
+
+The first half says the harness helps; the second says it does not close the gap. Both halves
+can fail independently and each failure is informative: zero spurious edges would mean the
+substrate's restraint contribution is reproducible with a filesystem and a loop, which is a
+result this project should want to know and would not enjoy; no improvement over `bare` would
+mean the harness adds nothing on the dimension it most plausibly should.
+
+**What would withdraw this amendment.** If constraint 1 or 2 cannot be enforced in the harness
+actually used — if the tool surface cannot be restricted to the transcribed documents — then
+`bare_agent` is measuring retrieval and must not be run at all. Recorded now so that
+discovering it later is a withdrawal rather than a footnote.
