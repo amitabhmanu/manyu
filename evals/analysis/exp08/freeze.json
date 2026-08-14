@@ -6,6 +6,7 @@
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-14 (o) arms.py added to `mechanisms` and test_exp08_arms.py to `standards`. arms.py is frozen because document_bundle is where an answer would leak: it is built by WHITELIST, so a corpus field added later cannot reach an arm by default, and loosening that to a blacklist is the one edit that would hand a bare arm the discriminator it is being asked to reproduce (A17's lapse condition, A19 constraint 2). The stages runner is offline and reads captures, so it needs no freeze of its own. NOTHING HAS BEEN CAPTURED and no provider has been called.",
     "2026-08-14 (n) re-frozen for A19, which registers a THIRD arm -- bare_agent, a model inside an agent harness with the transcribed documents on disk -- while arms.py does not exist and no arm has been scored. It is an ADDITION, never a substitution: running the harness instead of section 8's single-pass arm would swap the question from 'what does the substrate add over a stock model' to 'over an agent harness' without the pre-registration saying so. Two constraints are load-bearing rather than stylistic: network denied, because section 4 excludes retrieval as a confound between corpus quality and reconstruction quality; and the arm gets the DOCUMENTS, never corpus_*.json, because A17 states that handing a bare arm the evidence records kills the suspension dimension, and this is the arm with a filesystem. P11 registered with it. Still no scored arm run.",
     "2026-08-14 (m) key_D.json re-frozen, and the guard is what forced it. Removing the dead `suspended_edges` block changed the file's bytes and verify_fixture_freeze refused stage 0 -- correctly, since it cannot know a removed field was dead. THE SCORED CONTENT IS UNCHANGED: `edges` was and remains empty, so slot D's key still says exactly zero edges and P4's published numbers are unaffected. Digest f7c740028674 -> b7bd988649eb. Recorded rather than quietly re-hashed, because 'the change was harmless' is what every unjustified re-freeze says about itself.",
     "2026-08-14 (l) re-frozen for A18. The three keys are now model-drafted and experimenter-VALIDATED rather than model-authored -- a downgrade of A15's suspension, not a lift, because reviewing a draft is not deciding independently and recall is invisible to that kind of review: nine of key_B's eighteen edges claim textual descent where the corpus records no shared evidence, and the validation pass did not catch them either. Two key_B rows CORRECTED -- the draft marked gamow1956 -> oraifeartaigh2018.q_{alpher,wheeler} undetermined, double-counting a suspension that belongs to the witnesses themselves. Found by A17's dimension on its first run. Also: AnswerKey.from_dict now REFUSES a key carrying `suspended_edges`, and the empty block is gone from key_D.json -- silently ignoring it cost a whole scored dimension with no error raised. Keys still UNFROZEN and P3 still unconfirmed. results.md written. Still no scored arm run.",
@@ -78,6 +79,10 @@
     "evals/analysis/exp08/generate_slot_d.py": {
       "sha256": "860ae9345335c93738b2677e6e3d30b734970ce92d2bd37334c02dcd87c6dace",
       "role": "emits_the_null_and_its_key_from_one_function_easing_it_must_trip_this"
+    },
+    "tests/test_exp08_arms.py": {
+      "sha256": "493755253b469d7c981a53b63b8291f22a800ddbb408cd766b8bd43eeaf9ea48",
+      "role": "proves the arm bundle leaks no answer and no arm reaches the network"
     }
   },
   "mechanisms": {
@@ -88,6 +93,10 @@
     "src/manyu/descent_mutants.py": {
       "sha256": "8381cf67fcbbac1d7494f65146602ac3fdb941f1f9b7df14286ec9fe3232fcfc",
       "role": "eight_mutants_none_documented_as_equivalent"
+    },
+    "evals/analysis/exp08/arms.py": {
+      "sha256": "ca6889b4dbdd796984f61ba2fc35d8965f0d26537458ba157c24743bfacd379b",
+      "role": "what each arm may see, and the normalisation into one scoreable type"
     }
   }
 }
