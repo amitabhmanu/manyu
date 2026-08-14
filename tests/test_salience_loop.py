@@ -29,6 +29,13 @@ from manyu.salience import (
 
 AGENT = "agent_demo"
 
+# Trials for `test_a_tie_is_recorded_rather_than_silently_broken`, whose assertion is
+# statistical rather than exact. The tie-break is a fair coin between two outcomes, so
+# the test raises a false failure with probability 2 ** (1 - TIE_BREAK_TRIALS). At the
+# original 6 that was 3.1%, roughly one full-suite run in 32; at 24 it is 1.2e-7. The
+# trials are cheap (0.14s for all 24) and the reasoning is in the test's docstring.
+TIE_BREAK_TRIALS = 24
+
 
 def _core(name: str) -> tuple[ManyuCore, dict[str, str], dict[str, str]]:
     core = ManyuCore.from_paths(db_path=":memory:", frozen=True)
@@ -352,9 +359,24 @@ def test_a_tie_is_recorded_rather_than_silently_broken() -> None:
     ids. So the arbitrary choice is *recorded*, and the methodology consequence
     is carried on the result: arms may not be compared across separately-seeded
     stores on a web where `had_arbitrary_choice` is true.
+
+    **On the trial count, which is load-bearing — do not trim it.** This assertion
+    is statistical: the tie-break is a fair coin between two outcomes (measured
+    52/48 over 400 trials), so `len(picks) > 1` fails whenever every trial lands
+    the same way, with probability `2 ** (1 - TIE_BREAK_TRIALS)`.
+
+        6 trials  -> 3.1%    ~1 full-suite run in 32 fails for no reason
+        12 trials -> 0.05%
+        24 trials -> 0.00001%
+
+    It ran at 6 and duly failed a full run, which read as an order-dependent flake
+    and is nothing of the kind — the suite has no randomising plugin and this test
+    shares no state with any other. It was simply underpowered: six flips is not
+    enough evidence for "this is not always the same". 24 trials cost 0.14s, so
+    the power is bought for nothing.
     """
     picks = set()
-    for _ in range(6):
+    for _ in range(TIE_BREAK_TRIALS):
         core, _, reverse = _core("tied_tension_web")
         result = AttentionLoop(core, arm=Arm.DRIVEN, agent_id=AGENT).run(max_iterations=1)
         step = result.steps[0]
@@ -363,8 +385,10 @@ def test_a_tie_is_recorded_rather_than_silently_broken() -> None:
         picks.add(tuple(sorted(reverse[b] for b in step.conflict)))
 
     assert len(picks) > 1, (
-        "the tie broke the same way six times over — either the fixture no longer ties, or belief ids "
-        "have become deterministic. Both change what this test is documenting"
+        f"the tie broke the same way {TIE_BREAK_TRIALS} times over. At this trial count that "
+        f"happens by chance about once in {2 ** (TIE_BREAK_TRIALS - 1):,} runs, so it is far "
+        "likelier that the fixture no longer ties or that belief ids have become "
+        "deterministic. Both change what this test is documenting"
     )
 
 
