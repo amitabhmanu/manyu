@@ -597,3 +597,25 @@ def test_reconstruct_marks_only_what_it_is_handed() -> None:
     told = reconstruct(instances, sources, slot="X", arm="m", snapshot_id="s",
                        undetermined_pairs=[("X.early.c1", "X.late.c1")])
     assert [e.undetermined for e in told.edges] == [True]
+
+
+def test_a_key_using_suspended_edges_is_refused_loudly() -> None:
+    """The trap was silence, not the field. A18.
+
+    `suspended_edges` sat in key_D.json read by nothing. Empty, so harmless — but
+    a key author who used it would have lost the whole suspension dimension with
+    no error raised, `suspension_correct` reading `None` because `undetermined`
+    stayed empty.
+    """
+    with pytest.raises(ValueError, match="suspended_edges"):
+        descent.AnswerKey.from_dict({
+            "slot": "X", "edges": [],
+            "suspended_edges": [{"ancestor": "X.a", "descendant": "X.b"}],
+        })
+
+    # And the per-edge spelling, which is the one that works.
+    key = descent.AnswerKey.from_dict({
+        "slot": "X",
+        "edges": [{"ancestor": "X.a", "descendant": "X.b", "undetermined": True}],
+    })
+    assert key.undetermined == frozenset({("X.a", "X.b")})

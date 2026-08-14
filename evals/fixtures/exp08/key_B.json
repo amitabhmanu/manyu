@@ -2,7 +2,7 @@
   "fixture_id": "key_B",
   "role": "answer_key",
   "slot": "B",
-  "authored_by": "PROVISIONAL — MODEL-AUTHORED, IN SUSPENSION OF FR-2 (amendment A15). This key was drafted by a language model, not by the experimenter. FR-2 requires hand-authored keys because a model key scored against a model reconstruction measures AGREEMENT BETWEEN TWO MODEL READINGS, not correctness, and that failure is silent — the numbers look like results. Installed at the experimenter's explicit and repeated instruction to unblock the pipeline. NOT FROZEN, deliberately: freezing is the commitment step and this is not committed to. No stage-1..3 result computed against this key may be reported as a measurement of reconstruction accuracy. Replace by hand before any scored run. Original draft header follows.\n\nMODEL-AUTHORED DRAFT - NOT A HAND KEY. Written by a language model at the user's explicit instruction, AGAINST FR-2. Scoring a model-produced reconstruction against this measures agreement between two model readings, not correctness, and the failure is silent. Re-author by hand before use.",
+  "authored_by": "PROVISIONAL — MODEL-AUTHORED, IN SUSPENSION OF FR-2 (amendment A15). This key was drafted by a language model, not by the experimenter. FR-2 requires hand-authored keys because a model key scored against a model reconstruction measures AGREEMENT BETWEEN TWO MODEL READINGS, not correctness, and that failure is silent — the numbers look like results. Installed at the experimenter's explicit and repeated instruction to unblock the pipeline. NOT FROZEN, deliberately: freezing is the commitment step and this is not committed to. No stage-1..3 result computed against this key may be reported as a measurement of reconstruction accuracy. Replace by hand before any scored run. VALIDATED by the experimenter 2026-08-14, and corrected in two rows (A18). Original draft header follows.\n\nMODEL-AUTHORED DRAFT - NOT A HAND KEY. Written by a language model at the user's explicit instruction, AGAINST FR-2. Scoring a model-produced reconstruction against this measures agreement between two model readings, not correctness, and the failure is silent. Re-author by hand before use.",
   "edges": [
     {
       "ancestor": "B.gamow1956.c1",
@@ -51,10 +51,9 @@
     {
       "ancestor": "B.gamow1956.c1",
       "descendant": "B.oraifeartaigh2018.q_alpher",
-      "support": "testimony",
+      "support": "textual",
       "mutation": "attribution_shift",
-      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
-      "undetermined": true
+      "why": "CORRECTED 2026-08-14 (A18), at the experimenter's instruction. The draft marked this undetermined on the grounds that O'Raifeartaigh & Mitton raise the descent and decline to settle it. They do -- but about WHEELER AND ALPHER THEMSELVES, which this key already records as gamow1956 -> wheeler2000 and gamow1956 -> alpher1998. This endpoint is O&M's own reproduction, which descends from the witness textually, and that edge is recorded separately too. The draft counted one suspension twice. Found by A17's suspension dimension on its first run."
     },
     {
       "ancestor": "B.gamow1956.c1",
@@ -66,10 +65,9 @@
     {
       "ancestor": "B.gamow1956.c1",
       "descendant": "B.oraifeartaigh2018.q_wheeler",
-      "support": "testimony",
+      "support": "textual",
       "mutation": "attribution_shift",
-      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
-      "undetermined": true
+      "why": "CORRECTED 2026-08-14 (A18), at the experimenter's instruction. The draft marked this undetermined on the grounds that O'Raifeartaigh & Mitton raise the descent and decline to settle it. They do -- but about WHEELER AND ALPHER THEMSELVES, which this key already records as gamow1956 -> wheeler2000 and gamow1956 -> alpher1998. This endpoint is O&M's own reproduction, which descends from the witness textually, and that edge is recorded separately too. The draft counted one suspension twice. Found by A17's suspension dimension on its first run."
     },
     {
       "ancestor": "B.gamow1956.c1",

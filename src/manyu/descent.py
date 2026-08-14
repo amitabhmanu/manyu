@@ -256,6 +256,19 @@ class AnswerKey:
         mutations: dict[tuple[str, str], MutationOp] = {}
         undetermined: set[tuple[str, str]] = set()
         testimony: set[tuple[str, str]] = set()
+        # `suspended_edges` was a top-level block in the first key_D.json that
+        # `from_dict` never read. Empty there, so harmless — but a key author who
+        # put edges in it would get silence: no error, and `suspension_correct`
+        # reading `None` because `undetermined` stayed empty. Suspension is a
+        # PER-EDGE flag and there is no top-level list. Refusing loudly is the
+        # whole fix; supporting two spellings would let them disagree.
+        if "suspended_edges" in data:
+            raise ValueError(
+                "answer key uses `suspended_edges`, which nothing reads. Mark suspension "
+                "per edge instead: {\"ancestor\": ..., \"descendant\": ..., "
+                "\"undetermined\": true}. Left as a silent no-op this costs a whole scored "
+                "dimension without any error being raised."
+            )
         for entry in data.get("edges", ()):
             pair = (entry["ancestor"], entry["descendant"])
             edges.append(pair)

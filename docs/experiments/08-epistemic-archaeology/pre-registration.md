@@ -1038,3 +1038,48 @@ scoring — and the first thing it discriminated was an error in a model-written
 **Not applied to slots A or E.** Neither carries an assertion whose source raises a descent
 and declines it, so neither gains a flag. Slot A's undetermined origin edges have an absent
 endpoint and form no edge at all; that is a different condition (A9) and is left alone.
+
+### A18 — 2026-08-14: the keys are validated, two rows corrected, `suspended_edges` refused
+
+**Decision: A15's suspension of FR-2 is downgraded, not lifted.** The experimenter has read
+the three model-authored keys against the documents and accepted them. `key_A`, `key_B` and
+`key_E` are therefore **model-drafted, experimenter-validated** rather than model-authored,
+and each file records that in `authored_by`.
+
+**Two rows of `key_B` were wrong and are corrected.** The draft marked
+`gamow1956 → oraifeartaigh2018.q_alpher` and `gamow1956 → oraifeartaigh2018.q_wheeler` as
+`testimony` + `undetermined`, on the grounds that O'Raifeartaigh & Mitton raise the descent
+and decline to settle it. They do — but about **Wheeler and Alpher themselves**, which the
+key already records as `gamow1956 → wheeler2000` and `gamow1956 → alpher1998`. These two
+endpoints are O&M's own reproductions, which descend from the witnesses textually, and those
+edges are recorded separately as well. The draft counted one suspension twice. Corrected to
+`textual`, with the reasoning in each edge's `why`.
+
+**It was found by A17's suspension dimension on its first run**, which is the strongest thing
+that can be said for that dimension: it discriminated a right key from a wrong one before any
+arm existed to be scored, and what it discriminated was an error a human review had passed.
+
+**Why the suspension is downgraded rather than lifted, and this is not a formality.**
+
+- **Reviewing a draft is not deciding independently.** The anchoring failure is well
+  established and the worksheets exist precisely because deciding first and comparing second
+  is a different act. A validation pass can confirm that every edge is defensible without ever
+  asking which edges a reader would have drawn unprompted — and recall, unlike precision, is
+  invisible to that kind of review. **Nine of `key_B`'s eighteen edges claim textual descent
+  where the corpus records no shared evidence at all, and the validation pass did not catch
+  them either.**
+- **Slot A's 1.00 / 1.00 is still not P3 confirmed.** The key agrees with the mechanism on
+  all seven edges. If the validation asked "is this right?" against the same corpus, that is
+  the same reading a third time, not an independent one. **P3 remains unconfirmed**, and the
+  keys remain **unfrozen**.
+
+**What still lifts it fully:** hand-authored keys from the worksheets — 18 decisions for slot
+A, 47 for B, 12 for E — where the edges are chosen before the mechanism's output is seen.
+
+**Separately: `suspended_edges` is now refused.** `key_D.json` carried a top-level
+`suspended_edges` block that `AnswerKey.from_dict` never read. Empty there, so harmless — but
+a key author who used it would have lost the entire suspension dimension with no error raised,
+`suspension_correct` reading `None` because `undetermined` stayed empty. Suspension is a
+per-edge flag; `from_dict` now raises on the block rather than ignoring it, and the empty one
+is removed from `key_D.json`. Supporting both spellings was the alternative and would have let
+them disagree.
