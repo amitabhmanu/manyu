@@ -899,3 +899,60 @@ must report the gap between what O&M wrote and what the graph can hold.
 **A5 is not withdrawn.** Its reasoning stands, including its refusal to record a Gamow →
 Wheeler span; only its exclusion clause is superseded, and its condition is the reason this
 amendment had to be written at all.
+
+### A15 — 2026-08-14: FR-2 is suspended, and the keys are provisional
+
+**Decision: `key_A.json`, `key_B.json` and `key_E.json` are installed from
+model-authored drafts, at the experimenter's explicit and repeated instruction.** FR-2 —
+"answer keys are hand-authored; no model is involved in their production" — is suspended
+for these three files and for no others. `key_D.json` is unaffected: it is generated
+alongside its corpus by design (FR-8).
+
+**What FR-2 was protecting against, stated concretely because it is now unguarded.** The
+Manyu arm's reconstruction is produced by a mechanism; the bare arm's is produced by a
+model. Scoring either against a key a model wrote measures *agreement between two
+readings of the same documents*, at least one of which shares the failure modes of the
+thing being measured. It does not measure correctness. Crucially the failure is **silent**:
+the output is a set of well-formed numbers that look exactly like a result.
+
+**The demonstration, run before this amendment was written.** Against these keys, with
+suspension wired:
+
+| slot | precision | recall | mutations identified |
+|---|---|---|---|
+| A | **1.0** | **1.0** | 7 of 7 |
+| B | 0.50 | 0.36 | 6 of 18 |
+| E | 1.0 | 0.25 | 0 of 12 |
+
+**Slot A returns exactly 1.0 / 1.0 — the threshold §2's P3 registers as its criterion.**
+P3 is therefore, on paper, confirmed. It is not. That number is the clearest available
+statement of why FR-2 existed: a prediction that was meant to be hard to satisfy was
+satisfied on the first attempt by a key that agrees with the mechanism because both read
+the same documents the same way.
+
+**Binding consequences.**
+
+- **P3 is NOT confirmed and may not be recorded as confirmed.** Any 1.0/1.0 obtained
+  against `key_A.json` in its present state is void.
+- **No stage 1–3 result computed against these keys may be reported as a measurement of
+  reconstruction accuracy**, for either arm, including the between-arm difference — a
+  model key can be wrong in ways that flatter one arm and not the other, and nothing here
+  detects that.
+- **The keys are deliberately NOT frozen.** Freezing is the commitment step; these are
+  explicitly provisional. `freeze.json`'s `files` block continues to carry slot D only,
+  and the absence is now a statement rather than an omission.
+- Each key file carries its provenance in `authored_by`, at the top, before the original
+  draft's own header. Neither may be stripped.
+
+**What lifts the suspension.** Hand-authored keys, from the worksheets at
+`docs/experiments/08-epistemic-archaeology/key-worksheets/` — 18 decisions for slot A, 47
+for B, 12 for E — converted by `key_from_worksheet.py`, which makes no judgement. On
+arrival they replace these files and are frozen, and this amendment is superseded rather
+than deleted.
+
+**One corpus defect is unresolved underneath this and inflates slot E's numbers.** The span
+`misplaced_decimal_point` occurs verbatim in all three `rekdal2014` excerpts and the corpus
+records it only for `bender1972` and `bender1977`, in breach of the shared-span rule. Six of
+slot E's nine false negatives are that error rather than a disagreement about descent. The
+fix is a judgement — record it, or exclude it with a note as A5 excluded *"biggest blunder"* —
+and it is not made here.

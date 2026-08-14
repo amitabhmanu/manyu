@@ -1,0 +1,94 @@
+{
+  "fixture_id": "key_E",
+  "role": "answer_key",
+  "slot": "E",
+  "authored_by": "PROVISIONAL — MODEL-AUTHORED, IN SUSPENSION OF FR-2 (amendment A15). This key was drafted by a language model, not by the experimenter. FR-2 requires hand-authored keys because a model key scored against a model reconstruction measures AGREEMENT BETWEEN TWO MODEL READINGS, not correctness, and that failure is silent — the numbers look like results. Installed at the experimenter's explicit and repeated instruction to unblock the pipeline. NOT FROZEN, deliberately: freezing is the commitment step and this is not committed to. No stage-1..3 result computed against this key may be reported as a measurement of reconstruction accuracy. Replace by hand before any scored run. Original draft header follows.\n\nMODEL-AUTHORED DRAFT - NOT A HAND KEY. Written by a language model at the user's explicit instruction, AGAINST FR-2. Scoring a model-produced reconstruction against this measures agreement between two model readings, not correctness, and the failure is silent. Re-author by hand before use.",
+  "edges": [
+    {
+      "ancestor": "E.bender1972.c1",
+      "descendant": "E.bender1977.c1",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "Spans `fame_of_spinach` and `a misplaced decimal point` shared verbatim. Same author, hedge weakened: \"may well have grown from\" -> \"appears to have been based on\"."
+    },
+    {
+      "ancestor": "E.bender1972.c1",
+      "descendant": "E.hamblin1981.c1",
+      "support": "testimony",
+      "mutation": "qualification",
+      "why": "No meaningful shared span - only \"decimal point\" (2 tokens). Rekdal 2014 traces the story bender -> hamblin -> larsson -> himself. Rekdal is neither endpoint, so the descent rests on his assertion."
+    },
+    {
+      "ancestor": "E.bender1972.c1",
+      "descendant": "E.rekdal2014.p640_bare",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "\"a misplaced decimal point\" appears in both excerpts. Attributed to nobody: Rekdal's point is that a reader would take him for the discoverer."
+    },
+    {
+      "ancestor": "E.bender1972.c1",
+      "descendant": "E.rekdal2014.p640_larsson",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "\"a misplaced decimal point\" shared; Rekdal attributes to Larsson, the honest citation."
+    },
+    {
+      "ancestor": "E.bender1972.c1",
+      "descendant": "E.rekdal2014.p642_hamblin",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "\"a misplaced decimal point\" shared; Rekdal attributes to Hamblin - a citation he declares false while making it."
+    },
+    {
+      "ancestor": "E.bender1977.c1",
+      "descendant": "E.hamblin1981.c1",
+      "support": "testimony",
+      "mutation": "qualification",
+      "why": "Again only \"decimal point\" is shared. Rekdal 2014 traces the story bender -> hamblin -> larsson -> himself."
+    },
+    {
+      "ancestor": "E.bender1977.c1",
+      "descendant": "E.rekdal2014.p640_bare",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "\"a misplaced decimal point\" shared; no attribution in either."
+    },
+    {
+      "ancestor": "E.bender1977.c1",
+      "descendant": "E.rekdal2014.p640_larsson",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "\"a misplaced decimal point\" shared; attribution appears where there was none."
+    },
+    {
+      "ancestor": "E.bender1977.c1",
+      "descendant": "E.rekdal2014.p642_hamblin",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "\"a misplaced decimal point\" shared; attribution appears where there was none."
+    },
+    {
+      "ancestor": "E.hamblin1981.c1",
+      "descendant": "E.rekdal2014.p640_bare",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "Shares \"the 1930s\" and the decimal-point claim; Rekdal names Hamblin as the link in the chain that reached him via Larsson."
+    },
+    {
+      "ancestor": "E.hamblin1981.c1",
+      "descendant": "E.rekdal2014.p640_larsson",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "As above; Rekdal here credits Larsson, his actual proximate source."
+    },
+    {
+      "ancestor": "E.hamblin1981.c1",
+      "descendant": "E.rekdal2014.p642_hamblin",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "Rekdal cites \"(Hamblin, 1981)\" explicitly - the descent is stated on the page."
+    }
+  ],
+  "provisional": true,
+  "fr2_suspended": "A15"
+}

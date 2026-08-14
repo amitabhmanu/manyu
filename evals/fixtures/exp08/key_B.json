@@ -1,0 +1,140 @@
+{
+  "fixture_id": "key_B",
+  "role": "answer_key",
+  "slot": "B",
+  "authored_by": "PROVISIONAL — MODEL-AUTHORED, IN SUSPENSION OF FR-2 (amendment A15). This key was drafted by a language model, not by the experimenter. FR-2 requires hand-authored keys because a model key scored against a model reconstruction measures AGREEMENT BETWEEN TWO MODEL READINGS, not correctness, and that failure is silent — the numbers look like results. Installed at the experimenter's explicit and repeated instruction to unblock the pipeline. NOT FROZEN, deliberately: freezing is the commitment step and this is not committed to. No stage-1..3 result computed against this key may be reported as a measurement of reconstruction accuracy. Replace by hand before any scored run. Original draft header follows.\n\nMODEL-AUTHORED DRAFT - NOT A HAND KEY. Written by a language model at the user's explicit instruction, AGAINST FR-2. Scoring a model-produced reconstruction against this measures agreement between two model readings, not correctness, and the failure is silent. Re-author by hand before use.",
+  "edges": [
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.gamow1970.c1",
+      "support": "textual",
+      "mutation": "rewording",
+      "why": "Span `blunder_phrase` (\"was the biggest blunder he\") carried. Same author, fourteen years on: \"the cosmic repulsion idea\" -> \"the introduction of the cosmological term\", \"in his entire life\" -> \"in his life\"."
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.gamow1970.c2",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "Carries \"blunder\" in quotation marks. Livio treats those marks as his central evidence that Gamow meant to be quoting rather than paraphrasing."
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.alpher1998.c1",
+      "support": "testimony",
+      "mutation": "rewording",
+      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
+      "undetermined": true
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.wheeler2000.c1",
+      "support": "testimony",
+      "mutation": "qualification",
+      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
+      "undetermined": true
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.livio2013.q_gamow",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "Livio quotes the 1956 sentence verbatim and names Gamow as its author."
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.livio2013.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict quotes \"the biggest blunder\" back and attributes it to no one - Livio calls it \"Gamow's own hyperbole\"."
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.oraifeartaigh2018.q_alpher",
+      "support": "testimony",
+      "mutation": "attribution_shift",
+      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
+      "undetermined": true
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.oraifeartaigh2018.q_gamow",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "O'Raifeartaigh & Mitton quote the 1956 sentence verbatim and name Gamow."
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.oraifeartaigh2018.q_wheeler",
+      "support": "testimony",
+      "mutation": "attribution_shift",
+      "why": "O'Raifeartaigh & Mitton raise this descent and EXPLICITLY DECLINE to settle it. They are neither endpoint, so the edge is testimony; and because they suspend, so does the key.",
+      "undetermined": true
+    },
+    {
+      "ancestor": "B.gamow1956.c1",
+      "descendant": "B.oraifeartaigh2018.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict carries \"biggest blunder\" in quotation marks and attributes it to no one."
+    },
+    {
+      "ancestor": "B.gamow1970.c1",
+      "descendant": "B.livio2013.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict quotes \"the biggest blunder\" and \"had ever made\" - the 1970 wording, not the 1956 wording."
+    },
+    {
+      "ancestor": "B.gamow1970.c1",
+      "descendant": "B.oraifeartaigh2018.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict carries \"biggest blunder\" and addresses the attribution the 1970 passage makes."
+    },
+    {
+      "ancestor": "B.gamow1970.c2",
+      "descendant": "B.livio2013.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "Livio's reading turns on the quotation marks around \"blunder\" in this passage; the verdict answers it directly."
+    },
+    {
+      "ancestor": "B.alpher1998.c1",
+      "descendant": "B.oraifeartaigh2018.q_alpher",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "Span `alpher_recall` carried; O'Raifeartaigh & Mitton reproduce the posting in full as their Figure 7. The excerpts are byte-identical; only the attribution changes."
+    },
+    {
+      "ancestor": "B.alpher1998.c1",
+      "descendant": "B.oraifeartaigh2018.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict rests on \"at least one occasion\" across three reports, of which Alpher is one."
+    },
+    {
+      "ancestor": "B.wheeler2000.c1",
+      "descendant": "B.oraifeartaigh2018.q_wheeler",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "Span `wheeler_doorway` carried; the excerpts are byte-identical. Only the attribution changes, to \"via John Archibald Wheeler\"."
+    },
+    {
+      "ancestor": "B.wheeler2000.c1",
+      "descendant": "B.oraifeartaigh2018.verdict",
+      "support": "textual",
+      "mutation": "attribution_shift",
+      "why": "The verdict rests on three reports, of which Wheeler is one."
+    },
+    {
+      "ancestor": "B.livio2013.verdict",
+      "descendant": "B.oraifeartaigh2018.verdict",
+      "support": "textual",
+      "mutation": "qualification",
+      "why": "O'Raifeartaigh & Mitton answer Livio directly and reach the opposite conclusion, carrying \"biggest blunder\" across. Livio hedges with \"best guess\"/\"may have\"; they hedge differently with \"little doubt\"/\"very likely\"."
+    }
+  ],
+  "provisional": true,
+  "fr2_suspended": "A15"
+}
