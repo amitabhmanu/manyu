@@ -6,6 +6,7 @@
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-14 (i) pre-registration.md re-frozen for A16, settling the span question A15 left open. `a misplaced decimal point` occurs verbatim in all three rekdal2014 excerpts and the corpus recorded it only for the two Bender documents -- a breach of the shared-span rule, not a judgement, and one the transcription commit had actively denied by claiming Rekdal paraphrases rather than quotes. Recorded rather than excluded: A5's exclusion of 'biggest blunder' covered two tokens naming the legend, this is four tokens describing it, and the principle both share is that the CORPUS RECORDS EVIDENCE AND THE KEY RECORDS BELIEF. Slot E 3 edges -> 9. Surfaced by checking a model draft key against the corpus, which showed the corpus wrong. Still no scored arm run.",
     "2026-08-14 (h) pre-registration.md re-frozen for A15, which SUSPENDS FR-2: key_A, key_B and key_E are installed from model-authored drafts at the experimenter's explicit and repeated instruction. The keys themselves are deliberately NOT added to `files`. Scored before writing the amendment, slot A returns precision 1.0 and recall 1.0 -- exactly P3's registered criterion -- which is the clearest possible statement of what FR-2 was for: a prediction meant to be hard to satisfy, satisfied immediately by a key that agrees with the mechanism because both read the same documents the same way. P3 IS NOT CONFIRMED. No stage 1-3 number against these keys may be reported as a measurement. Still no scored arm run.",
     "2026-08-14 (g) pre-registration.md re-frozen for A14, which admits alpher1998 after A5 excluded it. A5's literal condition -- that the mailing-list post prove retrievable -- is NOT met; the post was never retrieved and the archive was never consulted. What is held is O'Raifeartaigh & Mitton's verbatim reproduction of it in a peer-reviewed paper, which serves A5's purpose by a different route: the same route slot A already uses for Stare and slot E for Larsson. THE AMENDMENT IS LATE. alpher1998 was committed in 0445906 before it was written, so the corpus shape was visible first -- though no arm has run, no key exists, and no scored dimension has ever been computed on any slot B corpus. The pre-Alpher state is at 1bb76aa for a reader who wants to discount this. Still no scored arm run.",
     "2026-08-13 (f) pre-registration.md and test_exp08_properties.py re-frozen for A13. The first real corpus showed an edge carrying TWO mutations -- vreeman2007 -> carroll2015 is both an attribution shift and a deletion -- and classify_mutation returns the first match, hiding the second. `mutation` stays single-valued, recorded as a simplification rather than a claim. The binding consequence falls on the key author: a key must record only the highest-precedence operator, or it scores a correct arm as misidentified. The precedence ladder is pinned by test_mutation_precedence_is_fixed and carried in every corpus file's key_authoring_note, because a rule living only in the pre-registration is one someone applies from memory.",
@@ -22,7 +23,7 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "f77dbc989dec033f5d727dce300bd1745247747e784d360a03805bf63371049d",
+      "sha256": "da004c3e364fdc8ca22ce280e940738bf741bb4926a6db6740a6cc7e28674dad",
       "amendments_at_freeze": [
         "A1",
         "A2",
@@ -38,7 +39,8 @@
         "A12",
         "A13",
         "A14",
-        "A15"
+        "A15",
+        "A16"
       ]
     }
   },

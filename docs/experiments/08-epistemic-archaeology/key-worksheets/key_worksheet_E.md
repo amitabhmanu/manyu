@@ -74,7 +74,7 @@ A shared span is evidence, not a verdict — you decide whether it means descent
 | span | appears in | text |
 |---|---|---|
 | `fame_of_spinach` | `bender1972`, `bender1977` | fame of spinach |
-| `misplaced_decimal_point` | `bender1972`, `bender1977` | a misplaced decimal point |
+| `misplaced_decimal_point` | `bender1972`, `bender1977`, `rekdal2014` | a misplaced decimal point |
 | `rekdal_myth_sentence` | `rekdal2014` | The idea that spinach is a good source of iron is a myth that was born in the 1930s, due t |
 
 ## 4. Asserted descents

@@ -294,8 +294,11 @@ SLOT_E: dict[str, Any] = {
         "registered. LAYER 1 IS NOW PRESENT: Rekdal writes the same sentence three times in "
         "one article, changing only the citation after it -- none, Larsson, then Hamblin, a "
         "source he states plainly he never read. Three instances identical to the character "
-        "that differ ONLY in attribution. Still a pilot: three of five Bender nodes are "
-        "missing, larsson1995 is named and paginated but not obtained, and no key exists."
+        "that differ ONLY in attribution -- and because the phrase `a misplaced decimal "
+        "point` is shared verbatim with both Bender loci (A16), those three instances also "
+        "carry six TEXTUAL edges whose only difference is the citation that follows them. "
+        "Still a pilot: three of five Bender nodes are missing, larsson1995 is named and "
+        "paginated but not obtained, and no hand-authored key exists."
     ),
     "sources": [
         ("bender1972", "Bender, Arnold E. The Wider Knowledge of Nutrition. Inaugural Lecture, 24 October 1972, Queen Elizabeth College, University of London. London: Castle Cary Press, 1972, p. 11.", "1972-10-24", "day", "origin of the decimal-point story (A12)"),
@@ -306,7 +309,7 @@ SLOT_E: dict[str, Any] = {
     ],
     "spans": [
         ("fame_of_spinach", "fame of spinach", ["bender1972", "bender1977"], None),
-        ("misplaced_decimal_point", "a misplaced decimal point", ["bender1972", "bender1977"], None),
+        ("misplaced_decimal_point", "a misplaced decimal point", ["bender1972", "bender1977", "rekdal2014"], "rekdal2014 was MISSING here until 2026-08-14 (A16). The phrase occurs verbatim in all three Rekdal loci and the shared-span rule takes one record per document a span appears in, so omitting it was a transcription defect, not a judgement -- and it suppressed six real edges. Recorded rather than excluded: A5 kept 'biggest blunder' out of slot B's spans for being two tokens and the NAME of the legend, but this is four tokens and a description, so the exception would need an argument this phrase does not support. Whether four shared words mean descent is the KEY AUTHOR's call; the corpus records the evidence and the key records the belief."),
         ("rekdal_myth_sentence", E_REKDAL_CLAIM, ["rekdal2014"], "Attested in ONE document -- but three times within it, which is why it earns a span anyway. It connects nothing, and that is the point: layer 1 shares no wording with the Bender layer it descends from, so the whole descent is asserted rather than textual."),
     ],
     "instances": [
@@ -314,9 +317,9 @@ SLOT_E: dict[str, Any] = {
         ("E.bender1977.c1", "bender1977", "§p18", None, E_B1977, ["fame_of_spinach", "misplaced_decimal_point"], None, None),
         ("E.hamblin1981.c1", "hamblin1981", "§p1671", "NARROWED to one continuous sentence. The worksheet excerpt carried ellipses and could not be hashed or diffed; the fuller passage remains un-obtained.", E_HAMBLIN, [], None, "Names NO ONE -- only 'German chemists' and 'the original workers'. Confirmed by a peer-reviewed source."),
         # Layer 1, three times over. Same sentence, three attributions, one document.
-        ("E.rekdal2014.p640_bare", "rekdal2014", "§p640.a", "Rekdal's paraphrase of Larsson, presented with NO reference at all, as the first of four citation practices he walks through.", E_REKDAL_CLAIM + ".", ["rekdal_myth_sentence"], None, "Attributed to NOBODY. Rekdal's point is that a reader would take him for the discoverer."),
-        ("E.rekdal2014.p640_larsson", "rekdal2014", "§p640.b", "The same sentence, same page, with the source he actually read.", E_REKDAL_CLAIM + " (Larsson, 1995: 448-449).", ["rekdal_myth_sentence"], "Hans Larsson", "The HONEST citation, and the one Rekdal endorses."),
-        ("E.rekdal2014.p642_hamblin", "rekdal2014", "§p642", "The same sentence again, two pages later, now crediting a source Rekdal states plainly he has NOT read: 'I have plagiarized the Hamblin reference from Larsson.'", E_REKDAL_CLAIM + " (Hamblin, 1981).", ["rekdal_myth_sentence"], "T. J. Hamblin", "A citation the author DECLARES to be false while making it. The corpus records what the document says, and what it says is Hamblin."),
+        ("E.rekdal2014.p640_bare", "rekdal2014", "§p640.a", "Rekdal's paraphrase of Larsson, presented with NO reference at all, as the first of four citation practices he walks through.", E_REKDAL_CLAIM + ".", ["rekdal_myth_sentence", "misplaced_decimal_point"], None, "Attributed to NOBODY. Rekdal's point is that a reader would take him for the discoverer."),
+        ("E.rekdal2014.p640_larsson", "rekdal2014", "§p640.b", "The same sentence, same page, with the source he actually read.", E_REKDAL_CLAIM + " (Larsson, 1995: 448-449).", ["rekdal_myth_sentence", "misplaced_decimal_point"], "Hans Larsson", "The HONEST citation, and the one Rekdal endorses."),
+        ("E.rekdal2014.p642_hamblin", "rekdal2014", "§p642", "The same sentence again, two pages later, now crediting a source Rekdal states plainly he has NOT read: 'I have plagiarized the Hamblin reference from Larsson.'", E_REKDAL_CLAIM + " (Hamblin, 1981).", ["rekdal_myth_sentence", "misplaced_decimal_point"], "T. J. Hamblin", "A citation the author DECLARES to be false while making it. The corpus records what the document says, and what it says is Hamblin."),
     ],
     "assertions": [
         ("hamblin_asserts_decimal_origin", "hamblin1981", "an UNNAMED 19th-century analysis -> the iron-rich claim", "Hamblin gives no reference, no names, no dates. BOTH endpoints are still absent -- the upstream because he names none, the downstream because Hamblin's descendant is the IRON-RICH claim itself, and the three layer-1 instances now in the corpus assert the opposite (that the claim is a myth). Adding layer 1 did not close this gap, and saying so is the point: a corpus can grow without the assertion it was supposed to ground getting any nearer to an edge. The canonical A9 case.", ["E.hamblin1981.c1"]),
@@ -330,7 +333,7 @@ SLOT_E: dict[str, Any] = {
         "sutton2010a and 2010b not obtained, so layer 3 has no dispute in the corpus.",
         "larsson1995 named and PAGINATED by Rekdal (448-449) but not obtained, so both links of the chain Rekdal states about his own writing have an absent endpoint.",
         "Layer 1 is present but did NOT close Hamblin's assertion. Hamblin's descendant is the iron-rich claim; Rekdal's three instances assert the opposite. The corpus grew and that assertion got no nearer to an edge -- worth reporting, because a growing corpus looks like progress on every gap at once.",
-        "The three Rekdal instances share their span with NO other document, so layer 1 connects to the Bender layer by assertion only. That is faithful -- Rekdal paraphrases rather than quotes -- but it means layer 1 adds nodes and no edges.",
+        "Whether four shared words mean descent is UNSETTLED and belongs to the key. `a misplaced decimal point` is what joins Rekdal to the Benders, and Rekdal reached the story through Larsson from Hamblin -- whose own wording is 'put the decimal point in the wrong place', sharing nothing. So either Larsson carried Bender's phrasing, or two writers independently chose the obvious four words. The corpus records the evidence either way (A16); the key decides.",
         "hamblin1981's excerpt is a narrowed continuous span, not the full passage.",
     ],
 }

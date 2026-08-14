@@ -62,9 +62,10 @@
       "text": "a misplaced decimal point",
       "appears_in": [
         "bender1972",
-        "bender1977"
+        "bender1977",
+        "rekdal2014"
       ],
-      "note": null
+      "note": "rekdal2014 was MISSING here until 2026-08-14 (A16). The phrase occurs verbatim in all three Rekdal loci and the shared-span rule takes one record per document a span appears in, so omitting it was a transcription defect, not a judgement -- and it suppressed six real edges. Recorded rather than excluded: A5 kept 'biggest blunder' out of slot B's spans for being two tokens and the NAME of the legend, but this is four tokens and a description, so the exception would need an argument this phrase does not support. Whether four shared words mean descent is the KEY AUTHOR's call; the corpus records the evidence and the key records the belief."
     },
     {
       "span_id": "rekdal_myth_sentence",
@@ -145,6 +146,13 @@
       "summary": "span 'misplaced_decimal_point' attested in bender1977"
     },
     {
+      "evidence_id": "ev_E_misplaced_decimal_point_rekdal2014",
+      "source_id": "rekdal2014",
+      "span_id": "misplaced_decimal_point",
+      "record_kind": "span",
+      "summary": "span 'misplaced_decimal_point' attested in rekdal2014"
+    },
+    {
       "evidence_id": "ev_E_rekdal_myth_sentence_rekdal2014",
       "source_id": "rekdal2014",
       "span_id": "rekdal_myth_sentence",
@@ -212,7 +220,8 @@
         "ev_E_fame_of_spinach_bender1972",
         "ev_E_fame_of_spinach_bender1977",
         "ev_E_misplaced_decimal_point_bender1972",
-        "ev_E_misplaced_decimal_point_bender1977"
+        "ev_E_misplaced_decimal_point_bender1977",
+        "ev_E_misplaced_decimal_point_rekdal2014"
       ]
     },
     {
@@ -232,7 +241,8 @@
         "ev_E_fame_of_spinach_bender1972",
         "ev_E_fame_of_spinach_bender1977",
         "ev_E_misplaced_decimal_point_bender1972",
-        "ev_E_misplaced_decimal_point_bender1977"
+        "ev_E_misplaced_decimal_point_bender1977",
+        "ev_E_misplaced_decimal_point_rekdal2014"
       ]
     },
     {
@@ -266,6 +276,9 @@
       "belief_key": "e.inst.p640_bare.rekdal2014",
       "proposition": "[rekdal2014 §p640.a] The idea that spinach is a good source of iron is a myth that was born in the 1930s, due to a misplaced decimal point, causing the concentration to appear ten times higher than its real value.",
       "evidence_ids": [
+        "ev_E_misplaced_decimal_point_bender1972",
+        "ev_E_misplaced_decimal_point_bender1977",
+        "ev_E_misplaced_decimal_point_rekdal2014",
         "ev_E_rekdal_myth_sentence_rekdal2014"
       ]
     },
@@ -283,6 +296,9 @@
       "proposition": "[rekdal2014 §p640.b] The idea that spinach is a good source of iron is a myth that was born in the 1930s, due to a misplaced decimal point, causing the concentration to appear ten times higher than its real value (Larsson, 1995: 448-449).",
       "evidence_ids": [
         "ev_E_assert_rekdal_asserts_larsson_to_himself",
+        "ev_E_misplaced_decimal_point_bender1972",
+        "ev_E_misplaced_decimal_point_bender1977",
+        "ev_E_misplaced_decimal_point_rekdal2014",
         "ev_E_rekdal_myth_sentence_rekdal2014"
       ]
     },
@@ -299,6 +315,9 @@
       "belief_key": "e.inst.p642_hamblin.rekdal2014",
       "proposition": "[rekdal2014 §p642] The idea that spinach is a good source of iron is a myth that was born in the 1930s, due to a misplaced decimal point, causing the concentration to appear ten times higher than its real value (Hamblin, 1981).",
       "evidence_ids": [
+        "ev_E_misplaced_decimal_point_bender1972",
+        "ev_E_misplaced_decimal_point_bender1977",
+        "ev_E_misplaced_decimal_point_rekdal2014",
         "ev_E_rekdal_myth_sentence_rekdal2014"
       ]
     }

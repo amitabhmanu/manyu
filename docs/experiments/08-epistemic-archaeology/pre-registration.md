@@ -956,3 +956,42 @@ records it only for `bender1972` and `bender1977`, in breach of the shared-span 
 slot E's nine false negatives are that error rather than a disagreement about descent. The
 fix is a judgement — record it, or exclude it with a note as A5 excluded *"biggest blunder"* —
 and it is not made here.
+
+### A16 — 2026-08-14: `misplaced_decimal_point` is recorded for `rekdal2014`
+
+**Decision: the span gains `rekdal2014`, and slot E gains six textual edges.** A15 left this
+open; it is settled here.
+
+**It was a defect, not a judgement.** The phrase *"a misplaced decimal point"* occurs
+verbatim in all three `rekdal2014` excerpts. The shared-span rule takes one record per
+document a span appears in, so the corpus was in breach of its own rule and had been since
+the Rekdal loci were added. It went unnoticed because the transcription commit asserted the
+opposite — *"Rekdal paraphrases rather than quotes… layer 1 adds nodes and no edges"* — which
+is false: his paraphrase reuses Bender's exact four words. That sentence is now corrected in
+`known_gaps` rather than deleted.
+
+**How it surfaced, which is worth recording.** A model-authored draft key (A15) asserted
+these six edges. Checking the draft against the corpus showed the corpus, not the draft, was
+wrong. The drafts are unusable as keys and found a real defect anyway; both facts belong in
+`results.md`.
+
+**Why recorded rather than excluded.** A5 kept *"biggest blunder"* out of slot B's spans
+because two tokens naming the legend would produce a textual edge contradicting every
+witness's claim of independent hearing. The parallel is close enough to have to be answered:
+this is **four** tokens and a *description* rather than a name, so the exception would need an
+argument specific to this phrase, and there is none. The general principle the two amendments
+share: **the corpus records evidence, the key records belief.** Excluding a verbatim span
+because it might not mean descent moves a judgement out of the key, where it is visible and
+scored, into the fixture, where it is neither.
+
+**What is genuinely unsettled, and now sits with the key author.** Rekdal reached the story
+through Larsson from Hamblin — and Hamblin's own wording is *"put the decimal point in the
+wrong place"*, which shares nothing. So either Larsson carried Bender's phrasing to Rekdal,
+or two writers independently reached for the obvious four words. The corpus cannot tell those
+apart and does not try. `hamblin1981` remains correctly outside the span.
+
+**Effect.** Slot E: 3 edges → 9. The six new ones run from both Bender loci to all three
+Rekdal loci; `bender* → p640_bare` classifies as `rewording` and the other four as
+`attribution_shift`, since the three Rekdal instances differ only in the citation that
+follows them. No key is frozen, no arm has been scored, and slot E's corpus is not in
+`freeze.json`.
