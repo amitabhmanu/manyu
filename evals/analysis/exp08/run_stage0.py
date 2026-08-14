@@ -43,7 +43,13 @@ import test_exp08_mutants as T  # noqa: E402
 import test_exp08_substrate as S  # noqa: E402
 
 from manyu import descent_mutants as M  # noqa: E402
-from manyu.descent import mechanism_drift, reconstruct, score, verify_freeze  # noqa: E402
+from manyu.descent import (  # noqa: E402
+    mechanism_drift,
+    pre_registration_drift,
+    reconstruct,
+    score,
+    verify_freeze,
+)
 from manyu.schemas import ReportTarget, ReportTargetKind  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "stage0.jsonl"
@@ -85,14 +91,16 @@ def _rows() -> list[dict[str, Any]]:
             "check": "freeze__mechanism_digest",
             "pins": "freeze.json `mechanisms`",
             "drifted": drifted,
+            "pre_registration_drifted": pre_registration_drift(),
             "note": (
-                "NO VERDICT — reported, not enforced. `verify_fixture_freeze` checks "
-                "`files` only and `verify_standards_freeze` checks `standards`; nothing in "
-                "the substrate reads `mechanisms` (salience.py:770, :793). Non-raising here "
-                "for the reason `verify_standards_freeze` gives about itself: a guard firing "
-                "on every development run gets deleted. THE PAID RUNNER MUST ENFORCE THIS — "
-                "a silently loosened support rule is exactly the defect that would "
-                "manufacture this experiment's restraint headline."
+                "NO VERDICT HERE — reported, not enforced, and non-raising for the reason "
+                "`verify_standards_freeze` gives about itself: a guard firing on every "
+                "development run gets deleted. The ENFORCEMENT now exists, which it did not "
+                "before 2026-08-14: `descent.verify_mechanism_freeze` and "
+                "`descent.verify_pre_registration_freeze` raise, and a scored run must call "
+                "both. Until then this row is the visible half. A silently loosened support "
+                "rule is exactly the defect that would manufacture this experiment's "
+                "restraint headline, and nothing downstream looks wrong when it happens."
             ),
         }
     )

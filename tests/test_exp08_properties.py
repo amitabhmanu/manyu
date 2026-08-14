@@ -441,3 +441,95 @@ def test_the_same_document_guard_does_not_rely_on_the_date_guard() -> None:
     recon = reconstruct([first, redated], sources, slot="A", arm="m", snapshot_id="s")
     assert recon.edges == ()
     assert recon.declined[0][2] == "same source document: siblings, not a descent relation"
+
+
+# ---------------------------------------------------------------------------
+# The freeze guards. Until 2026-08-14 the `mechanisms` and `pre_registration`
+# blocks of freeze.json were read by no code at all — `verify_fixture_freeze`
+# checks `files`, `verify_standards_freeze` checks `standards`, and a grep for
+# `pre_registration` across src/, evals/ and tests/ returned nothing. Both were
+# claims the freeze file made and could not keep. These tests are what stop them
+# lapsing back into documentation.
+# ---------------------------------------------------------------------------
+
+
+def _freeze_file(tmp_path, block: str, target, digest: str, **extra):
+    """A freeze document naming one absolute path, so `_drift` resolves it."""
+    import json
+
+    doc = {block: {str(target): {"sha256": digest, "role": "under test", **extra}}}
+    path = tmp_path / "freeze.json"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    return path
+
+
+def test_mechanism_freeze_refuses_a_changed_mechanism(tmp_path) -> None:
+    """`mechanism_drift` reports; this refuses. The scored run needs the refusal.
+
+    A loosened `classify_support` manufactures this experiment's headline in the
+    flattering direction, and no downstream number looks wrong when it does:
+    slot D still reports zero, and zero is what the finding is made of.
+    """
+    from manyu.salience import _frozen_digest
+
+    target = tmp_path / "mechanism.py"
+    target.write_text("def classify_support():\n    return 'textual'\n", encoding="utf-8")
+    good = _freeze_file(tmp_path, "mechanisms", target, _frozen_digest(target))
+    assert descent.verify_mechanism_freeze(good)  # unchanged: returns the freeze
+
+    target.write_text("def classify_support():\n    return 'always'\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="mechanisms freeze violated"):
+        descent.verify_mechanism_freeze(good)
+
+
+def test_pre_registration_freeze_refuses_a_changed_pre_registration(tmp_path) -> None:
+    """An amendment written to look pre-registered is what §9 exists to prevent."""
+    from manyu.salience import _frozen_digest
+
+    target = tmp_path / "pre-registration.md"
+    target.write_text("# P1\nThe substrate can represent a claim-instance.\n", encoding="utf-8")
+    doc = _freeze_file(tmp_path, "pre_registration", target, _frozen_digest(target),
+                       amendments_at_freeze=["A1"])
+    assert descent.verify_pre_registration_freeze(doc)
+
+    target.write_text("# P1\nThe substrate can, as anticipated, do the thing.\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="pre_registration freeze violated"):
+        descent.verify_pre_registration_freeze(doc)
+
+
+def test_pre_registration_freeze_catches_an_amendment_list_mismatch(tmp_path) -> None:
+    """The quiet failure: digest intact, but the freeze forgot to say what it covers."""
+    from manyu.salience import _frozen_digest
+
+    target = tmp_path / "pre-registration.md"
+    target.write_text("# P1\n", encoding="utf-8")
+    doc = _freeze_file(tmp_path, "pre_registration", target, _frozen_digest(target),
+                       amendments_at_freeze=["A1", "A2"])
+
+    assert descent.verify_pre_registration_freeze(doc, expect_amendments=["A1", "A2"])
+    with pytest.raises(RuntimeError, match="caller expected"):
+        descent.verify_pre_registration_freeze(doc, expect_amendments=["A1", "A2", "A3"])
+
+
+def test_freeze_digests_survive_a_crlf_checkout(tmp_path) -> None:
+    """The guard must fire on tampering, never on a line-ending translation.
+
+    The pre-registration digest was briefly stored over raw bytes from a CRLF
+    working tree. That value would have failed this guard on every LF clone
+    while nothing had been edited — and a guard that fires on checkout gets
+    deleted, leaving the file unprotected while looking protected.
+    """
+    from manyu.salience import _frozen_digest
+
+    lf = tmp_path / "lf.md"
+    lf.write_bytes(b"# P1\nline two\n")
+    crlf = tmp_path / "crlf.md"
+    crlf.write_bytes(b"# P1\r\nline two\r\n")
+    assert _frozen_digest(lf) == _frozen_digest(crlf)
+
+    doc = _freeze_file(tmp_path, "pre_registration", crlf, _frozen_digest(lf))
+    assert descent.verify_pre_registration_freeze(doc)
+
+    crlf.write_bytes(b"# P1\r\nline three\r\n")
+    with pytest.raises(RuntimeError, match="pre_registration freeze violated"):
+        descent.verify_pre_registration_freeze(doc)

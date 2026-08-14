@@ -59,11 +59,12 @@ Entirely offline. Nothing here calls a provider.
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Sequence
 
 FIXTURE_DIR = Path("evals/fixtures/exp08")
 FREEZE_PATH = Path("evals/analysis/exp08/freeze.json")
@@ -673,6 +674,90 @@ def verify_freeze() -> None:
     from manyu.salience import verify_fixture_freeze
 
     verify_fixture_freeze(FREEZE_PATH, experiment="8")
+
+
+def pre_registration_drift(path: Path | str = FREEZE_PATH) -> list[str]:
+    """Report drift in the frozen `pre_registration` block **without raising**.
+
+    The non-raising twin of `verify_pre_registration_freeze`, matching
+    `mechanism_drift`. Offline stages carry this into their artifact so that a
+    pre-registration edited mid-development is visible on every run; the scored
+    run calls the raising form.
+    """
+    from manyu.salience import _drift
+
+    freeze = json.loads(Path(path).read_text(encoding="utf-8"))
+    drifted, missing = _drift(freeze.get("pre_registration", {}))
+    return sorted(drifted + missing)
+
+
+def verify_mechanism_freeze(path: Path | str = FREEZE_PATH) -> dict[str, Any]:
+    """Refuse to proceed if `descent.py` or its mutants changed after freezing.
+
+    The raising counterpart to `mechanism_drift`, and the reason both exist is
+    the split `verify_standards_freeze` already draws: a guard that fires on
+    every development run gets deleted, so the offline stages *report* drift and
+    the scored run *refuses* it.
+
+    Why this block in particular. This experiment's headline candidate is a
+    restraint result — the Manyu arm drawing no edge where the bare arm draws
+    one. A quietly loosened `classify_support` manufactures exactly that, and
+    manufactures it in the flattering direction. There is no downstream number
+    that looks wrong when it happens: slot D still reports zero, and zero is
+    what the finding is made of.
+
+    Called by a scored run and deliberately not by the test suite.
+    """
+    from manyu.salience import _drift, _raise_on_drift
+
+    freeze = json.loads(Path(path).read_text(encoding="utf-8"))
+    _raise_on_drift("mechanisms", *_drift(freeze.get("mechanisms", {})), experiment="8")
+    return freeze
+
+
+def verify_pre_registration_freeze(
+    path: Path | str = FREEZE_PATH, *, expect_amendments: Sequence[str] | None = None
+) -> dict[str, Any]:
+    """Refuse to proceed if the pre-registration changed after freezing.
+
+    A pre-registration is only worth the discipline if the version a result is
+    reported against is the version that was sealed before the result existed.
+    Until this function was written, `grep -rn pre_registration` over `src/`,
+    `evals/` and `tests/` returned nothing: the digest was documentation, in the
+    same state `mechanisms` was in before `mechanism_drift` existed.
+
+    Two failure modes, and the second is the quiet one:
+
+    - the **file** changed after freezing — an amendment written to look
+      pre-registered, which is the defect the whole append-only §9 exists to
+      prevent;
+    - the **amendment list** in the freeze no longer matches what the caller
+      expects, which catches a re-freeze that recorded a new digest and forgot
+      to say which amendments it now covers.
+
+    Digests go through `salience._frozen_digest`, which normalises CRLF to LF.
+    That is not a weakening — see its docstring — and it is required: the hash
+    stored here on 2026-08-14 was briefly taken over raw bytes on a CRLF
+    checkout, which would have failed this guard on any LF clone while nothing
+    had been tampered with at all.
+    """
+    from manyu.salience import _drift, _raise_on_drift
+
+    freeze = json.loads(Path(path).read_text(encoding="utf-8"))
+    block = freeze.get("pre_registration", {})
+    _raise_on_drift("pre_registration", *_drift(block), experiment="8")
+
+    if expect_amendments is not None:
+        for relative, entry in block.items():
+            recorded = list(entry.get("amendments_at_freeze", ()))
+            if recorded != list(expect_amendments):
+                raise RuntimeError(
+                    f"experiment 8 pre_registration freeze violated — {relative} is frozen at "
+                    f"amendments {recorded}, caller expected {list(expect_amendments)}. The "
+                    f"digest matches, so the file is intact; the freeze record and the caller "
+                    f"disagree about which amendments the sealed version contains."
+                )
+    return freeze
 
 
 def mechanism_drift(path: Path | str = FREEZE_PATH) -> list[str]:
