@@ -6,6 +6,7 @@
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-14 (k) re-frozen for A17, which gives the record vocabulary an `undetermined` flag on an asserted descent and wires suspension for the first time. Before this NOTHING supplied undetermined_pairs, so suspension_correct returned False on every slot whatever the key said -- a registered dimension returning a constant in the shape of a failed prediction, meaning P8 could not have been tested at all. Slot B's two O'Raifeartaigh & Mitton witness-dependence assertions are flagged; the mechanism derives exactly those two pairs. Scored against the provisional model key suspension_correct is False, and against the same key with its two spurious marks removed it is True -- so the dimension discriminates, and the first thing it discriminated was an error in a model-written key. Still no scored arm run.",
     "2026-08-14 (j) mechanisms, standards and pre_registration all re-frozen, and for the first time all three are ENFORCED. descent.verify_mechanism_freeze and verify_pre_registration_freeze added; four tests in test_exp08_properties.py pin them, including one that a CRLF checkout must not trip the guard. Also CORRECTS AN ERROR: the pre-registration digest recorded on 2026-08-14 (g) and (h) was taken with raw hashlib.sha256 over working-tree bytes instead of salience._frozen_digest, so it was the CRLF value and would have failed on any LF clone. The earlier log entry's claim that this was an unfixable fragility was wrong -- the house helper had solved it, and the freeze script simply had not used it. Still no scored arm run.",
     "2026-08-14 (i) pre-registration.md re-frozen for A16, settling the span question A15 left open. `a misplaced decimal point` occurs verbatim in all three rekdal2014 excerpts and the corpus recorded it only for the two Bender documents -- a breach of the shared-span rule, not a judgement, and one the transcription commit had actively denied by claiming Rekdal paraphrases rather than quotes. Recorded rather than excluded: A5's exclusion of 'biggest blunder' covered two tokens naming the legend, this is four tokens describing it, and the principle both share is that the CORPUS RECORDS EVIDENCE AND THE KEY RECORDS BELIEF. Slot E 3 edges -> 9. Surfaced by checking a model draft key against the corpus, which showed the corpus wrong. Still no scored arm run.",
     "2026-08-14 (h) pre-registration.md re-frozen for A15, which SUSPENDS FR-2: key_A, key_B and key_E are installed from model-authored drafts at the experimenter's explicit and repeated instruction. The keys themselves are deliberately NOT added to `files`. Scored before writing the amendment, slot A returns precision 1.0 and recall 1.0 -- exactly P3's registered criterion -- which is the clearest possible statement of what FR-2 was for: a prediction meant to be hard to satisfy, satisfied immediately by a key that agrees with the mechanism because both read the same documents the same way. P3 IS NOT CONFIRMED. No stage 1-3 number against these keys may be reported as a measurement. Still no scored arm run.",
@@ -24,7 +25,7 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "a2e2753ee99e0250d2f4fefafd8a0ff2e191f3abcd77545968fe14405251497a",
+      "sha256": "0f7f052816965b7790ce454b935cdccbbffac0b413045f66f8a069e19568d0d5",
       "amendments_at_freeze": [
         "A1",
         "A2",
@@ -41,7 +42,8 @@
         "A13",
         "A14",
         "A15",
-        "A16"
+        "A16",
+        "A17"
       ]
     }
   },
@@ -65,7 +67,7 @@
       "role": "defect_battery_including_the_section_6_3_capability_check"
     },
     "tests/test_exp08_properties.py": {
-      "sha256": "eb52f32a26677b940ef15f15792acc586004c6c2784388bc61ff5869707e656c",
+      "sha256": "34b036c32d97f2b5b63bfcfeb726992eebf383f912119f2b2e36973272cdf886",
       "role": "structural_prohibitions_no_aggregate_no_threshold_no_arm_branch_and_mutation_precedence"
     },
     "evals/analysis/exp08/generate_slot_d.py": {
@@ -75,7 +77,7 @@
   },
   "mechanisms": {
     "src/manyu/descent.py": {
-      "sha256": "262db4e5976e66a33658a5bfc1eb63f85732e88cc66b365d0f2d5aa6aee0c60a",
+      "sha256": "6a80af420f4c251c322767f7b9e062790880b0b50ec3b3038c75cbe53339d8ad",
       "role": "derivation_and_scoring_no_threshold_declared"
     },
     "src/manyu/descent_mutants.py": {

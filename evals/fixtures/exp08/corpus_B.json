@@ -297,7 +297,8 @@
       "cited_by": [
         "B.gamow1956.c1",
         "B.wheeler2000.c1"
-      ]
+      ],
+      "undetermined": true
     },
     {
       "evidence_id": "ev_B_assert_om_raises_gamow_to_alpher",
@@ -308,7 +309,8 @@
       "cited_by": [
         "B.gamow1956.c1",
         "B.alpher1998.c1"
-      ]
+      ],
+      "undetermined": true
     },
     {
       "evidence_id": "ev_B_assert_livio_asserts_segre_folsing_repeat",

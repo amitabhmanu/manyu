@@ -995,3 +995,46 @@ Rekdal loci; `bender* → p640_bare` classifies as `rewording` and the other fou
 `attribution_shift`, since the three Rekdal instances differ only in the citation that
 follows them. No key is frozen, no arm has been scored, and slot E's corpus is not in
 `freeze.json`.
+
+### A17 — 2026-08-14: an assertion may be *raised and declined*, and suspension is wired
+
+**Decision: the record vocabulary gains an optional `undetermined` flag on an asserted
+descent.** `descent.undetermined_from_records` derives pairs from it and hands them to
+`reconstruct`, which continues to mark what it is told and decide nothing.
+
+**What it fixes.** Until now the vocabulary had one word for two different acts. A document
+that *asserts* X descended from Y and a document that *raises* the possibility and argues
+against it were both recorded as `assertion`, so both produced a confident `TESTIMONY` edge.
+Slot B carries the clean case: O'Raifeartaigh & Mitton write that Wheeler and Alpher may have
+been influenced by Gamow's recollections, then answer *"it seems a stretch to accuse three
+different scientists of invention"*. The corpus was recording the first half and discarding
+the second, and slot B's `known_gaps` has said so since the day those edges were built.
+
+**The second thing it fixes, which was worse.** Nothing anywhere supplied
+`undetermined_pairs`. `suspension_correct` was therefore `False` on every slot regardless of
+what any key said — a whole registered dimension returning a constant, and returning it in
+the shape of a failed prediction. **P8 could not have been tested at all.**
+
+**What the flag does and does not claim.** It records what the *asserting document did*: it
+raised a descent and did not settle it. It does not claim the edge is undetermined in fact.
+The key marks `undetermined` separately, from the documents, so the dimension still compares
+two authorships rather than reading one back.
+
+**The risk this creates, stated rather than managed away.** A corpus author who flags freely
+turns `suspension_correct` into a read-back. Two things hold against it: the key is authored
+independently, and the flag is a structured form of a sentence that is already in the corpus
+as text, not privileged information handed to one arm. **If a bare arm is ever handed the
+evidence records rather than the documents, the second protection lapses and this dimension
+stops measuring anything.** Whoever builds the arms owns that.
+
+**Demonstrated on slot B before this was written.** The mechanism derives exactly the two
+pairs `gamow1956 → wheeler2000` and `gamow1956 → alpher1998` and marks those edges. Scored
+against the provisional model key (A15) `suspension_correct` is `False`, because that key
+also marks two pairs pointing at O'Raifeartaigh & Mitton's own quoting loci rather than at
+the witnesses; scored against the same key with those two removed it is `True`. The dimension
+discriminates a right key from a wrong one, which is the only property that makes it worth
+scoring — and the first thing it discriminated was an error in a model-written key.
+
+**Not applied to slots A or E.** Neither carries an assertion whose source raises a descent
+and declines it, so neither gains a flag. Slot A's undetermined origin edges have an absent
+endpoint and form no edge at all; that is a different condition (A9) and is left alone.

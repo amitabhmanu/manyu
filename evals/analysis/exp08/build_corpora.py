@@ -247,8 +247,8 @@ SLOT_B: dict[str, Any] = {
         # two endpoints in one document: no edge (siblings) AND no entry in
         # unresolved_assertions, so it vanished exactly as slot A's did. Same trap, second
         # slot, one commit apart.
-        ("om_raises_gamow_to_wheeler", "oraifeartaigh2018", "gamow1956 -> wheeler2000, EXPLICITLY UNDETERMINED", "O&M state it themselves and decline to settle it: 'It is of course possible that both Wheeler and Alpher were influenced by Gamow's recollections. However, it seems a stretch to accuse three different scientists of invention.' BOTH endpoints are in the corpus, so this produces a TESTIMONY edge -- and that OVERSTATES the source. The vocabulary can say 'a third document asserts this descent'; it cannot say 'a third document raises this descent and declines to affirm it'. The key must mark this edge undetermined, and the gap between what O&M wrote and what the graph can hold is a finding for results.md, not something to hide by dropping the assertion.", ["B.gamow1956.c1", "B.wheeler2000.c1"]),
-        ("om_raises_gamow_to_alpher", "oraifeartaigh2018", "gamow1956 -> alpher1998, EXPLICITLY UNDETERMINED", "The second half of the same sentence, recorded separately because the two witnesses are independent of each other and an arm may well suspend on one and not the other. Same overstatement caveat as om_raises_gamow_to_wheeler.", ["B.gamow1956.c1", "B.alpher1998.c1"]),
+        ("om_raises_gamow_to_wheeler", "oraifeartaigh2018", "gamow1956 -> wheeler2000, EXPLICITLY UNDETERMINED", "O&M state it themselves and decline to settle it: 'It is of course possible that both Wheeler and Alpher were influenced by Gamow's recollections. However, it seems a stretch to accuse three different scientists of invention.' BOTH endpoints are in the corpus, so this produces a TESTIMONY edge -- and that OVERSTATES the source. The vocabulary can say 'a third document asserts this descent'; it cannot say 'a third document raises this descent and declines to affirm it'. The key must mark this edge undetermined, and the gap between what O&M wrote and what the graph can hold is a finding for results.md, not something to hide by dropping the assertion.", ["B.gamow1956.c1", "B.wheeler2000.c1"], True),
+        ("om_raises_gamow_to_alpher", "oraifeartaigh2018", "gamow1956 -> alpher1998, EXPLICITLY UNDETERMINED", "The second half of the same sentence, recorded separately because the two witnesses are independent of each other and an arm may well suspend on one and not the other. Same overstatement caveat as om_raises_gamow_to_wheeler.", ["B.gamow1956.c1", "B.alpher1998.c1"], True),
         ("livio_asserts_segre_folsing_repeat", "livio2013", "gamow1970 -> segre2011 and gamow1970 -> folsing1997", "The propagation half, asserted but not holdable: Livio names Segre as concluding the remark was made during 'World War II Princeton talks' and Folsing as having 'repeated the alleged biggest blunder citation'. Neither book is obtained and neither is quoted verbatim, so both downstream endpoints are absent (A9).", ["B.livio2013.verdict"]),
     ],
     "known_gaps": [
@@ -362,11 +362,19 @@ def build(spec: dict[str, Any]) -> dict[str, Any]:
     # first-order claim of its own.
     for assertion in spec["assertions"]:
         assertion_id, asserted_by, claims, note = assertion[:4]
-        evidence.append({
+        record = {
             "evidence_id": f"ev_{slot}_assert_{assertion_id}", "source_id": asserted_by,
             "record_kind": "assertion", "claims": claims, "summary": note,
             "cited_by": list(assertion[4]) if len(assertion) > 4 else [],
-        })
+        }
+        # A17: a sixth element marks an assertion the asserting document RAISED AND
+        # DECLINED to settle. Without it the vocabulary can only say `asserted`, and
+        # a raised-and-declined descent comes out TESTIMONY -- stronger than the
+        # source. It records what the document did, never that the edge is
+        # undetermined in fact; the key says that, independently.
+        if len(assertion) > 5 and assertion[5]:
+            record["undetermined"] = True
+        evidence.append(record)
 
     instances = []
     for iid, source_id, locus, locus_note, excerpt, span_ids, attributed, note in spec["instances"]:

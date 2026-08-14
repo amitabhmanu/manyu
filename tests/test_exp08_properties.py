@@ -533,3 +533,67 @@ def test_freeze_digests_survive_a_crlf_checkout(tmp_path) -> None:
     crlf.write_bytes(b"# P1\r\nline three\r\n")
     with pytest.raises(RuntimeError, match="pre_registration freeze violated"):
         descent.verify_pre_registration_freeze(doc)
+
+
+# ---------------------------------------------------------------------------
+# A17 — the corpus can say a descent was RAISED AND DECLINED, not merely
+# asserted. Before this, `suspension_correct` was False on every slot whatever
+# the key said, because nothing ever supplied `undetermined_pairs`.
+# ---------------------------------------------------------------------------
+
+
+def _b_pair(name: str, source: str, published: str, records: tuple[str, ...]) -> ClaimInstance:
+    return ClaimInstance(
+        instance_id=name, belief_key=f"k.{name}", source_id=source,
+        published=published, excerpt=f"excerpt for {name}", evidence_ids=records,
+        attributed_to=None,
+    )
+
+
+def test_undetermined_is_derived_from_the_flagged_record_not_declared_per_edge() -> None:
+    """The flag lives on the ASSERTION; the pairs come from who cites it."""
+    rec = "ev_X_assert_raised"
+    instances = [
+        _b_pair("X.early.c1", "early", "1956-01-01", (rec,)),
+        _b_pair("X.late.c1", "late", "2000-01-01", (rec,)),
+    ]
+    assert descent.undetermined_from_records(instances, [rec]) == (
+        ("X.early.c1", "X.late.c1"),
+    )
+    # No flag, no pairs — the default must stay empty, or every testimony edge
+    # would silently become suspended.
+    assert descent.undetermined_from_records(instances, []) == ()
+
+
+def test_undetermined_never_pairs_two_loci_of_one_document() -> None:
+    """Siblings are declined as edges, so they must not arrive as suspensions."""
+    rec = "ev_X_assert_raised"
+    instances = [
+        _b_pair("X.doc.a", "doc", "1956-01-01", (rec,)),
+        _b_pair("X.doc.b", "doc", "1956-01-01", (rec,)),
+    ]
+    assert descent.undetermined_from_records(instances, [rec]) == ()
+
+
+def test_reconstruct_marks_only_what_it_is_handed() -> None:
+    """`reconstruct` decides nothing about suspension — the separation A17 keeps.
+
+    If this ever fails because the module started deriving suspension itself,
+    the dimension has become a string this module chose rather than a state
+    derived from the record, which is what P8's falsifier turns on.
+    """
+    # Exactly ONE shared record, from a third document — the testimony profile.
+    # Sharing two records here matches no support pattern and yields no edge at
+    # all, which is what a first draft of this test actually produced.
+    rec = "ev_X_assert_raised"
+    instances = [
+        _b_pair("X.early.c1", "early", "1956-01-01", (rec,)),
+        _b_pair("X.late.c1", "late", "2000-01-01", (rec,)),
+    ]
+    sources = {rec: "third"}
+    bare = reconstruct(instances, sources, slot="X", arm="m", snapshot_id="s")
+    assert all(not edge.undetermined for edge in bare.edges)
+
+    told = reconstruct(instances, sources, slot="X", arm="m", snapshot_id="s",
+                       undetermined_pairs=[("X.early.c1", "X.late.c1")])
+    assert [e.undetermined for e in told.edges] == [True]

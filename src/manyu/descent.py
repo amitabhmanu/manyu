@@ -422,6 +422,50 @@ def classify_mutation(
     return MutationOp.NONE
 
 
+def undetermined_from_records(
+    instances: Iterable[ClaimInstance], undetermined_records: Iterable[str]
+) -> tuple[tuple[str, str], ...]:
+    """Pairs an asserting document *raised and declined to settle* (A17).
+
+    Deliberately **not** part of `reconstruct`, which marks what it is told and
+    decides nothing about suspension. Keeping the derivation out here is what
+    lets `undetermined_pairs` arrive either from this function or from
+    `underdetermination.derive` without `reconstruct` knowing which.
+
+    **What the flag records, and what it does not.** It is a fact about the
+    *asserting document's own text* — O'Raifeartaigh & Mitton write that Wheeler
+    and Alpher may have been influenced by Gamow and then argue against it. Before
+    A17 the vocabulary could only say `asserted`, so those edges came out
+    `TESTIMONY`, which is stronger than what the source wrote. The flag does not
+    say the edge is undetermined *in fact*; it says a document raised it and did
+    not settle it.
+
+    **The risk this creates, recorded rather than hidden.** A corpus author who
+    flags whatever they like makes `suspension_correct` a read-back. Two things
+    hold against that and neither is decorative: the key marks `undetermined`
+    independently, so scoring still compares two authorships; and the flag is a
+    structured form of a sentence both arms can already read in the corpus, not
+    privileged information handed to one of them. If a bare arm is ever given the
+    records rather than the documents, that second protection lapses and this
+    dimension stops measuring anything.
+    """
+    flagged = set(undetermined_records)
+    if not flagged:
+        return ()
+    ordered = sorted(instances, key=lambda item: (item.published, item.instance_id))
+    pairs: list[tuple[str, str]] = []
+    for record in sorted(flagged):
+        citing = [item for item in ordered if record in item.evidence_ids]
+        for index, ancestor in enumerate(citing):
+            for descendant in citing[index + 1 :]:
+                if ancestor.source_id == descendant.source_id:
+                    continue
+                if ancestor.published == descendant.published:
+                    continue
+                pairs.append((ancestor.instance_id, descendant.instance_id))
+    return tuple(sorted(set(pairs)))
+
+
 def reconstruct(
     instances: Iterable[ClaimInstance],
     record_sources: dict[str, str],
