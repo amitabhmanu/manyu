@@ -19,7 +19,9 @@ exports, and future ADRs.
 - [Experiments Backlog](experiments_backlog.md): dependency-ordered sequence of
   the ten experiments, with status tracking.
 - [Experiments folder](experiments/README.md): per-experiment requirements,
-  design, results, retrospective.
+  design, results, retrospective — and the **standing methodology rules** that
+  bind every experiment, currently **MS-1** (every scored dimension must be
+  shown capable of at least two values before any of its numbers are reported).
 
 ## Demo Notes
 

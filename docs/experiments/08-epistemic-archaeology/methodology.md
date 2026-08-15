@@ -9,6 +9,14 @@ pre-registration; why it is shaped this way is in the requirements. The division
 matters because this file may be edited during the experiment and the
 pre-registration may not.
 
+**This experiment is where [MS-1](../README.md#ms-1--every-scored-dimension-must-be-shown-capable-of-at-least-two-values)
+came from, and it satisfies it unevenly.** Slot D's restraint dimension had a
+capability check from the start (§6.3, the similarity mutant drawing 15 of 15).
+`suspension_correct` had none and spent the whole offline period returning a
+constant that read as a failed prediction. Later experiments should apply MS-1 to
+**every** dimension at pre-registration rather than to the one that looks
+fragile.
+
 ## 1. Running the offline stages
 
 Stages −1 and 0 consume no provider and are deterministic under `FrozenClock`.
