@@ -6,6 +6,7 @@
   "_key_note": "Answer keys are frozen alongside the corpora but are never loaded by `descent.reconstruct`. An answer key is expected output, which the house `expect`-block convention forbids in a fixture; keeping keys in separate `role: answer_key` files is what preserves that convention everywhere else.",
   "_mechanism_note": "`descent.py` is frozen before any scored arm runs. Because this experiment's headline candidate is a restraint result — the bare arm drawing edges where the Manyu arm draws none — a silently loosened support rule is the exact defect that would manufacture it. NOTHING IN THE SUBSTRATE ENFORCES THIS BLOCK: `verify_fixture_freeze` reads `files` only and `verify_standards_freeze` reads `standards` (salience.py:770, :793). `descent.mechanism_drift()` reports drift without raising and the offline runners record it into their artifact; THE PAID RUNNER MUST ENFORCE IT. Until that runner exists, this block is documentation backed by a report, not a guard.",
   "_refreeze_log": [
+    "2026-08-14 (q) re-frozen for A21, which records that SUSPENSION IS MEASURED AS TRANSPORT RATHER THAN AS JUDGEMENT. descent.py's docstring describes suspension as derived by underdetermination.derive over materialised rival claims -- 'a state the store holds' rather than 'a string this module chose' -- and grep returns five matches for that module in descent.py, ALL OF THEM PROSE. It is never imported. A17 built a corpus flag read through to the score instead, which is the condition the docstring itself names as fatal to P8's falsifier. A17 stands and was necessary -- before it the dimension returned a constant in the shape of a refutation -- but what it measures is that the pipeline does not flatten a hedge, not that the substrate can recognise one. Binding on reporting if the arms run first. Still no scored arm run.",
     "2026-08-14 (p) A20: corpus_{A,B,E}.json and key_{A,B,E}.json enter `files`. Freezing had been doing two jobs under one name -- DRIFT DETECTION (nothing moved between a capture and its score) and COMMITMENT (this is the artifact of record). A15 refused the second and, with one lever, got neither, so the three least trustworthy files were also the only ones nothing watched. The provisional entries carry the distinction in their `role` strings. The corpora go in too and that is the more important half: slot E moved 3 edges -> 9 on A16 alone, and a key pinned to a moving corpus pins nothing. Nine of key_B's edges still claim textual descent with no shared evidence and are frozen as-is, repeated in the amendment because a freeze makes a file harder to change and easier to trust. P3 still unconfirmed. Nothing captured; no provider has been called.",
     "2026-08-14 (o) arms.py added to `mechanisms` and test_exp08_arms.py to `standards`. arms.py is frozen because document_bundle is where an answer would leak: it is built by WHITELIST, so a corpus field added later cannot reach an arm by default, and loosening that to a blacklist is the one edit that would hand a bare arm the discriminator it is being asked to reproduce (A17's lapse condition, A19 constraint 2). The stages runner is offline and reads captures, so it needs no freeze of its own. NOTHING HAS BEEN CAPTURED and no provider has been called.",
     "2026-08-14 (n) re-frozen for A19, which registers a THIRD arm -- bare_agent, a model inside an agent harness with the transcribed documents on disk -- while arms.py does not exist and no arm has been scored. It is an ADDITION, never a substitution: running the harness instead of section 8's single-pass arm would swap the question from 'what does the substrate add over a stock model' to 'over an agent harness' without the pre-registration saying so. Two constraints are load-bearing rather than stylistic: network denied, because section 4 excludes retrieval as a confound between corpus quality and reconstruction quality; and the arm gets the DOCUMENTS, never corpus_*.json, because A17 states that handing a bare arm the evidence records kills the suspension dimension, and this is the arm with a filesystem. P11 registered with it. Still no scored arm run.",
@@ -30,7 +31,7 @@
   "stages_frozen": "-1 and 0 (offline). Stages 1-3 are paid and unrun; their fixtures do not exist yet.",
   "pre_registration": {
     "docs/experiments/08-epistemic-archaeology/pre-registration.md": {
-      "sha256": "c3231e39fc7ee7f8bfa425943b3bacf79c7660042835b50efce2edc96f609afd",
+      "sha256": "2f7112a0807e98ac40c65432ce3b51d4059a9c8bb740e1ff33ab01973ee1f5b3",
       "amendments_at_freeze": [
         "A1",
         "A2",
@@ -51,7 +52,8 @@
         "A17",
         "A18",
         "A19",
-        "A20"
+        "A20",
+        "A21"
       ]
     }
   },

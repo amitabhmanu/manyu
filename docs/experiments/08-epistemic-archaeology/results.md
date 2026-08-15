@@ -4,7 +4,7 @@
 **Date:** 2026-08-14
 **Requirements:** [requirements.md](requirements.md) · **Methodology:** [methodology.md](methodology.md) · **Pre-registration:** [pre-registration.md](pre-registration.md)
 **Artifacts:** `evals/analysis/exp08/{stage_minus1,stage0}.jsonl` · `freeze.json`
-**Amendments at time of writing:** A1–A20.
+**Amendments at time of writing:** A1–A21.
 
 > **Nothing in this document is a measurement of reconstruction accuracy.** The
 > answer keys for slots A, B and E were drafted by a language model and validated
@@ -118,7 +118,26 @@ prediction*.
 > **A paid run would have reported P8 as refuted when nothing had been measured.**
 
 Caught offline, by building a worked example on an invented slot rather than by
-reading the code.
+reading the code — a hand-written key that was correct by construction still
+scored `False`, which is impossible unless the plumbing is broken.
+
+**And the fix is narrower than it looks (A21).** `descent.py`'s docstring
+describes suspension as derived by `underdetermination.derive` over materialised
+rival claims — *"a state the store holds"* rather than *"a string this module
+chose"*. `grep -rn underdetermination src/manyu/descent.py` returns five matches,
+**all of them prose**; the module is never imported. What A17 built reads an
+`undetermined` flag off the corpus and carries it through.
+
+So what this dimension measures today is **transport fidelity** — the corpus
+records that O'Raifeartaigh & Mitton raised a descent and declined it, and the
+pipeline does not flatten that on the way to the score. A bare model may well
+fail it, and that difference is worth having. But it is **not** judgement: nothing
+tests whether the substrate can recognise an undetermined edge with no fixture
+saying so.
+
+> **If the arms run before A21 is closed, P8 is tested as transport, not as
+> judgement**, and no `suspension_correct` figure may be described as the
+> substrate holding an edge open on its own account.
 
 ## 9. Guards that were documentation
 

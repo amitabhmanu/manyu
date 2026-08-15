@@ -1190,3 +1190,59 @@ sides go in together or neither does.
 lose the provisional clause, and A15's suspension of FR-2 ends. The digests change and the
 freeze log records it, which is the same path any re-freeze takes — the point of freezing them
 now is that the change will be *visible* rather than silent.
+
+### A21 — 2026-08-14: suspension is measured as transport, not as judgement
+
+**Recorded as a limitation, not fixed here.** `descent.py`'s module docstring describes a
+suspension mechanism that does not exist, and A17 built a weaker one without saying so. This
+amendment states the gap so that no result can be read as more than it is.
+
+**What the docstring promises.**
+
+> Where the record cannot settle an edge, the contested edge is materialised as a
+> claim-instance in its own right and `underdetermination.derive` decides. Writing a hedging
+> rule in this module would reinvent experiment 5 and — worse — would make suspension **a
+> string this module chose rather than a state the store holds, which is exactly what P8's
+> falsifier turns on.**
+
+**What exists.** `undetermined_from_records` reads an `undetermined: true` flag off a corpus
+assertion and hands the pairs to `reconstruct`, which marks them. `grep -rn underdetermination
+src/manyu/descent.py` returns **five matches, all of them prose**. The module is never
+imported and `derive` is never called.
+
+So suspension is currently closer to *a value the fixture chose* than to *a state the store
+holds* — which is the condition the docstring names as fatal to P8's falsifier. The warning
+describes what got built.
+
+**What this does and does not invalidate.**
+
+- The A17 work stands and was necessary. Before it, `suspension_correct` returned `False` on
+  every slot regardless of any key — a constant in the shape of a refutation. That is fixed,
+  and the dimension now discriminates: `False` against the provisional key, `True` against the
+  same key with its two wrong rows corrected.
+- What is measured is **transport fidelity**: the corpus records that O'Raifeartaigh & Mitton
+  raised a descent and declined to settle it, and the pipeline carries that to the score
+  without flattening it. That is a real property and a bare model may well fail it.
+- What is **not** measured is judgement: whether the substrate can recognise an undetermined
+  edge from evidence it holds, with nothing in the fixture saying so.
+
+**Binding on reporting.** If stages 1–3 run before this is closed, `results.md` must say that
+**P8 was tested as transport rather than as judgement**, and no `suspension_correct` figure may
+be described as the substrate holding an edge open on its own account. A between-arm difference
+on this dimension remains reportable — carrying a hedge faithfully is a difference worth
+having — but it must be named as what it is.
+
+**The route that would close it, specified now so the choice is not made later under pressure.**
+Materialise the two verdicts as **rival claims about the same edge**: Livio's *"he never
+actually called it the biggest blunder"* and O'Raifeartaigh & Mitton's *"very likely that he
+labelled the term his biggest blunder"* are claim-instances that contradict each other about
+`gamow1956`'s ancestry. `underdetermination.derive` finds rival sets over stored candidates —
+`evidence_overlap` between those two is high and neither dominates. Suspension would then be
+**derived from two documents disagreeing**, which is the situation slot B was chosen for, and
+no corpus flag would decide it.
+
+**Why the flag is not simply removed.** It is faithful to something real: a document *can*
+raise a descent and decline it, and that fact belongs in the record whatever the mechanism
+later does with it. The two routes are complementary — the flag records what a source said,
+`derive` would decide what the corpus establishes. Keeping both, and being clear which one a
+number came from, is the honest arrangement.
